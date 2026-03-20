@@ -1,0 +1,139 @@
+[
+  {
+    "id": "minecraft",
+    "name": "Minecraft",
+    "templateImage": "/images/minecraft.webp",
+    "description": "Minecraft Java Edition server with Paper/Purpur/Vanilla support",
+    "defaultPort": 25565,
+    "docker": {
+      "image": "itzg/minecraft-server",
+      "tag": "latest",
+      "ports": [
+        25565
+      ],
+      "env": {
+        "EULA": "TRUE",
+        "MEMORY": "2G",
+        "ENABLE_RCON": "false",
+        "CREATE_CONSOLE_IN_PIPE": "true"
+      },
+      "volumes": [
+        "{BOT_DIR}:/data"
+      ],
+      "console": {
+        "type": "mc-pipe"
+      },
+      "command": "",
+      "restart": "unless-stopped"
+    }
+  },
+  {
+    "id": "nodejs",
+    "name": "Node.js",
+    "templateImage": "/images/nodejs.webp",
+    "description": "Run Node.js applications and Discord bots",
+    "defaultPort": 3000,
+    "docker": {
+      "image": "node",
+      "tag": "20-alpine",
+      "ports": [
+        3000
+      ],
+      "env": {
+        "NODE_ENV": "production"
+      },
+      "volumes": [
+        "{BOT_DIR}:/app"
+      ],
+      "command": "sh -c \"cd /app && npm install && node /app/index.js\"",
+      "restart": "unless-stopped",
+      "console": {
+        "type": "stdin"
+      }
+    }
+  },
+  {
+    "id": "csgo",
+    "name": "CS:GO",
+    "templateImage": "https://cdn.cloudflare.steamstatic.com/steam/apps/730/header.jpg",
+    "description": "Counter-Strike: Global Offensive dedicated server",
+    "defaultPort": 27015,
+    "docker": {
+      "image": "cm2network/csgo",
+      "tag": "sourcemod",
+      "ports": [
+        27015,
+        27020,
+        27005
+      ],
+      "env": {
+        "SRCDS_TOKEN": "",
+        "SRCDS_RCONPW": "changeme",
+        "SRCDS_PW": "",
+        "SRCDS_MAXPLAYERS": "16"
+      },
+      "volumes": [
+        "{BOT_DIR}:/home/steam/csgo-dedicated"
+      ],
+      "command": "",
+      "restart": "unless-stopped",
+      "console": {
+        "type": "stdin"
+      }
+    }
+  },
+  {
+    "id": "fivem",
+    "name": "FiveM",
+    "templateImage": "https://logos-world.net/wp-content/uploads/2021/03/FiveM-Symbol.png",
+    "description": "ADPanel helps you run FiveM servers very easy",
+    "defaultPort": 30120,
+    "docker": {
+      "image": "ich777/fivemserver",
+      "tag": "latest",
+      "ports": [
+        30120,
+        30110
+      ],
+      "env": {
+        "LICENSE_KEY": "",
+        "RCON_PASSWORD": "changeme",
+        "GAME_CONFIG": "server.cfg",
+        "FIVEM_TXADMIN_PORT": "40120"
+      },
+      "volumes": [
+        "{BOT_DIR}:/serverdata/serverfiles"
+      ],
+      "command": "",
+      "restart": "unless-stopped",
+      "console": {
+        "type": "stdin"
+      }
+    }
+  },
+  {
+    "id": "python",
+    "name": "Python",
+    "templateImage": "https://stalwart-pegasus-2c2ca4.netlify.app/img/python-logo.webp",
+    "description": "Run framworks or programs using python",
+    "defaultPort": 8000,
+    "docker": {
+      "image": "python",
+      "tag": "3.12-slim",
+      "ports": [
+        8000
+      ],
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "volumes": [
+        "{BOT_DIR}:/app"
+      ],
+      "command": "sh -c \"cd /app && pip install -r requirements.txt 2>/dev/null; python main.py\"",
+      "restart": "unless-stopped",
+      "console": {
+        "type": "stdin"
+      }
+    }
+  }
+]

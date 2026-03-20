@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+  "listenHost": "0.0.0.0",
+  "port": "5432",
+  "connectHost": "127.0.0.1",
+  "users": [
+    {
+      "email": "admin@gmail.com",
+      "pgUser": "admin",
+      "createdAt": 1773778293586
+    }
+  ],
+  "setupAt": 1773778293586
+}

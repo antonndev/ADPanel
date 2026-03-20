@@ -1,0 +1,13 @@
+{
+  "enabled": false,
+  "scheduled_at": null,
+  "enabled_by": null,
+  "enabled_at": null,
+  "reason": null,
+  "pre_alert": {
+    "show": false,
+    "message": null,
+    "minutes_before": null
+  },
+  "previous_alert_backup": null
+}

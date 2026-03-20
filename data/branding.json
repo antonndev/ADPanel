@@ -1,0 +1,12 @@
+{
+  "appName": "ADPanel",
+  "logoUrl": "https://cdn.jsdelivr.net/gh/antonndev/ADCDn/adpanel-dark.webp",
+  "localLogoPath": null,
+  "loginWatermarkUrl": "https://cdn.jsdelivr.net/gh/antonndev/ADCDn/watermark.webp",
+  "localLoginWatermarkPath": null,
+  "loginBackgroundType": "image",
+  "loginBackgroundExternalUrl": "https://cdn.jsdelivr.net/gh/antonndev/ADCDn/waves.png",
+  "localLoginBackgroundPath": "login-background-remote-80a53467cc608e86.png",
+  "loginBackgroundMimeType": "image/png",
+  "updatedAt": "2026-03-17T08:25:27.504Z"
+}

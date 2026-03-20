@@ -1,0 +1,27 @@
+# /etc/sudoers.d/adpanel-panel
+# Allow the adpanel user to run specific system commands needed by the panel
+# WITHOUT a password prompt. This enables the panel to drop from root
+# to the adpanel user while retaining the ability to manage nginx/apache.
+
+# Nginx operations
+adpanel ALL=(root) NOPASSWD: /usr/bin/nginx -t
+adpanel ALL=(root) NOPASSWD: /usr/sbin/nginx -t
+adpanel ALL=(root) NOPASSWD: /usr/bin/systemctl restart nginx
+adpanel ALL=(root) NOPASSWD: /usr/bin/systemctl reload nginx
+adpanel ALL=(root) NOPASSWD: /usr/bin/systemctl status nginx
+
+# Apache operations (for phpMyAdmin)
+adpanel ALL=(root) NOPASSWD: /usr/bin/systemctl restart apache2
+adpanel ALL=(root) NOPASSWD: /usr/bin/systemctl reload apache2
+adpanel ALL=(root) NOPASSWD: /usr/bin/systemctl status apache2
+adpanel ALL=(root) NOPASSWD: /usr/sbin/service apache2 restart
+
+# Tee for writing to /etc/nginx/snippets (safer than direct write as root)
+adpanel ALL=(root) NOPASSWD: /usr/bin/tee /etc/nginx/snippets/*
+
+# Sed for modifying nginx site configs
+adpanel ALL=(root) NOPASSWD: /usr/bin/sed -i * /etc/nginx/sites-available/*
+adpanel ALL=(root) NOPASSWD: /usr/bin/sed -i * /etc/nginx/sites-enabled/*
+
+# Ln for enabling apache sites
+adpanel ALL=(root) NOPASSWD: /usr/bin/ln -sf /etc/apache2/sites-available/* /etc/apache2/sites-enabled/*

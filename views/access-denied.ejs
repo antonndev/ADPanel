@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADPanel - Access Denied</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/css/bot.css">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+  <link id="favicon" rel="icon" type="image/png" href="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/adpanel-dark.webp" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+  <style nonce="<%= cspNonce %>">
+    *,
+    *::before,
+    *::after {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    img,
+    video,
+    canvas {
+      -webkit-user-drag: none;
+      user-drag: none;
+    }
+  </style>
+  <script nonce="<%= cspNonce %>">
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('dragstart', e => e.preventDefault());
+    document.addEventListener('selectstart', e => e.preventDefault());
+    document.addEventListener('copy', e => e.preventDefault());
+    document.addEventListener('cut', e => e.preventDefault());
+    document.addEventListener('keydown', e => {
+      if ((e.ctrlKey || e.metaKey) && ['c', 'C', 'a', 'A', 's', 'S', 'u', 'U'].includes(e.key)) e.preventDefault();
+    });
+  </script>
+</head>
+
+<body>
+  <div class="access-denied-container">
+    <div class="access-denied-particles">
+      <div class="access-denied-particle"></div>
+      <div class="access-denied-particle"></div>
+      <div class="access-denied-particle"></div>
+      <div class="access-denied-particle"></div>
+      <div class="access-denied-particle"></div>
+      <div class="access-denied-particle"></div>
+      <div class="access-denied-particle"></div>
+      <div class="access-denied-particle"></div>
+      <div class="access-denied-particle"></div>
+    </div>
+
+    <div class="access-denied-card">
+      <div class="access-denied-decor access-denied-decor-1"></div>
+      <div class="access-denied-decor access-denied-decor-2"></div>
+
+      <div class="sad-robot-container">
+        <svg class="sad-robot" viewBox="0 0 130 140" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="robot-head-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color:#4b5563" />
+              <stop offset="50%" style="stop-color:#374151" />
+              <stop offset="100%" style="stop-color:#1f2937" />
+            </linearGradient>
+            <linearGradient id="robot-body-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color:#374151" />
+              <stop offset="100%" style="stop-color:#1f2937" />
+            </linearGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+              <feMerge>
+                <feMergeNode in="coloredBlur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+
+          <ellipse class="sad-robot-shadow" cx="65" cy="135" rx="35" ry="5" />
+
+          <rect class="sad-robot-antenna" x="62" y="15" width="6" height="15" rx="2" />
+          <circle class="sad-robot-antenna-ball" cx="65" cy="12" r="8" filter="url(#glow)" />
+
+          <rect class="sad-robot-head" x="25" y="30" width="80" height="65" rx="12" fill="url(#robot-head-gradient)" />
+
+          <rect x="32" y="40" width="66" height="45" rx="8" fill="#1e293b" opacity="0.6" />
+
+          <g class="sad-robot-eye" transform-origin="50 58">
+            <ellipse cx="50" cy="58" rx="10" ry="12" fill="#1e293b" />
+            <ellipse class="sad-robot-eye-glow" cx="50" cy="58" rx="6" ry="8" fill="#ef4444" />
+            <ellipse cx="48" cy="55" rx="2" ry="2" fill="#fff" opacity="0.6" />
+          </g>
+          <g class="sad-robot-eye" transform-origin="80 58">
+            <ellipse cx="80" cy="58" rx="10" ry="12" fill="#1e293b" />
+            <ellipse class="sad-robot-eye-glow" cx="80" cy="58" rx="6" ry="8" fill="#ef4444" />
+            <ellipse cx="78" cy="55" rx="2" ry="2" fill="#fff" opacity="0.6" />
+          </g>
+
+          <path d="M 40 48 Q 50 52 58 48" stroke="#6b7280" stroke-width="2" fill="none" stroke-linecap="round" />
+          <path d="M 72 48 Q 80 52 90 48" stroke="#6b7280" stroke-width="2" fill="none" stroke-linecap="round" />
+
+          <path class="sad-robot-mouth" d="M 50 78 Q 65 68 80 78" stroke="#374151" stroke-width="3" fill="none"
+            stroke-linecap="round" />
+
+          <g class="sad-robot-tear" transform-origin="50 70">
+            <ellipse cx="50" cy="72" rx="3" ry="5" fill="#60a5fa" />
+          </g>
+          <g class="sad-robot-tear" transform-origin="80 70">
+            <ellipse cx="80" cy="72" rx="3" ry="5" fill="#60a5fa" />
+          </g>
+
+          <rect x="35" y="100" width="60" height="30" rx="6" fill="url(#robot-body-gradient)" />
+
+          <circle cx="55" cy="112" r="4" fill="#4b5563" />
+          <circle cx="75" cy="112" r="4" fill="#4b5563" />
+          <rect x="50" y="120" width="30" height="4" rx="2" fill="#4b5563" />
+
+          <rect x="15" y="50" width="10" height="20" rx="3" fill="#374151" />
+          <rect x="105" y="50" width="10" height="20" rx="3" fill="#374151" />
+        </svg>
+      </div>
+
+      <h1 class="access-denied-code">403</h1>
+      <h2 class="access-denied-title">No Access</h2>
+
+      <div class="access-denied-divider"></div>
+
+      <p class="access-denied-message">
+        You're logged in, but your account is not allowed<br>
+        to view or control this server.
+      </p>
+
+      <div class="access-denied-server">
+        <i class="fa-solid fa-server"></i>
+        <span>
+          <%= typeof bot !=='undefined' ? bot : 'Unknown Server' %>
+        </span>
+      </div>
+
+      <a href="/" class="access-denied-btn">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Back to Home</span>
+      </a>
+
+      <div class="access-denied-footer">
+        <p class="access-denied-footer-text">
+          <i class="fa-solid fa-shield-halved"></i>
+          Contact an administrator if you believe this is an error
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
