@@ -1,0 +1,155 @@
+[
+  {
+    "id": "minecraft",
+    "name": "Minecraft",
+    "description": "Minecraft Java Edition server",
+    "defaultPort": 25565,
+    "templateImage": "/images/minecraft.webp",
+    "docker": {
+      "image": "eclipse-temurin",
+      "tag": "21-jre",
+      "ports": [
+        25565
+      ],
+      "volumes": [
+        "{BOT_DIR}:/data"
+      ],
+      "workdir": "/data",
+      "env": {},
+      "command": "java -Xms128M -Xmx{RAM_MB}M -jar /data/server.jar nogui",
+      "restart": "unless-stopped",
+      "console": {
+        "type": "stdin"
+      }
+    }
+  },
+  {
+    "id": "nodejs",
+    "name": "Node.js",
+    "description": "Run Node.js applications easy.",
+    "defaultPort": 3000,
+    "templateImage": "/images/nodejs.webp",
+    "docker": {
+      "image": "node",
+      "tag": "20-alpine",
+      "ports": [
+        3000
+      ],
+      "volumes": [
+        "{BOT_DIR}:/app"
+      ],
+      "workdir": "/app",
+      "env": {
+        "NODE_ENV": "production"
+      },
+      "command": "node /app/index.js",
+      "restart": "unless-stopped",
+      "console": {
+        "type": "stdin"
+      }
+    }
+  },
+  {
+    "id": "csgo",
+    "name": "CS:GO",
+    "description": "Counter-Strike: Global Offensive dedicated server",
+    "defaultPort": 27015,
+    "templateImage": "https://cdn.cloudflare.steamstatic.com/steam/apps/730/header.jpg",
+    "docker": {
+      "image": "cm2network/csgo",
+      "tag": "sourcemod",
+      "ports": [
+        27015,
+        27020,
+        27005
+      ],
+      "volumes": [
+        "{BOT_DIR}:/home/steam/csgo-dedicated"
+      ],
+      "workdir": "/home/steam",
+      "env": {
+        "SRCDS_TOKEN": "0",
+        "SRCDS_RCONPW": "changeme",
+        "SRCDS_PW": "changeme",
+        "SRCDS_PORT": "27015",
+        "SRCDS_TV_PORT": "27020",
+        "SRCDS_CLIENT_PORT": "27005",
+        "SRCDS_MAXPLAYERS": "14",
+        "SRCDS_STARTMAP": "de_dust2",
+        "SRCDS_REGION": "3",
+        "SRCDS_MAPGROUP": "mg_active",
+        "SRCDS_GAMETYPE": "0",
+        "SRCDS_GAMEMODE": "1",
+        "ADDITIONAL_ARGS": ""
+      },
+      "command": "/home/steam/entry.sh",
+      "restart": "unless-stopped",
+      "console": {
+        "type": "stdin"
+      }
+    }
+  },
+  {
+    "id": "fivem",
+    "name": "FiveM",
+    "description": "Run your FiveM servers with this template",
+    "defaultPort": 30120,
+    "templateImage": "https://logos-world.net/wp-content/uploads/2021/03/FiveM-Symbol.png",
+    "docker": {
+      "image": "ich777/fivemserver",
+      "tag": "latest",
+      "ports": [
+        30120,
+        30110,
+        8080
+      ],
+      "volumes": [
+        "{BOT_DIR}:/serverdata/serverfiles"
+      ],
+      "workdir": "/serverdata/serverfiles",
+      "env": {
+        "DATA_DIR": "/serverdata",
+        "SERVER_DIR": "/serverdata/serverfiles",
+        "GAME_CONFIG": "server.cfg",
+        "SERVER_KEY": "change-me",
+        "SRV_ADR": "https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/",
+        "MANUAL_UPDATES": "",
+        "ENABLE_WEBCONSOLE": "true",
+        "UID": "99",
+        "GID": "100",
+        "START_VARS": ""
+      },
+      "command": "/opt/scripts/start.sh",
+      "restart": "unless-stopped",
+      "console": {
+        "type": "stdin"
+      }
+    }
+  },
+  {
+    "id": "python",
+    "name": "Python",
+    "description": "Run Python applications and frameworks",
+    "defaultPort": 8000,
+    "templateImage": "https://stalwart-pegasus-2c2ca4.netlify.app/img/python-logo.webp",
+    "docker": {
+      "image": "python",
+      "tag": "3.12-slim",
+      "ports": [
+        8000
+      ],
+      "volumes": [
+        "{BOT_DIR}:/app"
+      ],
+      "workdir": "/app",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "command": "python /app/main.py",
+      "restart": "unless-stopped",
+      "console": {
+        "type": "stdin"
+      }
+    }
+  }
+]

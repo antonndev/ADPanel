@@ -1,0 +1,52 @@
+{
+  "admin": [
+    {
+      "id": "default-1",
+      "title": "Manage account",
+      "link": "/settings?panel=account",
+      "icon": "fa-solid fa-user",
+      "animation": "scale",
+      "newTab": false,
+      "scaleValue": 1.05
+    },
+    {
+      "id": "default-2",
+      "title": "Manage servers",
+      "link": "/settings?panel=servers",
+      "icon": "fa-solid fa-bars-progress",
+      "animation": "scale",
+      "newTab": false,
+      "scaleValue": 1.05
+    },
+    {
+      "id": "default-3",
+      "title": "ADPanel Github",
+      "link": "https://github.com/antonndev/ADPanel-Enterprise",
+      "icon": "fa-duotone fa-regular fa-panel-ews",
+      "animation": "scale",
+      "newTab": true,
+      "scaleValue": 1.05
+    }
+  ],
+  "user": [
+    {
+      "id": "qa-1769250612756",
+      "title": "Manage account",
+      "link": "/#account",
+      "icon": "fa-solid fa-user",
+      "animation": "scale",
+      "newTab": false,
+      "scaleValue": 1.01
+    },
+    {
+      "id": "qa-1769251431563",
+      "title": "ADPanel Site",
+      "link": "https://github.com/antonndev/ADPanel-Enterprise",
+      "icon": "fa-solid fa-globe",
+      "animation": "scale",
+      "newTab": true,
+      "scaleValue": 1.01
+    }
+  ],
+  "updatedAt": 1773427337191
+}

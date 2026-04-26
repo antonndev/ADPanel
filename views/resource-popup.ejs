@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" data-bot="<%= bot %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resources - <%= bot %></title>
+  <link rel="stylesheet" href="/style.css?v=<%= Date.now() %>">
+  <link rel="stylesheet" href="/css/bot.css?v=<%= typeof themeVersion !== 'undefined' ? themeVersion : Date.now() %>">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha384-nRgPTkuX86pH8yjPJUAFuASXQSSl2/bBUiNV47vSYpKFxHJhbcrGnmlYpYJMeD7a" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <style nonce="<%= cspNonce %>">
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #0b0f14;
+    }
+
+    .resource-stats-popup {
+      position: relative;
+      top: auto;
+      left: auto;
+      transform: none !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      pointer-events: auto !important;
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
+      display: flex;
+      flex-direction: column;
+      background: transparent !important;
+      -webkit-backdrop-filter: none !important;
+      backdrop-filter: none !important;
+    }
+
+
+    .screen-fill-container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        background: linear-gradient(135deg, rgba(15, 20, 30, 0.92) 0%, rgba(10, 15, 25, 0.95) 100%);
+    }
+
+    .resource-stats-header {
+      border-radius: 0;
+    }
+
+    .resource-stats-body {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    #resourceStatsClose, #openResourceStatsTab {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="resource-stats-popup visible screen-fill-container" id="resourceStatsPopup">
+    <div class="resource-stats-header">
+      <div class="resource-stats-title"><i class="fa-solid fa-chart-pie"></i> Resource Usage</div>
+      <button class="resource-stats-action" id="openResourceStatsTab"><i class="fa-solid fa-arrow-up-right-from-square"></i></button>
+      <button class="resource-stats-close" id="resourceStatsClose"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="resource-stats-body">
+      <div class="resource-stat-row">
+        <div class="resource-stat-icon memory-icon"><i class="fa-solid fa-memory"></i></div>
+        <div class="resource-stat-info">
+          <div class="resource-stat-label">Memory</div>
+          <div class="resource-stat-value" id="resMemoryLabel">Loading...</div>
+        </div>
+        <div class="resource-stat-bar">
+          <div class="resource-stat-fill memory-fill" id="resMemoryBar" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="resource-stat-row">
+        <div class="resource-stat-icon disk-icon"><i class="fa-solid fa-hard-drive"></i></div>
+        <div class="resource-stat-info">
+          <div class="resource-stat-label">Storage</div>
+          <div class="resource-stat-value" id="resDiskLabel">Loading...</div>
+        </div>
+        <div class="resource-stat-bar">
+          <div class="resource-stat-fill disk-fill" id="resDiskBar" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="resource-stat-row">
+        <div class="resource-stat-icon cpu-icon"><i class="fa-solid fa-microchip"></i></div>
+        <div class="resource-stat-info">
+          <div class="resource-stat-label">CPU</div>
+          <div class="resource-stat-value" id="resCpuLabel">Loading...</div>
+        </div>
+        <div class="resource-stat-bar">
+          <div class="resource-stat-fill cpu-fill" id="resCpuBar" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="resource-stat-row">
+        <div class="resource-stat-icon uptime-icon"><i class="fa-solid fa-clock"></i></div>
+        <div class="resource-stat-info">
+          <div class="resource-stat-label">Uptime</div>
+          <div class="resource-stat-value" id="resUptimeLabel">Loading...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script nonce="<%= cspNonce %>" src="/socket.io/socket.io.js"></script>
+  <script nonce="<%= cspNonce %>" src="/js/resource-popup.js?v=<%= Date.now() %>"></script>
+</body>
+</html>

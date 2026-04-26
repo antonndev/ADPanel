@@ -1,0 +1,10 @@
+# /etc/sudoers.d/adpanel-panel
+# ADPanel runs as the unprivileged 'adpanel' user, but installer/database
+# workflows require unattended root-level package/service operations.
+#
+# This policy intentionally allows non-interactive sudo for adpanel so
+# panel-managed setup jobs (phpMyAdmin, pgAdmin, MongoDB, etc.) do not fail
+# with "sudo: a password is required".
+
+Defaults:adpanel !requiretty
+adpanel ALL=(ALL) NOPASSWD: ALL

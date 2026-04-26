@@ -1,0 +1,1908 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="dashboard.css?v=<%= typeof themeVersion !== 'undefined' ? themeVersion : Date.now() %>">
+  <title><%= (branding && branding.appName) ? branding.appName : 'ADPanel' %></title>
+  <link id="favicon" rel="icon" type="image/webp"
+    href="<%= (branding && branding.faviconUrl) ? branding.faviconUrl : '/auth-assets/favicon' %>" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    integrity="sha384-nRgPTkuX86pH8yjPJUAFuASXQSSl2/bBUiNV47vSYpKFxHJhbcrGnmlYpYJMeD7a"
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <link rel="stylesheet" href="/css/dashboard.css?v=<%= typeof themeVersion !== 'undefined' ? themeVersion : Date.now() %>">
+  <link rel="stylesheet" href="/css/dashboard-assistant.css?v=20260423-assistant-access-gate">
+  <style nonce="<%= cspNonce %>">
+    *,
+    *::before,
+    *::after {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    img,
+    video,
+    canvas {
+      -webkit-user-drag: none;
+      -khtml-user-drag: none;
+      -moz-user-drag: none;
+      -o-user-drag: none;
+      user-drag: none;
+      pointer-events: auto;
+    }
+  </style>
+  <script nonce="<%= cspNonce %>">
+    window.__dashboardSplashImage = '/images/hello.webp';
+    try {
+      const splashKey = `dashboard-splash-cache:${window.location.origin}:${window.__dashboardSplashImage}`;
+      window.__dashboardSplashKey = splashKey;
+      if (localStorage.getItem(splashKey) === '1') {
+        document.documentElement.classList.add('skip-dashboard-splash');
+      }
+    } catch (_) { }
+
+    document.addEventListener('contextmenu', e => {
+      if (e.target && e.target.tagName === 'INPUT') return;
+      if (e.target && e.target.tagName === 'TEXTAREA') return;
+      if (e.target && e.target.closest && e.target.closest('.dashboard-assistant-menu')) return;
+      e.preventDefault();
+    });
+    document.addEventListener('dragstart', e => e.preventDefault());
+    document.addEventListener('selectstart', e => {
+      if (e.target && e.target.tagName === 'INPUT') return;
+      if (e.target && e.target.tagName === 'TEXTAREA') return;
+      if (e.target && e.target.closest && e.target.closest('.dashboard-assistant-menu')) return;
+      e.preventDefault();
+    });
+    document.addEventListener('copy', e => {
+      if (e.target && e.target.tagName === 'INPUT') return;
+      if (e.target && e.target.tagName === 'TEXTAREA') return;
+      if (e.target && e.target.closest && e.target.closest('.dashboard-assistant-menu')) return;
+      e.preventDefault();
+    });
+    document.addEventListener('cut', e => {
+      if (e.target && e.target.tagName === 'INPUT') return;
+      if (e.target && e.target.tagName === 'TEXTAREA') return;
+      if (e.target && e.target.closest && e.target.closest('.dashboard-assistant-menu')) return;
+      e.preventDefault();
+    });
+    document.addEventListener('keydown', e => {
+      if (e.target && e.target.tagName === 'INPUT') return;
+      if (e.target && e.target.tagName === 'TEXTAREA') return;
+      if (e.target && e.target.closest && e.target.closest('.dashboard-assistant-menu')) return;
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'C' || e.key === 'a' || e.key === 'A' || e.key === 's' || e.key === 'S' || e.key === 'u' || e.key === 'U')) {
+        e.preventDefault();
+      }
+    });
+  </script>
+</head>
+
+<body data-server-start-time="<%= serverStartTime %>">
+  <div id="splash-screen" data-splash-image="/images/hello.webp"></div>
+
+  <svg xmlns="http://www.w3.org/2000/svg" class="mysvg">
+    <defs>
+      <filter id="glass-distortion" x="0%" y="0%" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.008 0.008" numOctaves="2" seed="92" result="noise" />
+        <feGaussianBlur in="noise" stdDeviation="2" result="blurred" />
+        <feDisplacementMap in="SourceGraphic" in2="blurred" scale="77" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </defs>
+  </svg>
+
+  <header class="top-bar" id="topBar">
+    <div class="brand">
+      <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/adpanel-dark.webp" alt="ADPanel logo"
+        class="brand-logo" />
+      <div class="brand-copy">
+        <h1 class="brand-title">ADPanel</h1>
+        <p class="brand-subtitle">Your intelligent dashboard</p>
+      </div>
+    </div>
+
+    <% if (typeof globalAlert !=='undefined' && globalAlert && globalAlert.message) { %>
+      <div
+        style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); background: rgba(255, 100, 100, 0.1); padding: 8px 16px; border-radius: 99px; display: flex; align-items: center; gap: 8px; color: #ffcccc; pointer-events: none;">
+        <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/alert.webp" width="25" height="20" alt="">
+        <span style="font-size: 14px; font-weight: 500;">
+          <%= globalAlert.message %>
+        </span>
+      </div>
+      <% } %>
+
+        <div class="toolbar">
+          <div class="toolbar-actions">
+            <% if (isAdmin) { %>
+              <button id="createBtn" class="btn-primary create-btn" title="Create">
+                <i class="fa-solid fa-plus"></i>
+                <span>Create</span>
+              </button>
+              <% } %>
+
+                <% if (isAdmin) { %>
+                  <button class="icon-button" title="Settings" data-href="/settings">
+                    <i class="fa-solid fa-bars"></i>
+                  </button>
+                  <% } else { %>
+                    <button class="icon-button" title="You are not admin" disabled>
+                      <i class="fa-solid fa-lock"></i>
+                    </button>
+                    <% } %>
+                      <button id="openSshTerminalBtn" class="icon-button ssh-terminal-btn" title="Open SSH Terminal">
+                        <i class="fa-solid fa-terminal"></i>
+                      </button>
+                      <% if (showDashboardAssistant) { %>
+                      <div class="toolbar-assistant">
+                        <button id="dashboardAssistantButton" class="icon-button dashboard-assistant-trigger"
+                          title="Open ADPanel Assistant" aria-haspopup="dialog" aria-expanded="false">
+                          <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </button>
+
+                        <section id="dashboardAssistantMenu" class="dashboard-assistant-menu" hidden aria-hidden="true"
+                          aria-label="ADPanel Assistant">
+                          <div class="dashboard-assistant-head">
+                            <div style="display: flex; align-items: center; gap: 16px; flex: 1; min-width: 0;">
+                              <div class="dashboard-assistant-icon">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                              </div>
+                              <div class="dashboard-assistant-head-copy" style="flex: 1; min-width: 0;">
+                                <h2 class="dashboard-assistant-title">ADPanel Assistant</h2>
+                                <p class="dashboard-assistant-subtitle">
+                                  Complexity, simplified.
+                                </p>
+                              </div>
+                            </div>
+                            <div class="dashboard-assistant-head-actions">
+                              <button id="dashboardAssistantConfigToggle" class="dashboard-assistant-head-btn"
+                                title="Assistant settings" hidden>
+                                <i class="fa-solid fa-key"></i>
+                              </button>
+                              <button id="dashboardAssistantReset" class="dashboard-assistant-head-btn"
+                                title="Start a new chat">
+                                <i class="fa-solid fa-rotate-right"></i>
+                              </button>
+                              <button id="dashboardAssistantClose" class="dashboard-assistant-head-btn"
+                                title="Close assistant">
+                                <i class="fa-solid fa-xmark"></i>
+                              </button>
+                            </div>
+                          </div>
+
+
+                          <div id="dashboardAssistantConfig" class="dashboard-assistant-config" hidden>
+                            <p class="dashboard-assistant-config-title">Assistant provider</p>
+                            <p class="dashboard-assistant-config-text">
+                              Please put an API Key to make the assistant work.
+                            </p>
+
+                            <form id="dashboardAssistantTokenForm" class="dashboard-assistant-token-form">
+                              <label class="dashboard-assistant-token-label" for="dashboardAssistantProviderSelect">
+                                Provider
+                              </label>
+                              <select id="dashboardAssistantProviderSelect" class="dashboard-assistant-token-input">
+                                <option value="groq">Groq</option>
+                                <option value="google">Google AI Studio</option>
+                              </select>
+                              <label class="dashboard-assistant-token-label" for="dashboardAssistantTokenInput">
+                                <span id="dashboardAssistantTokenLabel">API key</span>
+                              </label>
+                              <input id="dashboardAssistantTokenInput" class="dashboard-assistant-token-input"
+                                type="password" placeholder="Paste the selected provider API key" autocomplete="off"
+                                spellcheck="false" autocapitalize="off" autocorrect="off">
+                              <div class="dashboard-assistant-token-foot">
+                                <span id="dashboardAssistantTokenState" class="dashboard-assistant-token-state">
+                                  No AI provider key has been saved yet.
+                                </span>
+                                <button id="dashboardAssistantSaveToken" class="dashboard-assistant-save" type="submit">
+                                  Save
+                                </button>
+                              </div>
+                            </form>
+                            <% if (isAdmin) { %>
+                              <div class="dashboard-assistant-access-row">
+                                <div class="dashboard-assistant-access-copy">
+                                  <p class="dashboard-assistant-access-title">Allow normal users to access Assistant</p>
+                                  <p class="dashboard-assistant-access-text">
+                                    ADPanel helps you to deny or allow normal users to access the assistant.
+                                  </p>
+                                </div>
+                                <label class="dashboard-assistant-switch" title="Allow normal users to access Assistant">
+                                  <input type="checkbox" id="dashboardAssistantAllowUsersToggle">
+                                  <span class="dashboard-assistant-switch-slider"></span>
+                                </label>
+                              </div>
+                            <% } %>
+                          </div>
+
+                          <div id="dashboardAssistantNotice" class="dashboard-assistant-notice" hidden></div>
+
+                          <div id="dashboardAssistantMessages" class="dashboard-assistant-messages" aria-live="polite">
+                          </div>
+
+                          <div id="dashboardAssistantComposer" class="dashboard-assistant-composer">
+                            <form id="dashboardAssistantComposerForm" class="dashboard-assistant-text-form">
+                              <label class="dashboard-assistant-text-label" for="dashboardAssistantTextInput">
+                                Message
+                              </label>
+                              <div class="dashboard-assistant-text-row">
+                                <textarea id="dashboardAssistantTextInput" class="dashboard-assistant-text-input"
+                                  rows="2" placeholder="Ask ADPanel Assistant..." autocomplete="off"></textarea>
+                                <button id="dashboardAssistantSend" class="dashboard-assistant-send-btn" type="submit"
+                                  title="Send message">
+                                  <i class="fa-solid fa-paper-plane"></i>
+                                </button>
+                              </div>
+                            </form>
+                            <div class="dashboard-assistant-voicepad">
+                              <button id="dashboardAssistantMic" class="dashboard-assistant-voice-btn" type="button"
+                                title="Start voice input">
+                                <span class="dashboard-assistant-voice-icon">
+                                  <i class="fa-solid fa-microphone"></i>
+                                </span>
+                                <span class="dashboard-assistant-voice-copy">Tap to talk</span>
+                              </button>
+                              <button id="dashboardAssistantReplay" class="dashboard-assistant-replay-btn" type="button"
+                                title="Replay last assistant reply">
+                                <i class="fa-solid fa-volume-high"></i>
+                              </button>
+                            </div>
+                            <div class="dashboard-assistant-ptt-setting" style="margin-top: 14px; margin-bottom: 4px; font-size: 13px; color: rgba(255,255,255,0.5); text-align: center;">
+                              Push to talk: <button id="dashboardAssistantPttKeyBtn" type="button" style="background: none; border: none; padding: 0; color: #818cf8; cursor: pointer; font-weight: 600; font-family: inherit; font-size: inherit;">None</button>
+                            </div>
+                            <div class="dashboard-assistant-voice-meta">
+                              <div id="dashboardAssistantVoiceState" class="dashboard-assistant-voice-state">
+                                Voice replies are on.
+                              </div>
+                              <div id="dashboardAssistantSpeaking" class="dashboard-assistant-speaking" hidden>
+                                <span class="dashboard-assistant-speaking-wave"></span>
+                                <span class="dashboard-assistant-speaking-wave"></span>
+                                <span class="dashboard-assistant-speaking-wave"></span>
+                              </div>
+                            </div>
+                            <div id="dashboardAssistantTranscript" class="dashboard-assistant-transcript" hidden></div>
+
+                          </div>
+                        </section>
+                      </div>
+                      <% } %>
+                      <button id="accountBtn" class="icon-button account-avatar-btn" title="Manage account">
+                        <img src="<%= avatarUrl %>" alt="Avatar" class="account-btn-avatar" draggable="false">
+                      </button>
+                      <button id="logoutBtn" class="icon-butt" title="Log Out">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                      </button>
+          </div>
+        </div>
+  </header>
+
+  <div id="topbar-spacer" aria-hidden="true"></div>
+
+  <main class="dashboard" id="mainContent">
+    <section class="hero">
+      <div class="hero-copy">
+        <h2>Welcome back!</h2>
+        <p>
+          Monitor, deploy, and orchestrate servers with ease. Launch new experiences for your community in
+          seconds.
+        </p>
+
+        <div class="hero-actions">
+          <button class="pills" data-scroll-target="bots">View Servers</button>
+          <% if (isAdmin) { %>
+            <button class="pill pill--outline" id="createBtnHero">
+              <i class="fa-solid fa-plus" class="faplusbutton"></i>Create
+            </button>
+            <% } %>
+        </div>
+      </div>
+
+      <div class="hero-stats">
+        <article class="stat-card">
+          <div class="stat-card__icon stat-card__icon--active">
+            <i class="fa-solid fa-server"></i>
+          </div>
+          <div class="stat-card__content">
+            <p class="stat-card__label">Active servers</p>
+            <p class="stat-card__value">
+              <%= bots.length %>
+            </p>
+          </div>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-card__icon stat-card__icon--uptime">
+            <i class="fa-solid fa-signal"></i>
+          </div>
+          <div class="stat-card__content">
+            <p class="stat-card__label">Status</p>
+            <p class="stat-card__value">Operational</p>
+          </div>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-card__icon stat-card__icon--deploy">
+            <i class="fa-solid fa-clock"></i>
+          </div>
+          <div class="stat-card__content">
+            <p class="stat-card__label">Server Uptime</p>
+            <p class="stat-card__value" id="uptimeDisplay">0s</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <% if (quickActions && quickActions.length> 0) { %>
+      <section class="quick-actions" aria-label="Quick actions">
+        <h3>Quick actions</h3>
+        <div class="quick-actions__grid">
+          <% quickActions.forEach(function(action) { %>
+            <button
+              class="quick-action<%= action.animation && action.animation !== 'default' && action.animation !== 'none' ? ` qa-anim-${action.animation}` : '' %>"
+              data-href="<%= action.link %>" <%=action.newTab ? ' data-target="_blank"' : '' %>
+              style="<%= action.animation==='scale' ? `--hover-scale: ${action.scaleValue || 1.05}` : '' %>">
+                <i class="<%= action.icon || 'fa-solid fa-star' %>"></i>
+                <p>
+                  <%= action.title %>
+                </p>
+            </button>
+            <% }); %>
+        </div>
+      </section>
+      <% } %>
+
+        <section class="bots" id="servers">
+          <div class="section-heading">
+            <div>
+              <h3>Your servers</h3>
+              <p>Browse and jump straight into any workspace.</p>
+            </div>
+            <div class="section-actions">
+              <label for="searchBots" class="search-field">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input id="searchBots" class="search-servers" type="text" placeholder="Search servers" />
+              </label>
+            </div>
+          </div>
+
+          <div class="bot-grid" data-bot-grid>
+            <% bots.forEach(function(bot){ const coverStyle=bot.templateImage ?
+              `--bot-cover:url('${String(bot.templateImage).replace(/'/g, "\\'" )}');` : '' ; const ipPort=bot.port ?
+              `${bot.ip}:${bot.port}` : bot.ip; const memory=bot.memory || {}; const disk=bot.disk || {}; const
+              cpuPercent=bot.cpuPercent !==null && bot.cpuPercent !==undefined ? bot.cpuPercent : 0; const
+              cpuLimit=bot.cpuLimit || 100; const cpuBarWidth=cpuLimit > 0 ? Math.min(100, (cpuPercent / cpuLimit) * 100) : 0; const
+              statusClass=bot.status==='online' ? 'status-online' : (bot.status==='stopped' ? 'status-stopped'
+              : 'status-unknown' ) ; const nodeOffline=bot.nodeOnline===false; %>
+              <article class="bot-card <%= statusClass %><%= nodeOffline ? ' node-offline' : '' %>" data-bot-card
+                data-name="<%= bot.name.toLowerCase() %>" data-cover="<%= bot.templateImage ? bot.templateImage : '' %>"
+                data-href="/server/<%= bot.name %>">
+                <div class="bot-card__offline" data-offline-overlay
+                  style="display: <%= nodeOffline ? 'flex' : 'none' %>;">
+                  <div class="offline-ring"></div>
+                  <div class="offline-text">Can't establish connection to the server</div>
+                </div>
+                <div class="bot-card__body">
+                  <div class="bot-card__hero">
+                    <div class="bot-card__hero-bg"></div>
+                    <div class="bot-card__hero-overlay"></div>
+                    <div class="bot-card__hero-content">
+                      <div class="bot-card__title-row">
+                        <div>
+                          <h4>
+                            <%= bot.displayName || bot.name %>
+                          </h4>
+                          <p>Node: <%= bot.nodeName %>
+                          </p>
+                        </div>
+                        <div class="bot-card__status <%= statusClass %>">
+                          <span class="bot-card__status-dot"></span>
+                        </div>
+                      </div>
+                      <div class="bot-card__meta-row">
+                        <span><i class="fa-solid fa-globe"></i>
+                          <%= ipPort %>
+                        </span>
+                        <span><i class="fa-solid fa-cube"></i>
+                          <%= bot.templateId || 'Custom' %>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="bot-card__stats">
+                    <div class="bot-card__stat">
+                      <div class="bot-card__stat-label">
+                        <div class="bot-card__stat-icon bot-card__stat-icon--memory"><i class="fa-solid fa-memory"></i>
+                        </div>
+                        <div class="bot-card__stat-title">Memory</div>
+                        <div class="bot-card__stat-chip"><i class="fa-solid fa-wave-pulse"></i><span>
+                            <%= memory.label || 'N/A' %>
+                          </span></div>
+                      </div>
+                      <div class="bot-card__progress">
+                        <span style="width:<%= memory.percent != null ? memory.percent : 0 %>%"></span>
+                      </div>
+                    </div>
+                    <div class="bot-card__stat">
+                      <div class="bot-card__stat-label">
+                        <div class="bot-card__stat-icon bot-card__stat-icon--disk"><i
+                            class="fa-solid fa-hard-drive"></i>
+                        </div>
+                        <div class="bot-card__stat-title">Disk</div>
+                        <div class="bot-card__stat-chip"><i class="fa-solid fa-arrows-rotate"></i><span>
+                            <%= disk.label || 'N/A' %>
+                          </span></div>
+                      </div>
+                      <div class="bot-card__progress"><span
+                          style="width:<%= disk.percent != null ? disk.percent : 0 %>%"></span></div>
+                    </div>
+                    <div class="bot-card__stat">
+                      <div class="bot-card__stat-label">
+                        <div class="bot-card__stat-icon bot-card__stat-icon--cpu"><i class="fa-solid fa-microchip"></i>
+                        </div>
+                        <div class="bot-card__stat-title">CPU</div>
+                        <div class="bot-card__stat-chip"><i class="fa-solid fa-signal"></i><span>
+                            <%= bot.cpu || 'N/A' %>
+                          </span></div>
+                      </div>
+                      <div class="bot-card__progress"><span style="width:<%= cpuBarWidth %>%"></span></div>
+                    </div>
+                  </div>
+
+                  <div class="bot-card__footer">
+                    <div class="bot-card__footer-text">Click to view details</div>
+                    <i class="fa-solid fa-arrow-right bot-card__chevron"></i>
+                  </div>
+                </div>
+              </article>
+              <% }) %>
+          </div>
+          <% if (pagination && pagination.totalPages > 1) { %>
+          <div class="nodes-pagination" id="dashPagination" style="margin-top:16px">
+            <div class="nodes-pagination-inner">
+              <span class="nodes-pagination-info"><%= ((pagination.page - 1) * pagination.limit) + 1 %>–<%= Math.min(pagination.page * pagination.limit, pagination.total) %> of <%= pagination.total %> servers</span>
+              <div class="nodes-pagination-btns">
+                <button class="btn ghost btn-sm" <%= pagination.page <= 1 ? 'disabled' : '' %> data-dash-page="<%= pagination.page - 1 %>"><i class="fa-solid fa-chevron-left"></i></button>
+                <span class="nodes-pagination-current">Page <%= pagination.page %> / <%= pagination.totalPages %></span>
+                <button class="btn ghost btn-sm" <%= pagination.page >= pagination.totalPages ? 'disabled' : '' %> data-dash-page="<%= pagination.page + 1 %>"><i class="fa-solid fa-chevron-right"></i></button>
+              </div>
+            </div>
+          </div>
+          <% } %>
+        </section>
+
+  </main>
+
+  <div id="accountPage" class="account-page" style="display: none;">
+    <div class="account-header">
+      <button id="accountBackBtn" class="account-back-btn">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Back to Dashboard</span>
+      </button>
+      <h2>My Account</h2>
+      <p>View and manage your account information</p>
+    </div>
+
+    <div class="account-tabs">
+      <button class="account-tab active" data-account-tab="info">
+        <i class="fa-solid fa-circle-info"></i>
+        <span>Info</span>
+      </button>
+      <button class="account-tab" data-account-tab="credentials">
+        <i class="fa-solid fa-key"></i>
+        <span>Credentials</span>
+      </button>
+    </div>
+
+    <div id="accountInfoTab" class="account-tab-content active">
+      <div class="account-card">
+        <div class="account-card-header">
+          <div class="account-avatar" id="accountAvatarWrapper" title="Click to change avatar">
+            <img id="accountAvatarImg" src="<%= avatarUrl %>"
+              alt="Avatar">
+            <div class="account-avatar-overlay">
+              <i class="fa-solid fa-camera"></i>
+              <span>Change</span>
+            </div>
+          </div>
+          <div class="account-info">
+            <h3 id="accountUsername">Loading...</h3>
+            <p id="accountEmail">Loading...</p>
+          </div>
+        </div>
+
+        <input type="file" id="avatarFileInput" accept="image/jpeg,image/png,image/gif,image/webp"
+          style="display:none;">
+
+        <div class="account-section-title">
+          <i class="fa-solid fa-circle-info"></i>
+          Account Details
+        </div>
+
+        <div class="account-row account-row-editable" id="usernameRow">
+          <span class="account-row-label">Username</span>
+          <div class="account-row-value-wrap">
+            <span class="account-row-value" id="accountUsernameValue">—</span>
+            <input type="text" class="account-row-input" id="usernameInput" style="display:none;" maxlength="30"
+              placeholder="Enter username">
+            <button class="account-row-edit-btn" id="usernameEditBtn" title="Edit username">
+              <i class="fa-solid fa-pencil"></i>
+            </button>
+            <button class="account-row-save-btn" id="usernameSaveBtn" style="display:none;" title="Save">
+              <i class="fa-solid fa-check"></i>
+            </button>
+            <button class="account-row-cancel-btn" id="usernameCancelBtn" style="display:none;" title="Cancel">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+          <div class="account-row-cooldown" id="usernameCooldown" style="display:none;"></div>
+        </div>
+
+        <div class="account-row">
+          <span class="account-row-label">Email Address</span>
+          <span class="account-row-value" id="accountEmailValue">—</span>
+        </div>
+
+        <div class="account-row">
+          <span class="account-row-label">Role</span>
+          <span class="account-row-value" id="accountRoleValue">—</span>
+        </div>
+
+        <div class="account-row">
+          <span class="account-row-label">User ID</span>
+          <span class="account-row-value" id="accountIdValue">—</span>
+        </div>
+
+        <div class="account-row account-row-editable" id="statusRow">
+          <span class="account-row-label">Status</span>
+          <div class="account-row-value-wrap">
+            <span class="account-row-value account-status-value" id="accountStatusValue">
+              <span class="status-dot"></span>
+              <span id="accountStatusText">Available</span>
+            </span>
+            <button class="account-row-edit-btn" id="statusEditBtn" title="Edit status">
+              <i class="fa-solid fa-pencil"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="accountCredentialsTab" class="account-tab-content">
+      <div class="account-card">
+        <div class="credentials-card">
+          <div class="credentials-info">
+            <div class="credentials-icon">
+              <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/adpanel-dark.webp" alt="2FA" draggable="false">
+            </div>
+            <div class="credentials-text">
+              <h4>Two-Factor Authentication</h4>
+              <p>Change your authenticator app 2FA code</p>
+            </div>
+          </div>
+          <button class="credentials-btn" id="change2faBtn">
+            <i class="fa-solid fa-rotate"></i> Change 2FA
+          </button>
+        </div>
+      </div>
+
+      <div class="account-card">
+        <div class="credentials-card">
+          <div class="credentials-info">
+            <div class="credentials-icon">
+              <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/change-password.webp" alt="Password"
+                draggable="false">
+            </div>
+            <div class="credentials-text">
+              <h4>Change Password</h4>
+              <p>Update your account password</p>
+            </div>
+          </div>
+          <button class="credentials-btn" id="changePasswordBtn">
+            <i class="fa-solid fa-key"></i> Change Password
+          </button>
+        </div>
+      </div>
+
+      <div class="account-card">
+        <div class="credentials-card">
+          <div class="credentials-info">
+            <div class="credentials-icon">
+              <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/email.webp" alt="Email" draggable="false">
+            </div>
+            <div class="credentials-text">
+              <h4>Change Email</h4>
+              <p>Update your account email address</p>
+            </div>
+          </div>
+          <button class="credentials-btn" id="changeEmailBtn">
+            <i class="fa-solid fa-envelope"></i> Change Email
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="dashboardAssistantDeleteModal" class="enterprise-modal-overlay dashboard-assistant-confirm-overlay"
+    aria-hidden="true">
+    <div class="enterprise-modal dashboard-assistant-confirm-modal" role="dialog" aria-modal="true"
+      aria-labelledby="dashboardAssistantDeleteTitle">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon icon-terminal dashboard-assistant-confirm-icon">
+          <i class="fa-solid fa-trash-can"></i>
+        </div>
+        <div class="enterprise-modal-titles">
+          <div class="enterprise-modal-eyebrow">Assistant Confirmation</div>
+          <h3 class="enterprise-modal-title" id="dashboardAssistantDeleteTitle">Delete server</h3>
+          <p class="enterprise-modal-subtitle" id="dashboardAssistantDeleteSubtitle">
+            Confirm this action before the assistant removes the server.
+          </p>
+        </div>
+        <button id="dashboardAssistantDeleteClose" class="enterprise-modal-close" title="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="enterprise-modal-body">
+        <div class="dashboard-assistant-confirm-copy">
+          <p class="dashboard-assistant-confirm-lead">Do you want to delete server <strong
+              id="dashboardAssistantDeleteName">—</strong>?</p>
+          <p class="dashboard-assistant-confirm-text">
+            This removes the server files and its node container. You need to confirm here before the assistant
+            continues.
+          </p>
+        </div>
+      </div>
+      <div class="enterprise-modal-footer dashboard-assistant-confirm-footer">
+        <button id="dashboardAssistantDeleteCancel" class="enterprise-btn-secondary" type="button">Keep server</button>
+        <button id="dashboardAssistantDeleteConfirm" class="enterprise-btn-primary" type="button">
+          <i class="fa-solid fa-trash-can"></i>
+          Delete server
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="email-modal-overlay" id="emailModal">
+    <div class="email-modal">
+      <div class="email-modal-header">
+        <div class="email-modal-header-left">
+          <div class="email-modal-icon">
+            <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/email.webp" alt="Email" draggable="false">
+          </div>
+          <div>
+            <h3 class="email-modal-title">Change Email</h3>
+            <p class="email-modal-subtitle">Update your account email address</p>
+          </div>
+        </div>
+        <button class="email-modal-close" id="emailModalClose">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="email-modal-body">
+        <div id="emailStep1">
+          <div class="email-step">
+            <div class="email-step-label">
+              <span class="email-step-num">1</span>
+              Enter your password
+            </div>
+            <div class="email-input-wrap">
+              <input type="password" class="email-input" id="emailPasswordInput" placeholder="Current password"
+                autocomplete="current-password">
+              <button type="button" class="email-toggle-eye" data-target="emailPasswordInput" style="display:none;">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="email-step">
+            <div class="email-step-label">
+              <span class="email-step-num">2</span>
+              Enter your 2FA code
+            </div>
+            <input type="text" class="email-input email-code-input" id="email2faInput" placeholder="000000"
+              maxlength="6" autocomplete="off">
+            <div class="forgot-code-link" id="emailForgotLink">
+              You don't have the code? <span class="forgot-code-click">Click here</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="emailStep2" style="display:none;">
+          <div class="email-step">
+            <div class="email-step-label">
+              <span class="email-step-num">3</span>
+              Enter your new email address
+            </div>
+            <input type="email" class="email-input" id="newEmailInput" placeholder="new@email.com" autocomplete="email">
+          </div>
+        </div>
+
+        <div class="email-error" id="emailError"></div>
+        <div class="email-success" id="emailSuccess">
+          <i class="fa-solid fa-check-circle"></i> Email has been successfully changed!
+        </div>
+      </div>
+
+      <div class="email-modal-footer">
+        <button class="email-btn email-btn-cancel" id="emailCancelBtn">Cancel</button>
+        <button class="email-btn email-btn-confirm" id="emailConfirmBtn">Verify</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="recovery-modal-overlay" id="recoveryModal">
+    <div class="recovery-modal">
+      <div class="recovery-modal-header">
+        <div class="recovery-modal-header-left">
+          <div class="recovery-modal-icon">
+            <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/adpanel-dark.webp" alt="Recovery"
+              draggable="false">
+          </div>
+          <div>
+            <h3 class="recovery-modal-title">Recovery Code</h3>
+            <p class="recovery-modal-subtitle">Use a one-time recovery code</p>
+          </div>
+        </div>
+        <button class="recovery-modal-close" id="recoveryModalClose">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="recovery-modal-body">
+        <div class="recovery-step">
+          <div class="recovery-step-label">
+            <span class="recovery-step-num">1</span>
+            Enter one of your recovery codes
+          </div>
+          <input type="text" class="recovery-input" id="recoveryCodeInput" placeholder="XXXXXXXX" maxlength="8"
+            autocomplete="off"
+            style="text-transform: uppercase; letter-spacing: 4px; text-align: center; font-family: 'SF Mono', Monaco, monospace; font-size: 18px;">
+        </div>
+
+        <div class="recovery-hint">
+          Recovery codes were provided when you created your account. Each code can only be used once.
+        </div>
+
+        <div class="recovery-error" id="recoveryError"></div>
+      </div>
+
+      <div class="recovery-modal-footer">
+        <button class="recovery-btn recovery-btn-cancel" id="recoveryCancelBtn">Cancel</button>
+        <button class="recovery-btn recovery-btn-confirm" id="recoveryConfirmBtn">Verify Code</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="recovery-modal-overlay" id="statusModal">
+    <div class="recovery-modal">
+      <div class="recovery-modal-header">
+        <div class="recovery-modal-header-left">
+          <div class="recovery-modal-icon" style="background: transparent;">
+            <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/clock.webp" alt="Status"
+              style="width: 70px; height: 70px;">
+          </div>
+          <div>
+            <h3 class="recovery-modal-title">Update Status</h3>
+            <p class="recovery-modal-subtitle">Set a custom status message</p>
+          </div>
+        </div>
+        <button class="recovery-modal-close" id="statusModalClose">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="recovery-modal-body">
+        <div class="recovery-step">
+          <div class="recovery-step-label">
+            <span class="recovery-step-num">1</span>
+            Enter your status
+          </div>
+          <input type="text" class="recovery-input" id="statusInput" placeholder="In a flow..." maxlength="80"
+            autocomplete="off" style="text-align: left; letter-spacing: normal; font-family: inherit; font-size: 15px;">
+        </div>
+
+        <div class="recovery-step" style="margin-top: 16px;">
+          <div class="recovery-step-label">
+            <span class="recovery-step-num">2</span>
+            Clear after
+          </div>
+          <select class="recovery-input" id="statusDuration"
+            style="text-align: left; letter-spacing: normal; font-family: inherit; padding: 12px; background: #0a0c14; color: #fff; border: 1px solid rgba(255,255,255,0.12);">
+            <option value="86400000">1 day</option>
+            <option value="259200000">3 days</option>
+            <option value="604800000">1 week</option>
+            <option value="2592000000">1 month</option>
+            <option value="never">Never</option>
+          </select>
+        </div>
+
+        <div class="recovery-error" id="statusError"></div>
+      </div>
+
+      <div class="recovery-modal-footer">
+        <button class="recovery-btn recovery-btn-cancel" id="statusCancelBtn">Cancel</button>
+        <button class="recovery-btn recovery-btn-confirm" id="statusSaveBtn">Save Status</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="password-modal-overlay" id="passwordModal">
+    <div class="password-modal">
+      <div class="password-modal-header">
+        <div class="password-modal-header-left">
+          <div class="password-modal-icon">
+            <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/change-password.webp" alt="Password"
+              draggable="false">
+          </div>
+          <div>
+            <h3 class="password-modal-title">Change Password</h3>
+            <p class="password-modal-subtitle">Update your account password</p>
+          </div>
+        </div>
+        <button class="password-modal-close" id="passwordModalClose">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="password-modal-body">
+        <div id="passwordStep1">
+          <div class="password-step">
+            <div class="password-step-label">
+              <span class="password-step-num">1</span>
+              Enter your current password
+            </div>
+            <div class="password-input-wrap">
+              <input type="password" class="password-input" id="currentPasswordInput" placeholder="Current password"
+                autocomplete="current-password">
+              <button type="button" class="password-toggle-eye" data-target="currentPasswordInput"
+                style="display:none;">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="password-step">
+            <div class="password-step-label">
+              <span class="password-step-num">2</span>
+              Enter your 2FA code
+            </div>
+            <input type="text" class="password-input password-code-input" id="password2faInput" placeholder="000000"
+              maxlength="6" autocomplete="off">
+            <div class="forgot-code-link" id="passwordForgotLink">
+              You don't have the code? <span class="forgot-code-click">Click here</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="passwordStep2" style="display:none;">
+          <div class="password-step">
+            <div class="password-step-label">
+              <span class="password-step-num">3</span>
+              Enter your new password
+            </div>
+            <div class="password-input-wrap">
+              <input type="password" class="password-input" id="newPasswordInput" placeholder="New password"
+                autocomplete="new-password">
+              <button type="button" class="password-toggle-eye" data-target="newPasswordInput" style="display:none;">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="password-step">
+            <div class="password-step-label">
+              <span class="password-step-num">4</span>
+              Confirm your new password
+            </div>
+            <div class="password-input-wrap">
+              <input type="password" class="password-input" id="confirmPasswordInput" placeholder="Confirm new password"
+                autocomplete="new-password">
+              <button type="button" class="password-toggle-eye" data-target="confirmPasswordInput"
+                style="display:none;">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="password-error" id="passwordError"></div>
+        <div class="password-success" id="passwordSuccess">
+          <i class="fa-solid fa-check-circle"></i> Password has been successfully changed!
+        </div>
+      </div>
+
+      <div class="password-modal-footer">
+        <button class="password-btn password-btn-cancel" id="passwordCancelBtn">Cancel</button>
+        <button class="password-btn password-btn-confirm" id="passwordConfirmBtn">Verify</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="twofa-modal-overlay" id="twofaModal">
+    <div class="twofa-modal">
+      <div class="twofa-modal-header">
+        <div class="twofa-modal-header-left">
+          <div class="twofa-modal-icon">
+            <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/adpanel-dark.webp" alt="2FA" draggable="false"
+              width="20px" height="20px">
+          </div>
+          <div>
+            <h3 class="twofa-modal-title">Change 2FA Code</h3>
+            <p class="twofa-modal-subtitle">Update your authenticator app</p>
+          </div>
+        </div>
+        <button class="twofa-modal-close" id="twofaModalClose">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="twofa-modal-body">
+        <div class="twofa-step" id="twofaStep1">
+          <div class="twofa-step-label">
+            <span class="twofa-step-num">1</span>
+            Enter your current 2FA code
+          </div>
+          <input type="text" class="twofa-input" id="currentCodeInput" placeholder="000000" maxlength="6"
+            autocomplete="off">
+          <div class="forgot-code-link" id="twofaForgotLink">
+            You don't have the code? <span class="forgot-code-click">Click here</span>
+          </div>
+        </div>
+
+        <div class="twofa-step" id="qrCodeSection" style="display:none;">
+          <div class="twofa-step-label">
+            <span class="twofa-step-num">2</span>
+            Scan this new QR code with your authenticator
+          </div>
+          <div class="twofa-qr-wrap">
+            <img id="newQrCode" src="" alt="New 2FA QR Code">
+            <div class="twofa-qr-hint">Scan with Google Authenticator, Authy, etc.</div>
+          </div>
+          <div class="twofa-secret-display">
+            <span class="twofa-secret-code" id="newSecretDisplay">—</span>
+          </div>
+        </div>
+
+        <div class="twofa-step" id="confirmSection" style="display:none;">
+          <div class="twofa-step-label">
+            <span class="twofa-step-num">3</span>
+            Enter the code from your new authenticator
+          </div>
+          <input type="text" class="twofa-input" id="newCodeInput" placeholder="000000" maxlength="6"
+            autocomplete="off">
+        </div>
+
+        <div class="twofa-error" id="twofaError"></div>
+        <div class="twofa-success" id="twofaSuccess">
+          <i class="fa-solid fa-check-circle"></i> 2FA has been successfully updated!
+        </div>
+      </div>
+
+      <div class="twofa-modal-footer">
+        <button class="twofa-btn twofa-btn-cancel" id="twofaCancelBtn">Cancel</button>
+        <button class="twofa-btn twofa-btn-confirm" id="twofaConfirmBtn">Verify Current Code</button>
+      </div>
+    </div>
+  </div>
+
+
+  <% if (isAdmin) { %>
+    <footer class="footer" id="upload">
+      <div class="footer-inner">
+        <div class="footer-copy">
+          <h3>Spin up a new server</h3>
+          <p>Pick a template and a name, ADPanel will do the rest.</p>
+        </div>
+        <button class="btn-primary" id="createBtnFooter">
+          <i class="fa-solid fa-plus"></i>
+          <span>Create</span>
+        </button>
+      </div>
+    </footer>
+    <% } %>
+
+      <template id="empty-state">
+        <div class="empty-state">
+          <i class="fa-solid fa-wand-magic-sparkles empty-state__icon"></i>
+          <h4>No servers found</h4>
+          <p>
+            <% if (isAdmin) { %>
+              Try adjusting your search or create a new server.
+              <% } else { %>
+                You don't have access to any servers
+                <% } %>
+          </p>
+        </div>
+      </template>
+
+      <% if (isAdmin) { %>
+        <div id="createModal" class="enterprise-modal-overlay" aria-hidden="true">
+          <div class="enterprise-modal" role="dialog" aria-modal="true" aria-labelledby="createTitle">
+            <div class="enterprise-modal-header">
+              <div class="enterprise-modal-icon icon-rocket">
+                <Img src="/images/server.webp" alt="Create Server" width="67px" height="67px">
+              </div>
+              <div class="enterprise-modal-titles">
+                <h3 class="enterprise-modal-title" id="createTitle">Create server</h3>
+                <p class="enterprise-modal-subtitle">Setup your new server instance in just a few steps.</p>
+              </div>
+              <button id="createClose" class="enterprise-modal-close" title="Close">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+
+            <div class="enterprise-modal-body enterprise-modal-body--split">
+              <div class="enterprise-modal-main">
+                <div class="enterprise-field">
+                  <label for="serverName">Server name</label>
+                  <input id="serverName" type="text" placeholder="e.g. MY Discord Bot" maxlength="40" />
+                  <div class="enterprise-hint">
+                    Letters, numbers, spaces, dashes, and underscores. Maximum 40 characters.
+                  </div>
+                </div>
+
+                <div class="enterprise-field">
+                  <label>Template</label>
+                  <div id="templateGrid" class="enterprise-template-grid" role="listbox" aria-label="Templates"></div>
+                </div>
+
+                <div class="enterprise-field">
+                  <label>Specific Node</label>
+                  <div id="nodeGrid" class="enterprise-node-grid" role="listbox" aria-label="Nodes"></div>
+                </div>
+              </div>
+
+              <aside class="enterprise-modal-aside">
+                <div class="enterprise-summary">
+                  <div class="enterprise-summary-header">
+                    <div class="enterprise-summary-title">Summary</div>
+                    <span class="enterprise-summary-badge"><i class="fa-solid fa-bolt"></i>&nbsp;Live preview</span>
+                  </div>
+                  <div class="enterprise-summary-row">
+                    <span class="enterprise-summary-label">Name</span>
+                    <span class="enterprise-summary-value" id="summaryServerName">—</span>
+                  </div>
+                  <div class="enterprise-summary-row">
+                    <span class="enterprise-summary-label">Template</span>
+                    <span class="enterprise-summary-value" id="summaryTemplateName">—</span>
+                  </div>
+                  <div class="enterprise-summary-row">
+                    <span class="enterprise-summary-label">Node</span>
+                    <span class="enterprise-summary-value" id="summaryNodeName">Local node</span>
+                  </div>
+                  <div class="enterprise-summary-footer">
+                    ADPanel helps you choose the best
+                  </div>
+                </div>
+                <div id="templateInfo2" class="enterprise-hint"></div>
+              </aside>
+            </div>
+
+            <div class="enterprise-modal-footer">
+              <span class="enterprise-spinner" id="createSpinner"></span>
+              <button id="createCancel" class="enterprise-btn-secondary">Cancel</button>
+              <button id="createConfirm" class="enterprise-btn-primary">
+                <i class="fa-solid fa-arrow-right"></i><span>Continue</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div id="forkModal" class="enterprise-modal-overlay" aria-hidden="true">
+          <div class="enterprise-modal" role="dialog" aria-modal="true" aria-labelledby="forkTitle">
+            <div class="enterprise-modal-header">
+              <div class="enterprise-modal-icon icon-cube">
+                <i class="fa-solid fa-cube"></i>
+              </div>
+              <div class="enterprise-modal-titles">
+                <div class="enterprise-modal-eyebrow">Minecraft</div>
+                <h3 class="enterprise-modal-title" id="forkTitle">Choose Minecraft fork</h3>
+                <p class="enterprise-modal-subtitle">Select a server type.</p>
+              </div>
+              <button id="forkClose" class="enterprise-modal-close" title="Close">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+
+            <div class="enterprise-modal-body">
+              <div id="forkGrid" class="enterprise-fork-grid enterprise-fork-grid--spacious" role="listbox" aria-label="Minecraft forks"></div>
+
+              <div id="forkInfo" class="enterprise-hint enterprise-hint--spacious"></div>
+            </div>
+
+            <div class="enterprise-modal-footer">
+              <span class="enterprise-spinner" id="forkSpinner"></span>
+              <button id="forkBack" class="enterprise-btn-secondary">Back</button>
+              <button id="forkConfirm" class="enterprise-btn-primary">
+                <i class="fa-solid fa-arrow-right"></i><span>Continue</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="portModal" class="enterprise-modal-overlay" aria-hidden="true">
+          <div class="enterprise-modal" role="dialog" aria-modal="true" aria-labelledby="portTitle">
+            <div class="enterprise-modal-header">
+              <div class="enterprise-modal-icon icon-ethernet">
+                <i class="fa-solid fa-ethernet"></i>
+              </div>
+              <div class="enterprise-modal-titles">
+                <div class="enterprise-modal-eyebrow">Networking</div>
+                <h3 class="enterprise-modal-title" id="portTitle">
+                  <span id="portTitleText">Expose public port</span>
+                </h3>
+                <p class="enterprise-modal-subtitle" id="portSubtitle">Choose which public port to expose for this
+                  server.</p>
+              </div>
+              <button id="portClose" class="enterprise-modal-close" title="Close">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+
+            <div class="enterprise-modal-body">
+              <div class="enterprise-port-layout">
+                <div class="enterprise-field">
+                  <label>Public endpoint</label>
+                  <div class="enterprise-connection-chip">
+                    <i class="fa-solid fa-plug"></i>
+                    <span>
+                      <code id="serverIp">detecting…</code>
+                      <span class="enterprise-connection-chip__divider">:</span>
+                      <code id="serverPortPreview">25565</code>
+                    </span>
+                  </div>
+                  <div class="enterprise-hint">
+                    This is the address your users will use to connect.
+                  </div>
+                </div>
+                <div class="enterprise-field">
+                  <label for="serverPort">Public port</label>
+                  <input id="serverPort" type="number" min="1" max="65535" step="1" inputmode="numeric" pattern="[0-9]*" placeholder="25565" />
+                  <div class="enterprise-hint">
+                    Default <span id="portDefaultValue">25565</span>. Available range is 1 to 35650.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="enterprise-modal-footer">
+              <span class="enterprise-spinner" id="portSpinner"></span>
+              <button id="portBack" class="enterprise-btn-secondary">Back</button>
+              <button id="portConfirm" class="enterprise-btn-primary">
+                <i class="fa-solid fa-arrow-right"></i><span>Next</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="startupModal" class="enterprise-modal-overlay" aria-hidden="true">
+          <div class="enterprise-modal" role="dialog" aria-modal="true" aria-labelledby="startupTitle">
+            <div class="enterprise-modal-header">
+              <div class="enterprise-modal-icon icon-terminal">
+                <i class="fa-solid fa-terminal"></i>
+              </div>
+              <div class="enterprise-modal-titles">
+                <div class="enterprise-modal-eyebrow">Startup</div>
+                <h3 class="enterprise-modal-title" id="startupTitle">Startup Command</h3>
+                <p class="enterprise-modal-subtitle">Set the process command for your server.</p>
+              </div>
+              <button id="startupClose" class="enterprise-modal-close" title="Close">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+
+            <div class="enterprise-modal-body enterprise-modal-body--spacious">
+              <div class="enterprise-field">
+                <label for="startupCommand">Process Command</label>
+                <textarea id="startupCommand" rows="3" aria-describedby="startupCommandError"
+                  placeholder="java -Xms128M -Xmx{RAM_MB}M -jar /data/server.jar nogui"></textarea>
+                <div id="startupCommandError" class="enterprise-hint enterprise-hint-error" role="alert" hidden></div>
+              </div>
+              <div class="enterprise-field">
+                <label>Available Variables</label>
+                <div class="enterprise-variables-grid enterprise-variables-grid--spacious">
+                  <div class="enterprise-variable-chip"><code>{PORT}</code> – Port</div>
+                  <div class="enterprise-variable-chip"><code>{DATA_DIR}</code> – Data path</div>
+                  <div class="enterprise-variable-chip"><code>{START_FILE}</code> – Entry file</div>
+                  <div class="enterprise-variable-chip"><code>{RAM_MB}</code> – RAM (MB)</div>
+                  <div class="enterprise-variable-chip"><code>{CPU_CORES}</code> – CPU cores</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="enterprise-modal-footer">
+              <span class="enterprise-spinner" id="startupSpinner"></span>
+              <button id="startupBack" class="enterprise-btn-secondary">Back</button>
+              <button id="startupConfirm" class="enterprise-btn-primary">
+                <i class="fa-solid fa-arrow-right"></i><span>Next</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="importModal" class="enterprise-modal-overlay" aria-hidden="true">
+          <div class="enterprise-modal" role="dialog" aria-modal="true" aria-labelledby="importTitle">
+            <div class="enterprise-modal-header">
+              <div class="enterprise-modal-icon icon-download">
+                <i class="fa-solid fa-cloud-arrow-down"></i>
+              </div>
+              <div class="enterprise-modal-titles">
+                <div class="enterprise-modal-eyebrow">Optional</div>
+                <h3 class="enterprise-modal-title" id="importTitle">Import Files</h3>
+                <p class="enterprise-modal-subtitle">Download files from a URL to your server folder.</p>
+              </div>
+              <button id="importClose" class="enterprise-modal-close" title="Close">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+
+            <div class="enterprise-modal-body enterprise-modal-body--spacious">
+              <div class="enterprise-field">
+                <label for="importUrl">Archive URL</label>
+                <input id="importUrl" type="url" placeholder="https://example.com/files.zip" />
+                <div class="enterprise-hint">
+                  Supported: <code>.zip</code>, <code>.tar.gz</code>
+                </div>
+              </div>
+
+              <div id="importProgressContainer" class="enterprise-import-progress" style="display: none;">
+                <div class="enterprise-import-progress-header">
+                  <span class="enterprise-import-progress-label">Downloading...</span>
+                  <span class="enterprise-import-progress-percent" id="importPercent">0%</span>
+                </div>
+                <div class="enterprise-import-progress-bar">
+                  <div class="enterprise-import-progress-fill" id="importProgressFill" style="width: 0%;"></div>
+                </div>
+                <div class="enterprise-import-progress-info">
+                  <span id="importDownloaded">0 MB</span> / <span id="importTotal">0 MB</span>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="enterprise-modal-footer">
+              <span class="enterprise-spinner" id="importSpinner"></span>
+              <button id="importBack" class="enterprise-btn-secondary">Back</button>
+              <button id="importSkip" class="enterprise-btn-secondary">Skip</button>
+              <button id="importConfirm" class="enterprise-btn-primary">
+                <i class="fa-solid fa-download"></i><span>Download & Continue</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="resourcesModal" class="enterprise-modal-overlay" aria-hidden="true">
+          <div class="enterprise-modal" role="dialog" aria-modal="true" aria-labelledby="resourcesTitle">
+            <div class="enterprise-modal-header">
+              <div class="enterprise-modal-icon icon-chip">
+                <i class="fa-solid fa-microchip"></i>
+              </div>
+              <div class="enterprise-modal-titles">
+                <div class="enterprise-modal-eyebrow">Resources</div>
+                <h3 class="enterprise-modal-title" id="resourcesTitle">Configure Resources</h3>
+                <p class="enterprise-modal-subtitle">Set limits for this server. Leave empty to use node maximum.</p>
+              </div>
+              <button id="resourcesClose" class="enterprise-modal-close" title="Close">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+
+            <div class="enterprise-modal-body enterprise-modal-body--spacious">
+              <div class="enterprise-resources-layout">
+                <div class="enterprise-resources-info">
+                  <div class="enterprise-resources-info__header">
+                    <i class="fa-solid fa-server"></i>
+                    <span>Node Resources</span>
+                  </div>
+                  <div class="enterprise-resources-info__grid">
+                    <div class="enterprise-resources-info__item">
+                      <span class="enterprise-resources-info__label">Available RAM</span>
+                      <span class="enterprise-resources-info__value" id="nodeRamLimit">—</span>
+                    </div>
+                    <div class="enterprise-resources-info__item">
+                      <span class="enterprise-resources-info__label">Available CPU</span>
+                      <span class="enterprise-resources-info__value" id="nodeCpuLimit">—</span>
+                    </div>
+                    <div class="enterprise-resources-info__item">
+                      <span class="enterprise-resources-info__label">Available Storage</span>
+                      <span class="enterprise-resources-info__value" id="nodeStorageLimit">—</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="enterprise-resources-fields enterprise-resources-fields--spacious">
+                  <div class="enterprise-field">
+                    <label for="resourceRam">RAM Limit (MB)</label>
+                    <input id="resourceRam" type="number" min="0" step="128" placeholder="e.g. 2048" />
+                  </div>
+
+                  <div class="enterprise-field">
+                    <label for="resourceCpuCores">
+                      CPU Cores
+                      <span class="enterprise-field-tooltip">
+                        <i class="fa-solid fa-circle-question"></i>
+                        <span class="enterprise-field-tooltip-card">
+                          <p>The number of processing units dedicated to your server; use 2 or more for modern applications.</p>
+                        </span>
+                      </span>
+                    </label>
+                    <input id="resourceCpuCores" type="number" min="0" step="0.5" placeholder="e.g. 2" />
+                  </div>
+
+                  <div class="enterprise-field">
+                    <label for="resourceSwap">
+                      Swap Memory (MB)
+                      <span class="enterprise-field-tooltip">
+                        <i class="fa-solid fa-circle-question"></i>
+                        <span class="enterprise-field-tooltip-card">
+                          <p>Extra virtual RAM used when physical memory is full; set to 512 or 1024 to prevent the server from crashing from OOM Killer if your node have low memory, ensure you have SWAP activated on your machine.</p>
+                        </span>
+                      </span>
+                    </label>
+                    <input id="resourceSwap" type="number" min="-1" step="128" placeholder="e.g. 512" />
+                  </div>
+
+                  <div class="enterprise-field">
+                    <label for="resourceStorage">Storage (MB)</label>
+                    <input id="resourceStorage" type="number" min="0" step="1" placeholder="e.g. 500" />
+                  </div>
+
+                  <div class="enterprise-field">
+                    <label for="resourceBackups">Max Backups</label>
+                    <input id="resourceBackups" type="number" min="0" step="1" placeholder="e.g. 5" />
+                  </div>
+
+                  <div class="enterprise-field">
+                    <label for="resourceMaxSchedules">Max Schedules</label>
+                    <input id="resourceMaxSchedules" type="number" min="0" step="1" placeholder="e.g. 10" />
+                  </div>
+
+                  <div class="enterprise-field">
+                    <label for="resourceIoWeight">
+                      I/O Priority
+                      <span class="enterprise-field-tooltip">
+                        <i class="fa-solid fa-circle-question"></i>
+                        <span class="enterprise-field-tooltip-card">
+                          <p>I/O Priority determines how fast your server reads or writes data; set it to 1000 for having highest priority.</p>
+                        </span>
+                      </span>
+                    </label>
+                    <input id="resourceIoWeight" type="number" min="10" max="1000" step="10" placeholder="e.g. 500" />
+                    <div class="enterprise-hint">Maximum is 1000.</div>
+                  </div>
+
+                  <div class="enterprise-field">
+                    <label for="resourceCpuWeight">
+                      CPU Priority
+                      <span class="enterprise-field-tooltip">
+                        <i class="fa-solid fa-circle-question"></i>
+                        <span class="enterprise-field-tooltip-card">
+                          <p>CPU Priority controls how much processing power your server gets during high-load periods; to ensure maximum performance, set it to 1000.</p>
+                        </span>
+                      </span>
+                    </label>
+                    <input id="resourceCpuWeight" type="number" min="1" max="1000" step="10" placeholder="e.g. 500" />
+                    <div class="enterprise-hint">Maximum is 1000.</div>
+                  </div>
+
+                  <div class="enterprise-field">
+                    <label for="resourcePidsLimit">
+                      Process Limit
+                      <span class="enterprise-field-tooltip">
+                        <i class="fa-solid fa-circle-question"></i>
+                        <span class="enterprise-field-tooltip-card">
+                          <p>Process Limit restricts the maximum number of simultaneous tasks your server can run; to ensure maximum performance, set it to 512 or higher.</p>
+                        </span>
+                      </span>
+                    </label>
+                    <input id="resourcePidsLimit" type="number" min="64" max="4096" step="64" placeholder="e.g. 512" />
+                    <div class="enterprise-hint">Maximum is 4096.</div>
+                  </div>
+
+                  <div class="enterprise-field">
+                    <label for="resourceFileLimit">
+                      File Limit
+                      <span class="enterprise-field-tooltip">
+                        <i class="fa-solid fa-circle-question"></i>
+                        <span class="enterprise-field-tooltip-card">
+                          <p>File Limit sets the maximum number of files your server can keep open at once; set it to 32768 or higher to prevent crashes.</p>
+                        </span>
+                      </span>
+                    </label>
+                    <input id="resourceFileLimit" type="number" min="1024" max="1048576" step="1024" placeholder="e.g. 65535" />
+                    <div class="enterprise-hint">Maximum is 1048576.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="enterprise-modal-footer">
+              <span class="enterprise-spinner" id="resourcesSpinner"></span>
+              <button id="resourcesBack" class="enterprise-btn-secondary">Back</button>
+              <button id="resourcesConfirm" class="enterprise-btn-primary">
+                <i class="fa-solid fa-check"></i><span>Create</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="importModal" class="enterprise-modal-overlay" aria-hidden="true">
+          <div class="enterprise-modal" role="dialog" aria-modal="true" aria-labelledby="importTitle">
+            <div class="enterprise-modal-header">
+              <div class="enterprise-modal-icon icon-download">
+                <i class="fa-solid fa-download"></i>
+              </div>
+              <div class="enterprise-modal-titles">
+                <div class="enterprise-modal-eyebrow">Optional</div>
+                <h3 class="enterprise-modal-title" id="importTitle">Import Files from URL</h3>
+                <p class="enterprise-modal-subtitle">Download and extract an archive directly to your server folder.</p>
+              </div>
+              <button id="importClose" class="enterprise-modal-close" title="Close">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+
+            <div class="enterprise-modal-body">
+              <div class="enterprise-field">
+                <label for="importUrl">Archive URL</label>
+                <input id="importUrl" type="url" placeholder="https://example.com/files.zip" />
+                <div class="enterprise-hint">
+                  Direct link to an archive file. Supported formats: <strong>.zip</strong>, <strong>.tar.gz</strong>
+                </div>
+              </div>
+
+              <div class="enterprise-hint"
+                style="margin-top: 12px; padding: 12px 14px; background: rgba(255, 255, 255, 0.03); border-radius: 12px;">
+                <i class="fa-solid fa-circle-info" style="margin-right: 6px; color: rgba(16, 185, 129, 0.8);"></i>
+                Leave this empty to skip importing files. The server will be created with an empty folder or default
+                template files.
+              </div>
+
+              <div id="importProgressContainer" class="enterprise-import-progress" style="display: none;">
+                <div class="enterprise-import-progress-header">
+                  <span class="enterprise-import-progress-label">Downloading archive...</span>
+                  <span id="importPercent" class="enterprise-import-progress-percent">0%</span>
+                </div>
+                <div class="enterprise-import-progress-bar">
+                  <div id="importProgressFill" class="enterprise-import-progress-fill" style="width: 0%;"></div>
+                </div>
+                <div class="enterprise-import-progress-info">
+                  <span id="importDownloaded">0 MB</span> / <span id="importTotal">0 MB</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="enterprise-modal-footer">
+              <span class="enterprise-spinner" id="importSpinner"></span>
+              <button id="importBack" class="enterprise-btn-secondary">Back</button>
+              <button id="importSkip" class="enterprise-btn-secondary">Skip</button>
+              <button id="importConfirm" class="enterprise-btn-primary">
+                <i class="fa-solid fa-arrow-right"></i><span>Continue</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <% } %>
+
+          <script nonce="<%= cspNonce %>" data-cfasync="false" src="/socket.io/socket.io.min.js"></script>
+          <script nonce="<%= cspNonce %>" data-cfasync="false" src="/js/dashboard.js?v=20260426-resource-performance" defer></script>
+
+          <div class="christmas-modal" id="christmasModal">
+            <div class="christmas-glass-layer christmas-glass-layer-1"></div>
+            <div class="christmas-glass-layer christmas-glass-layer-3"></div>
+            <div class="christmas-popup">
+              <button class="christmas-close" id="christmasClose" type="button" aria-label="Close">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+              <div class="christmas-content">
+                <div class="christmas-brand">
+                  <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/adpanel-dark.webp" alt="ADPanel Christmas"
+                    class="christmas-logo" />
+                  <span class="christmas-title">ADPanel</span>
+                </div>
+                <p class="christmas-message">Wish you merry christmas!</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="newyear-modal" id="newyearModal">
+            <div class="newyear-glass-layer newyear-glass-layer-1"></div>
+            <div class="newyear-glass-layer newyear-glass-layer-3"></div>
+            <div class="newyear-popup">
+              <button class="newyear-close" id="newyearClose" type="button" aria-label="Close">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+              <div class="newyear-content">
+                <div class="newyear-brand">
+                  <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/adpanel-dark.webp" alt="ADPanel"
+                    class="newyear-logo" />
+                  <span class="newyear-title">ADPanel</span>
+                </div>
+                <p class="newyear-message">You are here to build amazing things 1 more year with ADPanel</p>
+              </div>
+            </div>
+          </div>
+
+          <style nonce="<%= cspNonce %>">
+            .christmas-modal {
+              position: fixed;
+              inset: 0;
+              display: none;
+              align-items: center;
+              justify-content: center;
+              z-index: 100000;
+              perspective: 1200px;
+            }
+
+            .christmas-modal.show {
+              display: flex;
+            }
+
+            .christmas-glass-layer {
+              position: absolute;
+              inset: 0;
+              pointer-events: none;
+            }
+
+            .christmas-glass-layer-1 {
+              background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.85) 100%);
+              opacity: 0;
+              animation: christmasLayer1In 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            }
+
+            .christmas-glass-layer-3 {
+              background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, transparent 30%, transparent 70%, rgba(255, 255, 255, 0.01) 100%);
+              opacity: 0;
+              backdrop-filter: blur(8px);
+              -webkit-backdrop-filter: blur(8px);
+              animation: christmasLayer3In 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+            }
+
+            @keyframes christmasLayer1In {
+              from {
+                opacity: 0;
+                filter: blur(20px);
+              }
+
+              to {
+                opacity: 1;
+                filter: blur(0);
+              }
+            }
+
+            @keyframes christmasLayer3In {
+              from {
+                opacity: 0;
+                filter: blur(10px);
+              }
+
+              to {
+                opacity: 1;
+                filter: blur(0);
+              }
+            }
+
+            .christmas-popup {
+              position: relative;
+              background: linear-gradient(135deg, rgba(20, 25, 30, 0.95) 0%, rgba(15, 18, 22, 0.98) 100%);
+              border: 1px solid rgba(255, 255, 255, 0.08);
+              border-radius: 20px;
+              padding: 40px 50px;
+              min-width: 320px;
+              max-width: 90vw;
+              text-align: center;
+              transform: translateY(30px) scale(0.95);
+              opacity: 0;
+              animation: christmasPopupIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
+              box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+            }
+
+            @keyframes christmasPopupIn {
+              to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+              }
+            }
+
+            .christmas-close {
+              position: absolute;
+              top: 16px;
+              right: 16px;
+              width: 32px;
+              height: 32px;
+              border: none;
+              background: rgba(255, 255, 255, 0.06);
+              border-radius: 8px;
+              color: rgba(255, 255, 255, 0.6);
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 14px;
+              transition: all 0.2s ease;
+            }
+
+            .christmas-close:hover {
+              background: rgba(255, 255, 255, 0.12);
+              color: #fff;
+            }
+
+            .christmas-content {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 20px;
+            }
+
+            .christmas-brand {
+              display: flex;
+              align-items: center;
+              gap: 12px;
+            }
+
+            .christmas-logo {
+              width: 64px;
+              height: 64px;
+              object-fit: contain;
+            }
+
+            .christmas-title {
+              font-family: 'Inter', 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+              font-size: 32px;
+              font-weight: 800;
+              color: #fff;
+              letter-spacing: -0.5px;
+            }
+
+            .christmas-message {
+              font-family: 'Inter', 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+              font-size: 18px;
+              color: rgba(255, 255, 255, 0.8);
+              margin: 0;
+              font-weight: 500;
+            }
+
+            .newyear-modal {
+              position: fixed;
+              inset: 0;
+              display: none;
+              align-items: center;
+              justify-content: center;
+              z-index: 100000;
+              perspective: 1200px;
+            }
+
+            .newyear-modal.show {
+              display: flex;
+            }
+
+            .newyear-glass-layer {
+              position: absolute;
+              inset: 0;
+              pointer-events: none;
+            }
+
+            .newyear-glass-layer-1 {
+              background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.85) 100%);
+              opacity: 0;
+              animation: newyearLayer1In 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            }
+
+            .newyear-glass-layer-3 {
+              background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, transparent 30%, transparent 70%, rgba(255, 255, 255, 0.01) 100%);
+              opacity: 0;
+              backdrop-filter: blur(8px);
+              -webkit-backdrop-filter: blur(8px);
+              animation: newyearLayer3In 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+            }
+
+            @keyframes newyearLayer1In {
+              from {
+                opacity: 0;
+                filter: blur(20px);
+              }
+
+              to {
+                opacity: 1;
+                filter: blur(0);
+              }
+            }
+
+            @keyframes newyearLayer3In {
+              from {
+                opacity: 0;
+                filter: blur(10px);
+              }
+
+              to {
+                opacity: 1;
+                filter: blur(0);
+              }
+            }
+
+            .newyear-popup {
+              position: relative;
+              background: linear-gradient(135deg, rgba(20, 25, 30, 0.95) 0%, rgba(15, 18, 22, 0.98) 100%);
+              border: 1px solid rgba(255, 255, 255, 0.08);
+              border-radius: 20px;
+              padding: 40px 50px;
+              min-width: 320px;
+              max-width: 90vw;
+              text-align: center;
+              transform: translateY(30px) scale(0.95);
+              opacity: 0;
+              animation: newyearPopupIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
+              box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+            }
+
+            @keyframes newyearPopupIn {
+              to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+              }
+            }
+
+            .newyear-close {
+              position: absolute;
+              top: 16px;
+              right: 16px;
+              width: 32px;
+              height: 32px;
+              border: none;
+              background: rgba(255, 255, 255, 0.06);
+              border-radius: 8px;
+              color: rgba(255, 255, 255, 0.6);
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 14px;
+              transition: all 0.2s ease;
+            }
+
+            .newyear-close:hover {
+              background: rgba(255, 255, 255, 0.12);
+              color: #fff;
+            }
+
+            .newyear-content {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 20px;
+            }
+
+            .newyear-brand {
+              display: flex;
+              align-items: center;
+              gap: 12px;
+            }
+
+            .newyear-logo {
+              width: 64px;
+              height: 64px;
+              object-fit: contain;
+            }
+
+            .newyear-title {
+              font-family: 'Inter', 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+              font-size: 32px;
+              font-weight: 800;
+              color: #fff;
+              letter-spacing: -0.5px;
+            }
+
+            .newyear-message {
+              font-family: 'Inter', 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+              font-size: 18px;
+              color: rgba(255, 255, 255, 0.8);
+              margin: 0;
+              font-weight: 500;
+            }
+          </style>
+
+          <script nonce="<%= cspNonce %>">
+            (function () {
+              const CHRISTMAS_IMG = '/images/ADPanel-christmas.png';
+              const NORMAL_IMG = '/images/ADPanel-dark.png';
+
+              function isChristmasPeriod() {
+                const now = new Date();
+                const month = now.getMonth();
+                const day = now.getDate();
+                return month === 11 && day >= 25 && day <= 28;
+              }
+
+              function isChristmasDay() {
+                const now = new Date();
+                return now.getMonth() === 11 && now.getDate() === 25;
+              }
+
+              function applyChristmasTheme() {
+                if (!isChristmasPeriod()) return;
+
+                const favicon = document.getElementById('favicon') || document.querySelector('link[rel="icon"]');
+                if (favicon) favicon.href = CHRISTMAS_IMG;
+
+                document.querySelectorAll('img').forEach(img => {
+                  if (img.src && (img.src.includes('ADPanel-dark.webp') || img.src.includes('i.imgur.com/k5agjYf'))) {
+                    img.src = CHRISTMAS_IMG;
+                  }
+                });
+              }
+
+              function showChristmasPopup() {
+                if (!isChristmasDay()) return;
+
+                const today = new Date().toDateString();
+                const seenKey = 'ADPanel_christmas_seen_' + today;
+                if (localStorage.getItem(seenKey)) return;
+
+                const modal = document.getElementById('christmasModal');
+                if (!modal) return;
+
+                modal.classList.add('show');
+                localStorage.setItem(seenKey, 'true');
+
+                const closeBtn = document.getElementById('christmasClose');
+                if (closeBtn) {
+                  closeBtn.addEventListener('click', () => modal.classList.remove('show'));
+                }
+
+                modal.addEventListener('click', (e) => {
+                  if (e.target === modal || e.target.classList.contains('christmas-glass-layer')) {
+                    modal.classList.remove('show');
+                  }
+                });
+              }
+
+              function isNewYearDay() {
+                const now = new Date();
+                return now.getMonth() === 0 && now.getDate() === 1;
+              }
+
+              function showNewYearPopup() {
+                if (!isNewYearDay()) return;
+
+                const today = new Date().toDateString();
+                const seenKey = 'ADPanel_newyear_seen_' + today;
+                if (localStorage.getItem(seenKey)) return;
+
+                const modal = document.getElementById('newyearModal');
+                if (!modal) return;
+
+                modal.classList.add('show');
+                localStorage.setItem(seenKey, 'true');
+
+                const closeBtn = document.getElementById('newyearClose');
+                if (closeBtn) {
+                  closeBtn.addEventListener('click', () => modal.classList.remove('show'));
+                }
+
+                modal.addEventListener('click', (e) => {
+                  if (e.target === modal || e.target.classList.contains('newyear-glass-layer')) {
+                    modal.classList.remove('show');
+                  }
+                });
+              }
+
+              document.addEventListener('DOMContentLoaded', () => {
+                applyChristmasTheme();
+                showChristmasPopup();
+                showNewYearPopup();
+              });
+            })();
+          </script>
+          <script nonce="<%= cspNonce %>" data-cfasync="false" src="/js/dashboard-assistant.js?v=20260423-assistant-access-gate" defer></script>
+          <div style="text-align: center; margin: 40px 0 20px 0; color: rgba(255, 255, 255, 0.4); font-size: 13px; font-weight: 500;">
+            &copy; 2026-<%= new Date().getFullYear() %> ADPanel Dashboard
+          </div>
+</body>
+
+</html>

@@ -1,0 +1,10 @@
+.dock-wrap.dock-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+}
+
+.dock-wrap {
+    transition: all 0.3s ease;
+}

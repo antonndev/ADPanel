@@ -1,0 +1,1988 @@
+<!DOCTYPE html>
+<html data-bot="<%= bot %>">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= (branding && branding.appName) ? branding.appName : 'ADPanel' %> - <%= displayName %>
+  </title>
+  <% const assetVersion = typeof themeVersion !== 'undefined' ? themeVersion : '1'; %>
+
+  <link rel="stylesheet" href="/style.css?v=<%= assetVersion %>">
+  <link id="favicon" rel="icon" type="image/webp" href="<%= (branding && branding.faviconUrl) ? branding.faviconUrl : '/auth-assets/favicon' %>" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha384-nRgPTkuX86pH8yjPJUAFuASXQSSl2/bBUiNV47vSYpKFxHJhbcrGnmlYpYJMeD7a" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="/css-ext/all.css" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+
+  <script nonce="<%= cspNonce %>" data-cfasync="false" src="/socket.io/socket.io.js"></script>
+  <script nonce="<%= cspNonce %>" data-cfasync="false"
+    src="https://cdn.jsdelivr.net/npm/ansi_up@5.1.0/ansi_up.min.js"></script>
+
+  <script nonce="<%= cspNonce %>" data-cfasync="false"
+    src="https://cdn.jsdelivr.net/npm/ace-builds@1.36.5/src-min-noconflict/ace.js"></script>
+  <script nonce="<%= cspNonce %>" data-cfasync="false"
+    src="https://cdn.jsdelivr.net/npm/ace-builds@1.36.5/src-min-noconflict/theme-one_dark.js"></script>
+  <script nonce="<%= cspNonce %>" data-cfasync="false"
+    src="https://cdn.jsdelivr.net/npm/ace-builds@1.36.5/src-min-noconflict/mode-javascript.js"></script>
+  <script nonce="<%= cspNonce %>" data-cfasync="false"
+    src="https://cdn.jsdelivr.net/npm/ace-builds@1.36.5/src-min-noconflict/mode-json.js"></script>
+  <script nonce="<%= cspNonce %>" data-cfasync="false"
+    src="https://cdn.jsdelivr.net/npm/ace-builds@1.36.5/src-min-noconflict/mode-yaml.js"></script>
+  <script nonce="<%= cspNonce %>" data-cfasync="false"
+    src="https://cdn.jsdelivr.net/npm/ace-builds@1.36.5/src-min-noconflict/mode-python.js"></script>
+  <script nonce="<%= cspNonce %>" data-cfasync="false"
+    src="https://cdn.jsdelivr.net/npm/ace-builds@1.36.5/src-min-noconflict/mode-sh.js"></script>
+  <script nonce="<%= cspNonce %>" data-cfasync="false"
+    src="https://cdn.jsdelivr.net/npm/ace-builds@1.36.5/src-min-noconflict/mode-ini.js"></script>
+  <script nonce="<%= cspNonce %>" data-cfasync="false"
+    src="https://cdn.jsdelivr.net/npm/ace-builds@1.36.5/src-min-noconflict/mode-html.js"></script>
+  <script nonce="<%= cspNonce %>" data-cfasync="false"
+    src="https://cdn.jsdelivr.net/npm/ace-builds@1.36.5/src-min-noconflict/mode-css.js"></script>
+  <script nonce="<%= cspNonce %>" data-cfasync="false"
+    src="https://cdn.jsdelivr.net/npm/ace-builds@1.36.5/src-min-noconflict/mode-java.js"></script>
+  <script nonce="<%= cspNonce %>" data-cfasync="false"
+    src="https://cdn.jsdelivr.net/npm/ace-builds@1.36.5/src-min-noconflict/mode-text.js"></script>
+
+
+
+  <script nonce="<%= cspNonce %>" data-cfasync="false">
+    window.__ADPANEL_BOOTSTRAP__ = Object.freeze({
+      currentUser: {
+        email: <%- JSON.stringify((user && user.email) || "") %>,
+        preferences: <%- JSON.stringify((user && user.preferences) || {}) %>
+      }
+    });
+  </script>
+  <script nonce="<%= cspNonce %>" data-cfasync="false" src="/js/bot.js?v=<%= assetVersion %>" defer></script>
+  <script nonce="<%= cspNonce %>" data-cfasync="false"
+    src="https://cdn.jsdelivr.net/npm/monaco-editor@0.55.1/min/vs/loader.min.js"></script>
+
+  <script nonce="<%= cspNonce %>" data-cfasync="false">
+    (function () {
+      const CHRISTMAS_IMG = '/images/ADPanel-christmas.png';
+      function isChristmasPeriod() {
+        const now = new Date();
+        const month = now.getMonth();
+        const day = now.getDate();
+        return month === 11 && day >= 25 && day <= 28;
+      }
+      function applyChristmasTheme() {
+        if (!isChristmasPeriod()) return;
+        const favicon = document.getElementById('favicon') || document.querySelector('link[rel="icon"]');
+        if (favicon) favicon.href = CHRISTMAS_IMG;
+        document.querySelectorAll('img').forEach(img => {
+          if (img.src && (img.src.includes('ADPanel-dark.webp') || img.src.includes('i.imgur.com/k5agjYf'))) {
+            img.src = CHRISTMAS_IMG;
+          }
+        });
+      }
+      document.addEventListener('DOMContentLoaded', applyChristmasTheme);
+    })();
+  </script>
+
+  <link rel="stylesheet" href="/css/bot.css?v=<%= assetVersion %>">
+  <style nonce="<%= cspNonce %>">
+    *,
+    *::before,
+    *::after {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    #console,
+    #console *,
+    .ai-chat-messages,
+    .ai-chat-messages *,
+    .ai-message,
+    .ai-message *,
+    .ai-model-selector,
+    .ai-model-selector *,
+    input,
+    textarea {
+      -webkit-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text;
+    }
+
+    #console {
+      cursor: text;
+    }
+
+    img,
+    video,
+    canvas {
+      -webkit-user-drag: none;
+      user-drag: none;
+    }
+  </style>
+  <script nonce="<%= cspNonce %>">
+    function isInteractive(el) {
+      if (!el) return false;
+      if (el.nodeType === 3) el = el.parentNode;
+      if (!el.tagName) return false;
+      const tag = el.tagName.toUpperCase();
+      return tag === 'INPUT' || tag === 'TEXTAREA' || !!el.closest('#console, .ai-chat-messages, .ai-message, .ai-model-selector');
+    }
+
+    document.addEventListener('contextmenu', e => {
+      if (!isInteractive(e.target)) e.preventDefault();
+    });
+    document.addEventListener('dragstart', e => {
+      if (!isInteractive(e.target)) e.preventDefault();
+    });
+    document.addEventListener('selectstart', e => {
+      if (!isInteractive(e.target)) e.preventDefault();
+    });
+    document.addEventListener('copy', e => {
+      const selection = window.getSelection().toString();
+      if (selection.length === 0 && !isInteractive(e.target)) e.preventDefault();
+    });
+    document.addEventListener('cut', e => {
+      const tag = (e.target && e.target.tagName) ? e.target.tagName.toUpperCase() : '';
+      if (tag !== 'INPUT' && tag !== 'TEXTAREA') e.preventDefault();
+    });
+
+    document.addEventListener('keydown', e => {
+      const tag = (e.target && e.target.tagName) ? e.target.tagName.toUpperCase() : '';
+      const isInput = tag === 'INPUT' || tag === 'TEXTAREA';
+
+      if (e.ctrlKey || e.metaKey) {
+        if (['c', 'C'].includes(e.key)) {
+          return;
+        }
+
+        if (['a', 'A'].includes(e.key)) {
+          if (isInput) return;
+
+          e.preventDefault();
+          const consoleEl = document.getElementById('console');
+          if (consoleEl) {
+            const range = document.createRange();
+            range.selectNodeContents(consoleEl);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+          }
+          return;
+        }
+
+        if (['s', 'S', 'u', 'U'].includes(e.key)) {
+          e.preventDefault();
+        }
+      }
+    });
+  </script>
+  <style nonce="<%= cspNonce %>">
+    body {
+      background-color: #0b0f14;
+      color: #e6eef8;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow-x: hidden;
+    }
+
+    #mobile-block-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 999999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+      white-space: normal;
+    }
+
+    #mobile-block-overlay h2 {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.4;
+      font-size: clamp(18px, 5vw, 24px);
+      padding: 0 10px;
+      word-wrap: break-word;
+    }
+
+    @media (max-width: 767px) and (orientation: portrait) {
+      #mobile-block-overlay {
+        display: flex !important;
+      }
+    }
+  </style>
+  <style nonce="<%= cspNonce %>">
+    .sidebar-shell {
+      transition:
+        width 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.2s ease,
+        background-color 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.42s cubic-bezier(0.22, 1, 0.36, 1) !important;
+      will-change: width, background-color, box-shadow;
+    }
+
+    .sidebar-shell.open:hover {
+      box-shadow:
+        0 18px 44px rgba(0, 0, 0, 0.34),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      background-color: rgba(255, 255, 255, 0.062);
+    }
+
+    .sidebar-shell.open .sidebar-item,
+    .sidebar-shell.open .profile-card {
+      transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        color 0.2s ease,
+        padding 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .sidebar-shell.open .sidebar-item .label,
+    .sidebar-shell.open .profile-meta {
+      transition:
+        max-width 0.36s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.26s ease,
+        transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+      transition-delay: 0s;
+    }
+
+    .sidebar-shell.open:hover .sidebar-item .label,
+    .sidebar-shell.open:hover .profile-meta {
+      transition-delay: 0.08s;
+    }
+
+    .sidebar-shell.open:not(:hover) .sidebar-item .label,
+    .sidebar-shell.open:not(:hover) .profile-meta {
+      transition-delay: 0s;
+    }
+
+    #cmdInput,
+    #cmdInput:hover,
+    #cmdInput:focus,
+    #cmdInput:focus-visible,
+    #cmdInput:active {
+      outline: none !important;
+      border: none !important;
+      box-shadow: none !important;
+      transition: none !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="mobile-block-overlay">
+    <h2 style="color: white; font-weight: 700; font-size: 24px;">If you're on mobile, turn on your Desktop Mode or use
+      Landscape to work</h2>
+  </div>
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
+    <defs>
+      <filter id="glass-distortion" x="0%" y="0%" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.008 0.008" numOctaves="2" seed="92" result="noise" />
+        <feGaussianBlur in="noise" stdDeviation="2" result="blurred" />
+        <feDisplacementMap in="SourceGraphic" in2="blurred" scale="77" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </defs>
+  </svg>
+  <div id="offlineOverlay" class="notfound-modal" aria-hidden="true">
+    <div class="notfound-glass-layer notfound-glass-layer-1"></div>
+    <div class="notfound-glass-layer notfound-glass-layer-2"></div>
+    <div class="notfound-panel" role="dialog" aria-modal="true">
+      <div class="notfound-content">
+        <div class="notfound-robot">
+          <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/adpanel-dark.webp" alt="ADPanel"
+            class="notfound-robot-img" draggable="false" />
+        </div>
+        <div class="notfound-text">
+          <div class="notfound-code">404</div>
+          <div class="notfound-title">Page Not Found</div>
+          <div class="notfound-desc offline-text">The server you're looking for doesn't exist or has been removed.</div>
+        </div>
+        <div class="notfound-actions">
+          <a href="/" class="notfound-btn-primary">
+            <i class="fa-solid fa-house"></i>
+            <span>Back to Dashboard</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle quick actions" type="button"><i
+      class="fa-solid fa-grip"></i></button>
+  <aside class="sidebar-shell open" id="floatingSidebar" aria-label="Quick navigation">
+    <div class="sidebar-top">
+      <a href="/#account" class="sidebar-item active"
+        style="text-decoration: none; font-size: 13.33px; box-sizing: border-box;">
+        <span class="icon"><i class="fa-solid fa-user-gear"></i></span>
+        <span class="label">Account</span>
+      </a>
+    </div>
+    <div class="sidebar-middle">
+      <a class="sidebar-item" href="/"
+        style="text-decoration: none; color: inherit; font-size: 13.33px; box-sizing: border-box;">
+        <span class="icon"><i class="fa-solid fa-house"></i></span>
+        <span class="label">Overview</span>
+      </a>
+      <button class="sidebar-item" type="button" id="resourceStatsBtn" data-action="open-resource-stats">
+        <span class="icon"><i class="fa-solid fa-chart-pie"></i></span>
+        <span class="label">Resource statistics</span>
+      </button>
+
+      <a class="sidebar-item" href="/#servers"
+        style="text-decoration: none; color: inherit; font-size: 13.33px; box-sizing: border-box;">
+        <span class="icon"><i class="fa-solid fa-server"></i></span>
+        <span class="label">My servers</span>
+      </a>
+      <button class="sidebar-item" type="button" id="subdomainsSidebarBtn" data-action="open-subdomains">
+        <span class="icon"><i class="fa-solid fa-globe"></i></span>
+        <span class="label">Subdomains</span>
+      </button>
+      <% if (user && user.admin) { %>
+        <a href="/settings" class="sidebar-item"
+          style="text-decoration: none; color: inherit; font-size: 13.33px; box-sizing: border-box;">
+          <span class="icon"><i class="fa-solid fa-gear"></i></span>
+          <span class="label">Panel Settings</span>
+        </a>
+        <% } %>
+    </div>
+    <div class="sidebar-bottom">
+      <button class="profile-card" id="profileCard" type="button">
+        <div class="icon">
+          <img src="<%= avatarUrl %>" alt="Avatar"
+            style="width: 100%; height: 100%; border-radius: 999px; object-fit: cover;" draggable="false">
+        </div>
+        <div class="profile-meta">
+          <span id="profileEmail">—</span>
+          <div class="profile-status"><span class="status-dot"></span><span id="profileStatusLabel">Available</span>
+          </div>
+        </div>
+      </button>
+      <div class="status-popover" id="statusPopover" role="dialog" aria-modal="true" aria-label="Update status">
+        <div>
+          <label for="statusInput">Custom status</label>
+          <input id="statusInput" class="statusinputs" type="text" placeholder="In a flow..." maxlength="80" />
+        </div>
+        <div>
+          <label for="statusDuration">Clear after</label>
+          <div class="custom-select-wrapper" style="position:relative;width:100%">
+            <select id="statusDuration" style="display:none">
+              <option value="86400000">1 day</option>
+              <option value="259200000">3 days</option>
+              <option value="604800000">1 week</option>
+              <option value="2592000000">1 month</option>
+              <option value="never">Never</option>
+            </select>
+            <div class="custom-select" id="customStatusDuration" tabindex="0">
+              <span class="current">1 day</span>
+              <div class="arrow"></div>
+            </div>
+            <div class="custom-options" id="customStatusOptions">
+              <div class="option selected" data-value="86400000">1 day</div>
+              <div class="option" data-value="259200000">3 days</div>
+              <div class="option" data-value="604800000">1 week</div>
+              <div class="option" data-value="2592000000">1 month</div>
+              <div class="option" data-value="never">Never</div>
+            </div>
+          </div>
+        </div>
+        <div class="status-actions">
+          <button type="button" id="cancelStatus">Cancel</button>
+          <button type="button" class="save" id="saveStatus">Save</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="app-wrap">
+    <div class="topbar">
+      <div class="brands"></div>
+
+      <div class="top-actions">
+        <button class="icon-btn" id="filesBtn" data-action="open-files"><i class="fa-solid fa-folder-open"></i>
+          Files</button>
+        <button class="icon-btn" id="backupsBtn" data-action="open-backups"><i class="fa-solid fa-box-archive"></i>
+          Backups</button>
+
+        <button class="icon-btn" id="storeBtn" data-action="open-store"><i class="fa-solid fa-store"></i> Store</button>
+        <button class="icon-btn" id="activityBtn" data-action="open-activity"><i
+            class="fa-solid fa-clock-rotate-left"></i> Activity</button>
+        <button class="icon-btn" id="schedulerBtn" data-action="open-scheduler"><i
+            class="fa-solid fa-calendar-days"></i> Scheduler</button>
+        <button class="icon-btn" id="aiHelpBtn" data-action="open-ai-help">
+          <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/adpanel-dark.webp" alt="ADPanel Agent" width="20px"
+            height="21px" /> ADPanel Agent</button>
+        <button class="icon-btn" id="infoBtn" data-action="open-info"><i class="fa-solid fa-circle-info"></i>
+          Information</button>
+        <button class="icon-btn" id="runBtn" data-action="run" title="Run selected"><i class="fa-solid fa-play"></i>
+          Run</button>
+        <button class="icon-btn" id="subdomainsBtn" data-action="open-subdomains"><i class="fa-solid fa-globe"></i>
+          Subdomains</button>
+        <button class="icon-btn" id="stopBtn" data-action="stop" title="Stop process"><i class="fa-solid fa-stop"></i>
+          Stop</button>
+        <button class="icon-btn reinstall-topbar-btn" id="reinstallBtn" data-action="open-reinstall"
+          title="Reinstall server"><i class="fa-solid fa-rotate"></i>
+          Reinstall</button>
+      </div>
+    </div>
+
+    <div class="main-stage" style="margin-top:2px">
+      <div class="console-panel" role="main" aria-label="Console panel"
+        style="position: absolute; display: flex; justify-content: center; align-items: center; margin-left: 20px;">
+        <div class="console-window"
+          style="height: 500px; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);">
+          <div class="brandss"
+            style="display:flex;align-items:center; gap:10px; position:absolute; top:-60px; left:-40px;">
+            <a href="/"><img src="https://i.imgur.com/k5agjYf.png" width="50" height="30"></a>
+            <a href="/"
+              style="position: absolute;font-size:30px;font-weight:bold;color:white;text-decoration:none; margin-top: -5px; margin-left: 55px;">Panel</a>
+          </div>
+          <div class="window-header">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="dot" style="background:#ff5f56;cursor:pointer" data-action="stop"></span>
+              <span class="dot" style="background:#ffbd2e;cursor:pointer" data-action="stop"></span>
+              <span class="dot" style="background:#27c93f;cursor:pointer" data-action="run"></span>
+              <div style="margin-left:6px;color:var(--muted);font-size:13px">Console — <span
+                  style="color:#fff;font-weight:700">
+                  <%= displayName %>
+                </span></div>
+            </div>
+            <div class="window-controls">
+              <div style="color:var(--muted);font-size:13px">Status: <span id="statusLabel">idle</span></div>
+            </div>
+          </div>
+
+          <div class="controls">
+            <button class="run-button" id="miniRunBtn" data-action="run" title="Run"><i class="fa-solid fa-play"
+                style="transform:rotate(90deg)"></i></button>
+            <button class="stop-button" id="miniStopBtn" data-action="stop" title="Stop"><i
+                class="fa-solid fa-stop"></i></button>
+            <button class="stop-button kill-button" id="miniKillBtn" data-action="kill" title="Kill container"><i
+                class="fa-solid fa-power-off"></i></button>
+            <div style="flex:1"></div>
+          </div>
+
+          <pre id="console" aria-live="polite"></pre>
+
+          <div class="cmd-row" id="cmdRow" style="margin-top: 4px;">
+            <input id="cmdInput" class="command" type="text" placeholder="Type a command and press Enter" />
+            <button class="icon-btn" id="sendBtn" type="button" data-action="send" title="Send">Send</button>
+            <button class="icon-btn" id="clearBtn" type="button" data-action="clear" title="Clear">Clear</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="infoModal" class="info-modal" aria-hidden="true">
+    <div class="info-glass-layer info-glass-layer-1"></div>
+    <div class="info-glass-layer info-glass-layer-2"></div>
+    <div class="info-glass-layer info-glass-layer-3"></div>
+    <div class="info-panel" role="dialog" aria-modal="true" aria-labelledby="infoModalTitle">
+      <div class="info-inner-glow"></div>
+      <div class="info-header">
+        <div class="info-header-left">
+          <div class="info-icon-wrap">
+            <div class="info-icon-pulse"></div>
+            <div class="info-icon"><i class="fa-solid fa-circle-info"></i></div>
+          </div>
+          <div class="info-header-text">
+            <div class="info-title" id="infoModalTitle">Server Information</div>
+            <div class="info-subtitle"><span class="info-server-name">
+                <%= displayName %>
+              </span></div>
+          </div>
+        </div>
+        <button class="info-close" id="infoModalClose" title="Close (Esc)">
+          <span class="info-close-icon"><i class="fa-solid fa-xmark"></i></span>
+        </button>
+      </div>
+
+      <div class="info-body">
+        <div class="info-section">
+          <div class="info-section-title">
+            <i class="fa-solid fa-server"></i>
+            <span>Connection Details</span>
+          </div>
+          <div class="info-grid">
+            <div class="info-card">
+              <div class="info-card-icon"><i class="fa-solid fa-network-wired"></i></div>
+              <div class="info-card-content">
+                <div class="info-card-label">IP Address</div>
+                <div class="info-card-value" id="infoIp">—</div>
+              </div>
+            </div>
+            <div class="info-card">
+              <div class="info-card-icon"><i class="fa-solid fa-plug"></i></div>
+              <div class="info-card-content">
+                <div class="info-card-label">Port</div>
+                <div class="info-card-value" id="infoPort">—</div>
+              </div>
+            </div>
+          </div>
+          <div class="info-address-row">
+            <div class="info-address-label">Connection Address</div>
+            <div class="info-address-wrap">
+              <input id="infoAddress" class="info-address-input" type="text" readonly value="" />
+              <button id="copyAddressBtn" class="info-copy-btn" title="Copy to clipboard">
+                <i class="fa-solid fa-copy"></i>
+              </button>
+            </div>
+            <div class="info-address-hint">Share this address to connect to your server</div>
+          </div>
+        </div>
+
+        <div class="info-section info-sftp-section" id="infoSftpSection" style="display:none;">
+          <div class="info-section-title" style="display:none;">
+            <i class="fa-solid fa-folder-tree" style="display:none;"></i>
+            <span style="display:none;">SFTP Credentials</span>
+            <span class="info-sftp-badge" style="display:none;">Secure</span>
+          </div>
+          <div class="info-sftp-notice" style="display:none;">
+            <i class="fa-solid fa-shield-halved" style="display:none;"></i>
+            <span style="display:none;">Access restricted to your server folder only</span>
+          </div>
+          <div class="info-grid" style="display:none;">
+            <div class="info-card" style="display:none;">
+              <div class="info-card-icon" style="display:none;"><i class="fa-solid fa-globe"></i></div>
+              <div class="info-card-content" style="display:none;">
+                <div class="info-card-label" style="display:none;">SFTP Host</div>
+                <div class="info-card-value info-sftp-value" id="infoSftpHost" style="display:none;">—</div>
+              </div>
+              <button class="info-card-copy" data-copy="infoSftpHost" title="Copy" style="display:none;"><i
+                  class="fa-solid fa-copy"></i></button>
+            </div>
+            <div class="info-card" style="display:none;">
+              <div class="info-card-icon" style="display:none;"><i class="fa-solid fa-ethernet"></i></div>
+              <div class="info-card-content" style="display:none;">
+                <div class="info-card-label" style="display:none;">SFTP Port</div>
+                <div class="info-card-value info-sftp-value" id="infoSftpPort" style="display:none;">—</div>
+              </div>
+              <button class="info-card-copy" data-copy="infoSftpPort" title="Copy" style="display:none;"><i
+                  class="fa-solid fa-copy"></i></button>
+            </div>
+            <div class="info-card" style="display:none;">
+              <div class="info-card-icon" style="display:none;"><i class="fa-solid fa-user" style="display:none;"></i>
+              </div>
+              <div class="info-card-content" style="display:none;">
+                <div class="info-card-label" style="display:none;">Username</div>
+                <div class="info-card-value info-sftp-value" id="infoSftpUser" style="display:none;">—</div>
+              </div>
+              <button class="info-card-copy" data-copy="infoSftpUser" title="Copy"><i
+                  class="fa-solid fa-copy"></i></button>
+            </div>
+            <div class="info-card">
+              <div class="info-card-icon" style="display:none;"><i class="fa-solid fa-key"></i></div>
+              <div class="info-card-content" style="display:none;">
+                <div class="info-card-label" style="display:none;">Password</div>
+                <div class="info-card-value info-sftp-value info-sftp-password" id="infoSftpPass">
+                  <span class="info-sftp-pass-mask" style="display:none;">••••••••••••</span>
+                  <span class="info-sftp-pass-text" style="display:none;"></span>
+                </div>
+              </div>
+              <button class="info-sftp-toggle-pass" id="infoSftpTogglePass" title="Show/Hide password"
+                style="display:none;">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+              <button class="info-card-copy" data-copy="infoSftpPassValue" title="Copy" style="display:none;"><i
+                  class="fa-solid fa-copy"></i></button>
+            </div>
+          </div>
+          <div class="info-sftp-permissions" style="display:none;">
+            <div class="info-sftp-perm-label" style="display:none;">
+              <i class="fa-solid fa-user-shield"></i>
+              <span>Your Permissions:</span>
+            </div>
+            <div class="info-sftp-perm-value" id="infoSftpPerms" style="display:none;">Read Only</div>
+          </div>
+          <div class="info-sftp-footer">
+            <button class="info-sftp-regen" id="infoSftpRegenBtn" title="Regenerate password" style="display:none;">
+              <i class="fa-solid fa-rotate" style="display:none;"></i>
+              <span style="display:none;">Regenerate Password</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="info-section info-sftp-no-access" id="infoSftpNoAccess" style="display:none;">
+          <div class="info-section-title">
+            <i class="fa-solid fa-folder-tree"></i>
+            <span>SFTP Access</span>
+          </div>
+          <div class="info-no-access-message">
+            <i class="fa-solid fa-lock"></i>
+            <span>You don't have file access permissions for this server</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="filesModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="filesModalTitle" style="position:relative;">
+      <div class="ptero-flash-bar" id="filesFlashBar">
+        <div class="ptero-flash-fill" id="filesFlashFill"></div>
+      </div>
+      <div class="modal-header">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div>
+            <div class="modal-title" id="filesModalTitle">Managing <span style="color:#fff;font-weight:700">
+                <%= displayName %>
+              </span></div>
+            <div style="color:var(--muted);font-size:13px">Explore and manage files</div>
+          </div>
+          <div id="progressWheel" class="progress-wheel hidden" title="Operation in progress">
+            <div class="fill" id="progressFill" style="height:0%"></div>
+          </div>
+        </div>
+        <div><button class="modal-close" id="filesModalClose" title="Close (Esc)"><i
+              class="fa-solid fa-xmark"></i></button></div>
+      </div>
+
+      <div id="dropOverlay" aria-hidden="true">
+        <div class="inner">
+          <i class="fa-solid fa-cloud-arrow-up"
+            style="font-size:36px;color:rgba(96,165,250,0.7);margin-bottom:14px;display:block;"></i>
+          <h3 id="dropTitle">Drop to upload</h3>
+          <p id="dropSubtitle">Release to upload to current folder</p>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-left">
+          <div class="file-toolbar">
+            <div class="file-toolbar-left">
+              <div class="file-toolbar-icon"><i class="fa-solid fa-folder-tree"></i></div>
+              <div class="file-toolbar-meta">
+                <div class="file-toolbar-title">Working directory</div>
+                <div id="breadcrumbs"></div>
+              </div>
+            </div>
+            <div class="file-toolbar-actions">
+              <div class="file-action-row">
+                <label class="ghost-btn" id="uploadLabel" for="fileUploadModal" style="cursor:pointer"><i
+                    class="fa-solid fa-upload"></i> Upload</label>
+                <input id="fileUploadModal" type="file" />
+                <button class="ghost-btn" id="newBtn" data-action="create-new" title="New file/folder"><i
+                    class="fa-solid fa-file-circle-plus"></i> New</button>
+                <button class="bulk-delete" id="bulkDeleteBtn" title="Delete selected">
+                  <i class="fa-solid fa-trash"></i>
+                  <span>Delete</span>
+                </button>
+                <button class="bulk-archive" id="bulkArchiveBtn" title="Archive selected">
+                  <i class="fa-solid fa-file-zipper"></i>
+                  <span>Archive</span>
+                </button>
+              </div>
+              <label class="select-all-control" for="selectAllToggle">
+                <input type="checkbox" id="selectAllToggle" />
+                <span class="select-all-checkbox"><i class="fa-solid fa-check"></i></span>
+                <span class="select-all-label">Select</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="file-glance">
+            <div class="glance-card">
+              <div class="icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+              <div>
+                <div class="glance-label">Uploads</div>
+                <div class="glance-desc">Drag & drop anywhere</div>
+              </div>
+            </div>
+          </div>
+
+          <ul id="entries" role="list"></ul>
+        </div>
+
+        <div class="modal-right"></div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+  <div id="editorModal" class="modal-overlay editor-modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="editorModalTitle" style="position:relative;">
+      <div class="ptero-flash-bar" id="editorFlashBar">
+        <div class="ptero-flash-fill" id="editorFlashFill"></div>
+      </div>
+      <div class="editor-header">
+        <div>
+          <div class="editor-title" id="editorModalTitle">ADPanel Editor</div>
+          <div style="color:var(--muted);font-size:13px" id="editorPath"></div>
+        </div>
+        <div class="editor-actions">
+          <button class="modal-close" id="editorModalClose" title="Close (Esc)"><i
+              class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>
+
+      <div id="bigEditor">
+        <div id="codeShell" class="code-shell" style="display:none">
+
+          <div id="monacoContainer" style="width:100%;height:100%;"></div>
+          <div id="aceContainer" style="width:100%;height:100%;display:none;"></div>
+
+
+          <div id="lineGutter" class="line-gutter" style="display:none"></div>
+          <div class="code-pane" style="display:none">
+            <pre id="codeOverlay" class="code-overlay"></pre>
+            <textarea id="codeInput" class="code-input" spellcheck="false"></textarea>
+            <div id="codeSpacer" class="code-spacer" aria-hidden="true"></div>
+          </div>
+        </div>
+
+
+        <textarea id="textArea" style="display:none" spellcheck="false"></textarea>
+
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button class="icon-btn" id="editorDiscard">Discard</button>
+          <button class="icon-btn" id="editorSave">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="storeModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="storeModalTitle">
+      <div class="store-header">
+        <div class="store-header-main">
+          <div>
+            <div class="modal-title" id="storeModalTitle">
+              Store — <span style="color:#fff;font-weight:700">
+                <%= displayName %>
+              </span>
+            </div>
+            <div class="store-subtitle" id="storeSubtitle">Choose your core distribution and manage plugins.</div>
+          </div>
+        </div>
+        <div class="store-header-right">
+          <div class="store-tabs" id="storeTabs">
+            <button class="store-tab active" id="storeTabVersions"><i class="fa-solid fa-cubes-stacked"></i>&nbsp;
+              Versions</button>
+            <button class="store-tab" id="storeTabPlugins"><i class="fa-solid fa-plug"></i>&nbsp; Plugins/Mods</button>
+          </div>
+          <button class="modal-close store-close" id="storeModalClose" title="Close (Esc)">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+      <div class="store-body">
+        <div id="storeContent"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="storePrefModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="storePrefTitle">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="storePrefTitle">What should the Store show?</div>
+          <div class="store-subtitle">We didn't detect a store template. Choose the experience for this server.</div>
+          <div class="hint" style="margin-top:-20px; margin-left: -530px;">Your choice is saved for this server so you
+            can reopen the Store anytime.</div>
+        </div>
+        <div><button class="modal-close" id="storePrefClose" title="Close"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="store-pref-grid" id="storePrefOptions"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="mrPluginModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mrPluginModalTitle">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="mrPluginModalTitle">Install Plugin</div>
+          <div class="mr-title-sub" id="mrPluginName"></div>
+        </div>
+        <div><button class="modal-close" id="mrPluginModalClose" title="Close (Esc)"><i
+              class="fa-solid fa-xmark"></i></button></div>
+      </div>
+      <div class="modal-body">
+        <div class="select-control">
+          <label for="mrPlatformSelect">Platform</label>
+          <div class="select-wrap">
+
+            <select id="mrPlatformSelect" aria-label="Select platform"></select>
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+        </div>
+
+        <div class="select-control">
+          <label for="mrVersionSelect">Minecraft Version</label>
+          <div class="select-wrap">
+
+            <select id="mrVersionSelect" aria-label="Select Minecraft version"></select>
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+        </div>
+
+        <button id="mrPluginInstallBtn" class="downloadBtnFinal" disabled>Install Plugin</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="activityModal" class="activity-modal" aria-hidden="true">
+    <div class="activity-glass-layer activity-glass-layer-1"></div>
+    <div class="activity-glass-layer activity-glass-layer-2"></div>
+    <div class="activity-glass-layer activity-glass-layer-3"></div>
+    <div class="activity-panel" role="dialog" aria-modal="true" aria-labelledby="activityModalTitle">
+      <div class="activity-inner-glow"></div>
+      <div class="activity-header">
+        <div class="activity-header-left">
+          <div class="activity-icon-wrap">
+            <div class="activity-icon-pulse"></div>
+            <div class="activity-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+          </div>
+          <div class="activity-header-text">
+            <div class="activity-title" id="activityModalTitle">Activity</div>
+            <div class="activity-subtitle"><span class="activity-server-name">
+                <%= displayName %>
+              </span></div>
+          </div>
+        </div>
+        <button class="activity-close" id="activityModalClose" title="Close (Esc)">
+          <span class="activity-close-icon"><i class="fa-solid fa-xmark"></i></span>
+        </button>
+      </div>
+      <div class="activity-search-wrap">
+        <div class="activity-search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="activitySearchInput" placeholder="Search by user, IP, actions..." autocomplete="off">
+        </div>
+        <div class="activity-filter-pills" style="gap: 10px;">
+          <button class="activity-pill active" data-filter="all">All</button>
+          <button class="activity-pill" data-filter="power" title="Power actions (start, stop, restart, kill)"><i
+              class="fa-solid fa-power-off" style="font-size: 18px;"></i></button>
+          <button class="activity-pill" data-filter="console" title="Console commands"><i class="fa-solid fa-terminal"
+              style="font-size: 18px;"></i></button>
+          <button class="activity-pill" data-filter="file" title="File operations"><i class="fa-solid fa-file"
+              style="font-size: 18px;"></i></button>
+        </div>
+      </div>
+      <div class="activity-body">
+        <div class="activity-list" id="activityList">
+          <div class="activity-loading">
+            <div class="activity-loading-spinner"></div>
+            <span>Loading activity...</span>
+          </div>
+        </div>
+      </div>
+      <div class="activity-footer">
+        <button class="activity-load-more" id="activityLoadMore">
+          <span class="activity-load-more-text">Load More</span>
+          <span class="activity-load-more-icon"><i class="fa-solid fa-chevron-down"></i></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="backupsModal" class="activity-modal" aria-hidden="true">
+    <div class="activity-glass-layer activity-glass-layer-1"></div>
+    <div class="activity-glass-layer activity-glass-layer-2"></div>
+    <div class="activity-glass-layer activity-glass-layer-3"></div>
+    <div class="activity-panel" role="dialog" aria-modal="true" aria-labelledby="backupsModalTitle">
+      <div class="activity-inner-glow"></div>
+      <div class="activity-header">
+        <div class="activity-header-left">
+          <img class="backups-header-icon" src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/adpanel-dark.webp"
+            alt="Backups" draggable="false" />
+          <div class="activity-header-text">
+            <div class="activity-title" id="backupsModalTitle">Server Backups</div>
+            <div class="activity-subtitle"><span class="activity-server-name">
+                <%= displayName %>
+              </span></div>
+          </div>
+        </div>
+        <button class="activity-close" id="backupsModalClose" title="Close (Esc)">
+          <span class="activity-close-icon"><i class="fa-solid fa-xmark"></i></span>
+        </button>
+      </div>
+
+      <div class="activity-search-wrap">
+        <div class="activity-filter-pills" style="gap: 10px;">
+          <button class="activity-pill" id="backupsCreateBtn" title="Create Backup">
+            <i class="fa-solid fa-plus"></i>
+            <span>Create Backup</span>
+          </button>
+          <button class="activity-pill" id="backupsRefreshBtn" title="Refresh">
+            <i class="fa-solid fa-rotate-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="activity-body">
+        <div class="activity-list" id="backupsList">
+          <div class="backups-loading"><i class="fa-solid fa-spinner fa-spin"></i> Loading backups...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="backupCreateModal" class="activity-modal backup-create-activity" aria-hidden="true">
+    <div class="activity-glass-layer activity-glass-layer-1"></div>
+    <div class="activity-glass-layer activity-glass-layer-2"></div>
+    <div class="activity-glass-layer activity-glass-layer-3"></div>
+    <div class="activity-panel" role="dialog" aria-modal="true" aria-labelledby="backupCreateModalTitle">
+      <div class="activity-inner-glow"></div>
+      <div class="activity-header">
+        <div class="activity-header-left">
+          <img class="backups-header-icon" src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/adpanel-dark.webp"
+            alt="Backups" draggable="false" />
+          <div class="activity-header-text">
+            <div class="activity-title" id="backupCreateModalTitle">Create New Backup</div>
+            <div class="activity-subtitle"><span class="activity-server-name">
+                <%= displayName %>
+              </span></div>
+          </div>
+        </div>
+        <button class="activity-close" id="backupCreateClose" title="Close (Esc)">
+          <span class="activity-close-icon"><i class="fa-solid fa-xmark"></i></span>
+        </button>
+      </div>
+
+      <div class="activity-body">
+        <div class="backup-create-body">
+          <div class="backup-create-field">
+            <label for="backupNameInput">Backup Name</label>
+            <input type="text" id="backupNameInput" placeholder="My Backup" maxlength="100" />
+          </div>
+          <div class="backup-create-field">
+            <label for="backupDescInput">Description (optional)</label>
+            <textarea id="backupDescInput" placeholder="Notes about this backup..." maxlength="500" rows="3"></textarea>
+          </div>
+          <div class="backup-create-info">
+            <i class="fa-solid fa-info-circle"></i>
+            <span>This will create a full backup of all server files. Large servers may take a few minutes.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="backup-create-footer">
+        <button class="backup-create-cancel" id="backupCreateCancel">Cancel</button>
+        <button class="backup-create-confirm" id="backupCreateConfirm">
+          <i class="fa-solid fa-box-archive" style="color: white;"></i>
+          <span style="color: white;">Create Backup</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="schedulerModal" class="scheduler-modal" aria-hidden="true">
+    <div class="scheduler-glass-layer scheduler-glass-layer-1"></div>
+    <div class="scheduler-glass-layer scheduler-glass-layer-2"></div>
+    <div class="scheduler-panel" role="dialog" aria-modal="true" aria-labelledby="schedulerModalTitle">
+      <div class="scheduler-header">
+        <div class="scheduler-header-left">
+          <div class="scheduler-icon-wrap">
+            <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/adpanel-dark.webp" alt="Scheduler"
+              class="scheduler-header-img">
+          </div>
+          <div class="scheduler-header-text">
+            <div class="scheduler-title" id="schedulerModalTitle">Task Scheduler</div>
+            <div class="scheduler-subtitle">Server: <span class="scheduler-server-name">
+                <%= displayName %>
+              </span></div>
+          </div>
+        </div>
+        <button class="scheduler-close" id="schedulerModalClose" title="Close (Esc)">
+          <span class="scheduler-close-icon"><i class="fa-solid fa-xmark"></i></span>
+        </button>
+      </div>
+
+      <div class="scheduler-tabs">
+        <button class="scheduler-tab active" data-tab="tasks">
+          <i class="fa-solid fa-list-check"></i> Scheduled Tasks
+        </button>
+        <button class="scheduler-tab" data-tab="create">
+          <i class="fa-solid fa-plus"></i> Create New
+        </button>
+      </div>
+
+      <div class="scheduler-body">
+        <div class="scheduler-content" id="schedulerTasksTab">
+          <div class="scheduler-tasks-header">
+            <div class="scheduler-tasks-title">Active &amp; Pending Tasks</div>
+            <button class="scheduler-refresh-btn" id="schedulerRefreshBtn" title="Refresh">
+              <i class="fa-solid fa-rotate-right"></i>
+            </button>
+          </div>
+          <div class="scheduler-tasks-list" id="schedulerTasksList">
+            <div class="scheduler-loading">
+              <div class="scheduler-loading-spinner"></div>
+              <span>Loading tasks...</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="scheduler-content hidden" id="schedulerCreateTab">
+          <div class="scheduler-form">
+            <div class="scheduler-form-section">
+              <label class="scheduler-label">Task Name</label>
+              <input type="text" class="scheduler-input" id="schedulerTaskName" placeholder="My Scheduled Task"
+                maxlength="100">
+            </div>
+
+            <div class="scheduler-form-section">
+              <label class="scheduler-label">Schedule Type</label>
+              <div class="scheduler-schedule-options">
+                <button class="scheduler-schedule-option active" data-schedule="once">
+                  <i class="fa-solid fa-clock"></i>
+                  <span>One Time</span>
+                </button>
+                <button class="scheduler-schedule-option" data-schedule="recurring">
+                  <i class="fa-solid fa-repeat"></i>
+                  <span>Recurring</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="scheduler-form-section" id="schedulerOnceSection">
+              <label class="scheduler-label">Run At</label>
+              <div class="scheduler-datetime-row">
+                <input type="date" class="scheduler-input" id="schedulerDate">
+                <input type="time" class="scheduler-input" id="schedulerTime" value="00:00">
+              </div>
+            </div>
+
+            <div class="scheduler-form-section hidden" id="schedulerRecurringSection">
+              <label class="scheduler-label">Repeat</label>
+              <div class="scheduler-recurring-options">
+                <select class="scheduler-select" id="schedulerRecurringType">
+                  <option value="seconds">Every X Seconds</option>
+                  <option value="minutes">Every X Minutes</option>
+                  <option value="hourly">Every X Hours</option>
+                  <option value="daily">Daily at Time</option>
+                  <option value="weekly">Weekly on Day</option>
+                </select>
+              </div>
+
+              <div class="scheduler-recurring-config" id="schedulerSecondsConfig">
+                <label class="scheduler-label-small">Every</label>
+                <select class="scheduler-select scheduler-select-small" id="schedulerSecondsInterval">
+                  <option value="10">10 seconds</option>
+                  <option value="15">15 seconds</option>
+                  <option value="30" selected>30 seconds</option>
+                  <option value="45">45 seconds</option>
+                </select>
+              </div>
+
+              <div class="scheduler-recurring-config hidden" id="schedulerMinutesConfig">
+                <label class="scheduler-label-small">Every</label>
+                <select class="scheduler-select scheduler-select-small" id="schedulerMinutesInterval">
+                  <option value="1">1 minute</option>
+                  <option value="2">2 minutes</option>
+                  <option value="5" selected>5 minutes</option>
+                  <option value="10">10 minutes</option>
+                  <option value="15">15 minutes</option>
+                  <option value="20">20 minutes</option>
+                  <option value="30">30 minutes</option>
+                  <option value="45">45 minutes</option>
+                </select>
+              </div>
+
+              <div class="scheduler-recurring-config hidden" id="schedulerHourlyConfig">
+                <label class="scheduler-label-small">Every</label>
+                <select class="scheduler-select scheduler-select-small" id="schedulerHourlyInterval">
+                  <option value="1">1 hour</option>
+                  <option value="2">2 hours</option>
+                  <option value="3">3 hours</option>
+                  <option value="4">4 hours</option>
+                  <option value="6">6 hours</option>
+                  <option value="8">8 hours</option>
+                  <option value="12">12 hours</option>
+                  <option value="24">24 hours</option>
+                </select>
+              </div>
+
+              <div class="scheduler-recurring-config hidden" id="schedulerDailyConfig">
+                <label class="scheduler-label-small">At</label>
+                <input type="time" class="scheduler-input" id="schedulerDailyTime" value="00:00">
+              </div>
+
+              <div class="scheduler-recurring-config hidden" id="schedulerWeeklyConfig">
+                <label class="scheduler-label-small">On</label>
+                <select class="scheduler-select" id="schedulerWeeklyDay">
+                  <option value="0">Sunday</option>
+                  <option value="1">Monday</option>
+                  <option value="2">Tuesday</option>
+                  <option value="3">Wednesday</option>
+                  <option value="4">Thursday</option>
+                  <option value="5">Friday</option>
+                  <option value="6">Saturday</option>
+                </select>
+                <label class="scheduler-label-small">at</label>
+                <input type="time" class="scheduler-input" id="schedulerWeeklyTime" value="00:00">
+              </div>
+            </div>
+
+            <div class="scheduler-or-divider">
+              <span>ACTION</span>
+            </div>
+
+            <div class="scheduler-form-section">
+              <label class="scheduler-label">Action Type</label>
+              <select class="scheduler-select" id="schedulerActionType">
+                <option value="">Select an action...</option>
+                <option value="console_command">📟 Console Command</option>
+                <option value="server_start">▶️ Server Start</option>
+                <option value="server_stop">⏹️ Server Stop</option>
+                <option value="create_file">📄 Create File</option>
+                <option value="modify_file">✏️ Modify File</option>
+                <option value="backup">💾 Backup</option>
+                <option value="planner_prompt_to_agent">🧠 Send Planner Prompt to Agent</option>
+              </select>
+            </div>
+
+            <div class="scheduler-action-config hidden" id="schedulerActionConsole">
+              <label class="scheduler-label">Command</label>
+              <input type="text" class="scheduler-input scheduler-input-mono" id="schedulerCommand"
+                placeholder="say Hello World">
+              <div class="scheduler-hint">The command will be sent to the server console.</div>
+            </div>
+
+            <div class="scheduler-action-config hidden" id="schedulerActionServerControl">
+              <div class="scheduler-action-info">
+                <i class="fa-solid fa-info-circle"></i>
+                <span id="schedulerServerControlText">The server will be started/stopped at the scheduled time.</span>
+              </div>
+            </div>
+
+            <div class="scheduler-action-config hidden" id="schedulerActionFile">
+              <label class="scheduler-label">File Path</label>
+              <input type="text" class="scheduler-input scheduler-input-mono" id="schedulerFilePath"
+                placeholder="config/settings.yml">
+              <label class="scheduler-label">Content</label>
+              <textarea class="scheduler-textarea scheduler-input-mono" id="schedulerFileContent"
+                placeholder="File content here..." rows="5"></textarea>
+            </div>
+
+            <div class="scheduler-action-config hidden" id="schedulerActionBackup">
+              <label class="scheduler-label">Backup Name</label>
+              <input type="text" class="scheduler-input" id="schedulerBackupName" placeholder="Scheduled Backup">
+              <label class="scheduler-label">Description (optional)</label>
+              <input type="text" class="scheduler-input" id="schedulerBackupDesc" placeholder="Automated backup">
+            </div>
+
+            <div class="scheduler-action-config hidden" id="schedulerActionPlanner">
+              <label class="scheduler-label">Planner Prompt</label>
+              <div class="scheduler-datetime-row">
+                <select class="scheduler-select" id="schedulerPlannerItem">
+                  <option value="">Select a planner prompt...</option>
+                </select>
+                <button class="scheduler-refresh-btn" id="schedulerPlannerRefreshBtn" type="button" title="Refresh planner prompts">
+                  <i class="fa-solid fa-rotate-right"></i>
+                </button>
+              </div>
+              <label class="scheduler-label">Prompt Preview</label>
+              <textarea class="scheduler-textarea scheduler-input-mono" id="schedulerPlannerPromptPreview"
+                placeholder="Select a planner prompt to preview..." rows="5" readonly></textarea>
+              <div class="scheduler-hint">The selected planner prompt will be sent to ADPanel Agent when this schedule runs.</div>
+            </div>
+
+            <div class="scheduler-form-footer">
+              <button class="scheduler-create-btn" id="schedulerCreateBtn">
+                <i class="fa-solid fa-plus"></i>
+                <span>Create Task</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="scheduler-status-bar">
+        <div class="scheduler-status-indicator" id="schedulerStatusIndicator">
+          <span class="scheduler-status-dot"></span>
+          <span class="scheduler-status-text">Scheduler Ready</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="plannerModal" class="planner-modal" aria-hidden="true">
+    <div class="planner-glass-layer planner-glass-layer-1"></div>
+    <div class="planner-glass-layer planner-glass-layer-2"></div>
+    <div class="planner-panel" role="dialog" aria-modal="true" aria-labelledby="plannerModalTitle">
+      <div class="planner-header">
+        <div class="planner-header-left">
+          <div class="planner-icon-wrap">
+            <div class="planner-icon-pulse"></div>
+            <div class="planner-icon"><i class="fa-solid fa-list-check"></i></div>
+          </div>
+          <div class="planner-header-text">
+            <div class="planner-title" id="plannerModalTitle">Planner</div>
+            <div class="planner-subtitle">Shared prompts for <span class="planner-server-name">
+                <%= displayName %>
+              </span></div>
+          </div>
+        </div>
+        <div class="planner-header-actions">
+          <button class="planner-refresh-btn" id="plannerRefreshBtn" title="Refresh">
+            <i class="fa-solid fa-rotate-right"></i>
+          </button>
+          <button class="planner-close" id="plannerModalClose" title="Close (Esc)">
+            <span class="planner-close-icon"><i class="fa-solid fa-xmark"></i></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="planner-tabs">
+        <button class="planner-tab active" data-tab="board">
+          <i class="fa-solid fa-layer-group"></i> Board
+        </button>
+        <button class="planner-tab" data-tab="compose">
+          <i class="fa-solid fa-pen-to-square"></i> Compose
+        </button>
+      </div>
+
+      <div class="planner-body">
+        <div class="planner-content" id="plannerBoardTab">
+          <div class="planner-summary" id="plannerSummary"></div>
+
+          <div class="planner-board-section">
+            <div class="planner-section-header">
+              <div>
+                <div class="planner-section-title">Priority Queue</div>
+                <div class="planner-section-subtitle">Drag prompts to change priority. Click one to send it to ADPanel
+                  Agent.</div>
+              </div>
+              <button class="planner-add-inline" id="plannerOpenComposeBtn" type="button">
+                <i class="fa-solid fa-plus"></i>
+                <span>New Prompt</span>
+              </button>
+            </div>
+            <div class="planner-list" id="plannerActiveList">
+              <div class="planner-loading">
+                <div class="planner-loading-spinner"></div>
+                <span>Loading planner...</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="planner-board-section planner-completed-section" id="plannerCompletedSection">
+            <div class="planner-section-header">
+              <div>
+                <div class="planner-section-title">Completed</div>
+                <div class="planner-section-subtitle">Finished prompts stay here until someone reopens or deletes them.
+                </div>
+              </div>
+            </div>
+            <div class="planner-list planner-list-completed" id="plannerCompletedList"></div>
+          </div>
+        </div>
+
+        <div class="planner-content hidden" id="plannerComposeTab">
+          <div class="planner-form">
+            <input type="hidden" id="plannerItemId">
+
+            <div class="planner-form-section">
+              <label class="planner-label" for="plannerTitleInput">Prompt Name</label>
+              <input type="text" class="planner-input" id="plannerTitleInput"
+                placeholder="Fix spawn points / Update txAdmin / Prepare weekend event" maxlength="120">
+            </div>
+
+            <div class="planner-form-section">
+              <label class="planner-label" for="plannerPromptInput">Prompt</label>
+              <textarea class="planner-textarea" id="plannerPromptInput"
+                placeholder="Write exactly what ADPanel Agent should do on this server..." rows="8"
+                maxlength="4000"></textarea>
+              <div class="planner-hint">Saved prompts stay shared on this server, and clicking a card sends the prompt
+                straight to ADPanel Agent.</div>
+            </div>
+
+            <div class="planner-form-footer">
+              <button class="planner-secondary-btn" id="plannerResetBtn" type="button">Clear</button>
+              <button class="planner-primary-btn" id="plannerSaveBtn" type="button">
+                <i class="fa-solid fa-plus"></i>
+                <span>Save Prompt</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="planner-status-bar">
+        <div class="planner-status-indicator" id="plannerStatusIndicator">
+          <span class="planner-status-dot"></span>
+          <span class="planner-status-text">Planner ready</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="dock-wrap" role="navigation" aria-label="taskbar">
+    <div class="dock">
+      <div class="dock-item" id="dockHome" data-action="go-home" title="Dashboard">
+        <div class="icon"><i class="fa-solid fa-house" style="color:white;"></i></div>
+        <div class="label">Home</div>
+      </div>
+
+      <div class="sep" aria-hidden="true"></div>
+
+      <div class="dock-item" id="dockFiles" data-action="open-files" title="Files">
+        <div class="icon"><i class="fa-solid fa-folder-open" id="dockfiles"></i></div>
+        <div class="label">Files</div>
+      </div>
+      <div class="dock-item" id="dockStore" data-action="open-store" title="Store">
+        <div class="icon"><i class="fa-solid fa-store"></i></div>
+        <div class="label">Store</div>
+      </div>
+      <div class="dock-item" id="dockActivity" data-action="open-activity" title="Activity Logs">
+        <div class="icon"><i class="fa-solid fa-clock-rotate-left" style="color:white;"></i></div>
+        <div class="label">Activity</div>
+      </div>
+
+      <div class="dock-item" id="dockBackups" data-action="open-backups" title="Backups">
+        <div class="icon"><i class="fa-solid fa-box-archive" style="color:white;"></i></div>
+        <div class="label">Backups</div>
+      </div>
+      <div class="dock-item" id="dockScheduler" data-action="open-scheduler" title="Scheduler">
+        <div class="icon"><i class="fa-solid fa-calendar-days" style="color:white;"></i></div>
+        <div class="label">Scheduler</div>
+      </div>
+      <div class="dock-item" id="dockPlanner" data-action="open-planner" title="Planner">
+        <div class="icon"><i class="fa-solid fa-list-check" style="color:white;"></i></div>
+        <div class="label">Planner</div>
+      </div>
+
+      <div class="dock-item" id="dockSubdomains" data-action="open-subdomains" title="Subdomains">
+        <div class="icon"><i class="fa-solid fa-globe"></i></div>
+        <div class="label">Subdomains</div>
+      </div>
+      <div class="dock-item" id="dockInfo" data-action="open-info" title="Information">
+        <div class="icon"><i class="fa-solid fa-circle-info"></i></div>
+        <div class="label">Information</div>
+      </div>
+
+      <div class="dock-item ai-help-dock" id="dockAiHelp" data-action="open-ai-help" title="ADPanel Agent">
+        <div class="icon"><img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/adpanel-dark.webp" alt="ADPanel Agent"
+            width="32" height="32" /></div>
+        <div class="label">ADPanel Agent</div>
+      </div>
+
+      <div class="dock-item" id="dockRun" data-action="run" title="Run">
+        <div class="icon"><i class="fa-solid fa-play" style="color:white;"></i></div>
+        <div class="label">Run</div>
+      </div>
+      <div class="dock-item" id="dockStop" data-action="stop" title="Stop">
+        <div class="icon"><i class="fa-solid fa-stop" style="color:white;"></i></div>
+        <div class="label">Stop</div>
+      </div>
+      <div class="dock-item" id="dockReinstall" data-action="open-reinstall" title="Reinstall">
+        <div class="icon"><i class="fa-solid fa-rotate" style="color:white;"></i></div>
+        <div class="label">Reinstall</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="progressPopup" class="progress-popup" role="dialog" aria-hidden="true">
+    <div class="row">
+      <div>
+        <div class="title">Current Operation</div>
+        <div class="percent" id="popupPercent">0%</div>
+      </div>
+      <div><button id="popupClose" class="close-btn" title="Close">✕</button></div>
+    </div>
+    <div class="progress-bar" aria-hidden="true">
+      <div class="bar" id="popupBar" style="width:0%"></div>
+    </div>
+    <div class="meta">
+      <div id="popupMsg">Processing...</div>
+      <div id="popupTime" style="font-size:12px;color:#88929b">—</div>
+    </div>
+  </div>
+
+  <div class="resource-stats-popup" id="resourceStatsPopup" role="dialog" aria-modal="true"
+    aria-label="Resource Statistics">
+    <div class="resource-stats-header">
+      <div class="resource-stats-title"><i class="fa-solid fa-chart-pie"></i> Resource Statistics</div>
+      <button class="resource-stats-action" id="openResourceStatsTab" title="Open in small tab"
+        style="margin-left:auto;margin-right:10px;background:none;border:none;color:inherit;cursor:pointer;">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+      </button>
+      <button class="resource-stats-close" id="resourceStatsClose" type="button" aria-label="Close"><i
+          class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="resource-stats-body">
+      <div class="resource-stat-row">
+        <div class="resource-stat-icon memory-icon"><i class="fa-solid fa-memory"></i></div>
+        <div class="resource-stat-info">
+          <div class="resource-stat-label">Memory</div>
+          <div class="resource-stat-value" id="resMemoryLabel">Loading...</div>
+        </div>
+        <div class="resource-stat-bar">
+          <div class="resource-stat-fill memory-fill" id="resMemoryBar" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="resource-stat-row">
+        <div class="resource-stat-icon disk-icon"><i class="fa-solid fa-hard-drive"></i></div>
+        <div class="resource-stat-info">
+          <div class="resource-stat-label">Storage</div>
+          <div class="resource-stat-value" id="resDiskLabel">Loading...</div>
+        </div>
+        <div class="resource-stat-bar">
+          <div class="resource-stat-fill disk-fill" id="resDiskBar" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="resource-stat-row">
+        <div class="resource-stat-icon cpu-icon"><i class="fa-solid fa-microchip"></i></div>
+        <div class="resource-stat-info">
+          <div class="resource-stat-label">CPU</div>
+          <div class="resource-stat-value" id="resCpuLabel">Loading...</div>
+        </div>
+        <div class="resource-stat-bar">
+          <div class="resource-stat-fill cpu-fill" id="resCpuBar" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="resource-stat-row">
+        <div class="resource-stat-icon uptime-icon"><i class="fa-solid fa-clock"></i></div>
+        <div class="resource-stat-info">
+          <div class="resource-stat-label">Uptime</div>
+          <div class="resource-stat-value" id="resUptimeLabel">Loading...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="aiHelpModal" class="ai-help-modal" aria-hidden="true">
+    <div class="activity-glass-layer activity-glass-layer-1"></div>
+    <div class="activity-glass-layer activity-glass-layer-2"></div>
+    <div class="activity-glass-layer activity-glass-layer-3"></div>
+    <div class="ai-help-panel" role="dialog" aria-modal="true" aria-labelledby="aiHelpModalTitle">
+      <div class="activity-inner-glow"></div>
+      <div class="ai-help-header">
+        <div class="ai-help-header-left">
+          <div class="ai-avatar-wrap">
+            <div class="ai-avatar-pulse"></div>
+            <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/adpanel-dark.webp" alt="AI" class="ai-avatar-img">
+          </div>
+          <div class="activity-header-text">
+            <div class="activity-title" id="aiHelpModalTitle">ADPanel Agent</div>
+            <div class="activity-subtitle">Your intelligent assistant for <span class="activity-server-name">
+                <%= displayName %>
+              </span></div>
+          </div>
+        </div>
+        <div class="ai-help-header-actions">
+          <button class="ai-help-settings-btn hidden" id="aiHelpSettingsBtn" title="Settings">
+            <i class="fa-solid fa-gear"></i>
+          </button>
+          <button class="activity-close" id="aiHelpModalClose" title="Close (Esc)">
+            <span class="activity-close-icon"><i class="fa-solid fa-xmark"></i></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="ai-help-setup" id="aiHelpSetup">
+        <div class="ai-setup-welcome">
+          <div class="ai-setup-emoji">🤖</div>
+          <h2>Select your Intelligence</h2>
+          <p>Connect your preferred AI provider to get started</p>
+        </div>
+        <div class="ai-provider-grid" id="aiProviderGrid">
+          <button class="ai-provider-card" data-provider="openai">
+            <div class="ai-provider-icon openai-icon"><img
+                src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/chatgpt.webp" alt="OpenAI"></div>
+            <div class="ai-provider-info">
+              <div class="ai-provider-name">OpenAI</div>
+              <div class="ai-provider-desc">Access any OpenAI model available</div>
+            </div>
+            <div class="ai-provider-status-wrap">
+              <div class="ai-provider-status" id="status-openai"></div>
+              <span class="ai-provider-status-label" id="status-label-openai"></span>
+            </div>
+          </button>
+          <button class="ai-provider-card" data-provider="anthropic">
+            <div class="ai-provider-icon anthropic-icon"><img
+                src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/anthropic.webp" alt="Anthropic"></div>
+            <div class="ai-provider-info">
+              <div class="ai-provider-name">Anthropic</div>
+              <div class="ai-provider-desc">Get helped from the most powerful AI right in your ADPanel</div>
+            </div>
+            <div class="ai-provider-status-wrap">
+              <div class="ai-provider-status" id="status-anthropic"></div>
+              <span class="ai-provider-status-label" id="status-label-anthropic"></span>
+            </div>
+          </button>
+          <button class="ai-provider-card" data-provider="openai-compatible">
+            <div class="ai-provider-icon openai-compatible-icon"><i class="fa-solid fa-plug-circle-bolt"></i></div>
+            <div class="ai-provider-info">
+              <div class="ai-provider-name">OpenAI Compatible</div>
+              <div class="ai-provider-desc">You can attach any OpenAI Compatible API</div>
+            </div>
+            <div class="ai-provider-status-wrap">
+              <div class="ai-provider-status" id="status-openai-compatible"></div>
+              <span class="ai-provider-status-label" id="status-label-openai-compatible"></span>
+            </div>
+          </button>
+          <button class="ai-provider-card" data-provider="google">
+            <div class="ai-provider-icon google-icon"><img
+                src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/gemini.webp"
+                alt="Google"></div>
+            <div class="ai-provider-info">
+              <div class="ai-provider-name">Google AI</div>
+              <div class="ai-provider-desc">Access Gemini and many others</div>
+            </div>
+            <div class="ai-provider-status-wrap">
+              <div class="ai-provider-status" id="status-google"></div>
+              <span class="ai-provider-status-label" id="status-label-google"></span>
+            </div>
+          </button>
+          <button class="ai-provider-card" data-provider="groq">
+            <div class="ai-provider-icon groq-icon"><img
+                src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/groq.webp" alt="Groq">
+            </div>
+            <div class="ai-provider-info">
+              <div class="ai-provider-name">Groq</div>
+              <div class="ai-provider-desc">Llama, Mixtral (Fast)</div>
+            </div>
+            <div class="ai-provider-status-wrap">
+              <div class="ai-provider-status" id="status-groq"></div>
+              <span class="ai-provider-status-label" id="status-label-groq"></span>
+            </div>
+          </button>
+          <button class="ai-provider-card" data-provider="huggingface">
+            <div class="ai-provider-icon hf-icon"><img
+                src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/huggingface.webp"
+                alt="HuggingFace"></div>
+            <div class="ai-provider-info">
+              <div class="ai-provider-name">HuggingFace</div>
+              <div class="ai-provider-desc">Open source models</div>
+            </div>
+            <div class="ai-provider-status-wrap">
+              <div class="ai-provider-status" id="status-huggingface"></div>
+              <span class="ai-provider-status-label" id="status-label-huggingface"></span>
+            </div>
+          </button>
+          <button class="ai-provider-card" data-provider="together">
+            <div class="ai-provider-icon together-icon"><img
+                src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/togetherai.webp"
+                alt="Together AI"></div>
+            <div class="ai-provider-info">
+              <div class="ai-provider-name">Together AI</div>
+              <div class="ai-provider-desc">Llama, Mistral, more</div>
+            </div>
+            <div class="ai-provider-status-wrap">
+              <div class="ai-provider-status" id="status-together"></div>
+              <span class="ai-provider-status-label" id="status-label-together"></span>
+            </div>
+          </button>
+          <button class="ai-provider-card" data-provider="cohere">
+            <div class="ai-provider-icon cohere-icon"><img
+                src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/cohere.webp"
+                alt="Cohere"></div>
+            <div class="ai-provider-info">
+              <div class="ai-provider-name">Cohere</div>
+              <div class="ai-provider-desc">Enterprise AI just for your needs.</div>
+            </div>
+            <div class="ai-provider-status-wrap">
+              <div class="ai-provider-status" id="status-cohere"></div>
+              <span class="ai-provider-status-label" id="status-label-cohere"></span>
+            </div>
+          </button>
+          <button class="ai-provider-card" data-provider="openrouter">
+            <div class="ai-provider-icon openrouter-icon"><img
+                src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/openrouter.webp"
+                alt="OpenRouter"></div>
+            <div class="ai-provider-info">
+              <div class="ai-provider-name">OpenRouter</div>
+              <div class="ai-provider-desc">Multiple providers</div>
+            </div>
+            <div class="ai-provider-status-wrap">
+              <div class="ai-provider-status" id="status-openrouter"></div>
+              <span class="ai-provider-status-label" id="status-label-openrouter"></span>
+            </div>
+          </button>
+        </div>
+        <div class="ai-api-key-form" id="aiApiKeyForm" style="display:none;">
+          <div class="ai-key-form-header">
+            <button class="ai-key-back" id="aiKeyBack"><i class="fa-solid fa-arrow-left"></i></button>
+            <span id="aiKeyProviderName">Provider</span>
+          </div>
+          <div class="ai-config-field" id="aiBaseUrlField" style="display:none;">
+            <label class="ai-config-label" for="aiBaseUrlInput">Base URL</label>
+            <div class="ai-key-input-wrap ai-base-url-input-wrap">
+              <input type="text" id="aiBaseUrlInput" placeholder="https://your-provider.example.com/v1" autocomplete="off"
+                spellcheck="false" />
+            </div>
+          </div>
+          <div class="ai-config-field">
+            <label class="ai-config-label" for="aiApiKeyInput">API Key</label>
+            <div class="ai-key-input-wrap">
+              <input type="password" id="aiApiKeyInput" placeholder="Enter your API key" autocomplete="off" />
+              <button class="ai-key-toggle" id="aiKeyToggle" type="button"><i class="fa-solid fa-eye"></i></button>
+            </div>
+          </div>
+          <button class="ai-key-save" id="aiKeySave" disabled>Save & Connect</button>
+        </div>
+      </div>
+
+      <div class="ai-help-chat" id="aiHelpChat" style="display:none;">
+        <div class="ai-chat-sidebar" id="aiChatSidebar">
+          <div class="ai-sidebar-header">
+            <span>Chats</span>
+            <button class="ai-new-chat-btn" id="aiNewChatBtn" title="New Chat">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
+          <div class="ai-chats-list" id="aiChatsList">
+            <div class="ai-no-chats">
+              <i class="fa-regular fa-comments"></i>
+              <p>No chats yet</p>
+            </div>
+          </div>
+          <button class="ai-sidebar-toggle" id="aiSidebarToggle" title="Toggle Sidebar">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+        </div>
+
+        <div class="ai-chat-main">
+          <div class="ai-chat-toolbar">
+            <button class="ai-sidebar-expand-btn" id="aiSidebarExpand" title="Show Chats">
+              <i class="fa-solid fa-bars"></i>
+            </button>
+            <div class="ai-model-selector" id="aiModelSelector">
+              <select id="aiModelSelect" aria-hidden="true" tabindex="-1">
+                <option value="" disabled>Select model...</option>
+              </select>
+              <button class="ai-model-trigger" id="aiModelTrigger" type="button" aria-haspopup="listbox"
+                aria-expanded="false" aria-controls="aiModelOptions">
+                <span class="ai-model-current" id="aiModelCurrent">Select model...</span>
+                <i class="fa-solid fa-chevron-down"></i>
+              </button>
+              <div class="ai-model-options-shell">
+                <div class="ai-model-options" id="aiModelOptions" role="listbox" aria-label="AI models"></div>
+              </div>
+            </div>
+            <button class="ai-chat-clear" id="aiChatClear" title="Clear chat">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+          <div class="ai-chat-messages" id="aiChatMessages">
+            <div class="ai-chat-welcome">
+              <div class="ai-welcome-emoji">👋</div>
+              <h3>Hello there!</h3>
+              <p>I'm your AI assistant. Ask me anything about your server, or request file modifications.</p>
+              <div class="ai-welcome-suggestions">
+                <button class="ai-suggestion">List files in plugins folder</button>
+                <button class="ai-suggestion">Create a new config file</button>
+                <button class="ai-suggestion">Edit spigot.yml</button>
+              </div>
+            </div>
+          </div>
+          <div class="ai-chat-input-container">
+            <div class="ai-chat-input-box" id="aiChatInputBox">
+              <div class="ai-chat-input-row">
+                <textarea id="aiChatInput" placeholder="Message ADPanel Agent..." rows="1"
+                  spellcheck="false"></textarea>
+                <div class="ai-chat-input-actions">
+                  <input type="file" id="aiFileInput" style="display:none"
+                    accept="image/*,.txt,.json,.yml,.yaml,.xml,.md,.log,.cfg,.conf,.properties,.ini">
+                  <button class="ai-chat-attach-btn" id="aiChatAttach" title="Attach file">
+                    <i class="fa-solid fa-paperclip"></i>
+                  </button>
+                  <button class="ai-chat-send-btn" id="aiChatSend" disabled>
+                    <i class="fa-solid fa-arrow-up"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-undo-toast" id="aiUndoToast">
+        <i class="fa-solid fa-rotate-left"></i>
+        <span>File modified</span>
+        <button class="ai-undo-btn" id="aiUndoBtn">Undo</button>
+        <button class="ai-undo-dismiss" id="aiUndoDismiss"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="ai-file-changes-bar" id="aiFileChangesBar">
+        <div class="ai-file-changes-header">
+          <div class="ai-file-changes-title">
+            <i class="fa-solid fa-file-pen"></i>
+            <span>Modified Files</span>
+            <span class="ai-file-changes-count" id="aiFileChangesCount">0</span>
+          </div>
+          <div class="ai-file-changes-actions">
+            <button class="ai-file-changes-accept-all" id="aiAcceptAllChanges" title="Accept all changes">
+              <i class="fa-solid fa-check-double"></i> Accept All
+            </button>
+            <button class="ai-file-changes-undo-all" id="aiUndoAllChanges" title="Undo all changes">
+              <i class="fa-solid fa-rotate-left"></i> Undo All
+            </button>
+            <button class="ai-file-changes-toggle" id="aiFileChangesToggle" title="Toggle list">
+              <i class="fa-solid fa-chevron-down"></i>
+            </button>
+          </div>
+        </div>
+        <div class="ai-file-changes-list" id="aiFileChangesList">
+        </div>
+      </div>
+
+      <div class="ai-confirm-dialog" id="aiConfirmDialog">
+        <div class="ai-confirm-content">
+          <div class="ai-confirm-header">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>Confirm File Operation</span>
+          </div>
+          <div class="ai-confirm-body">
+            <p id="aiConfirmMessage">The AI wants to perform the following operation:</p>
+            <div class="ai-confirm-operation" id="aiConfirmOperation">
+              <div class="ai-confirm-action" id="aiConfirmAction"></div>
+              <div class="ai-confirm-path" id="aiConfirmPath"></div>
+            </div>
+            <div class="ai-confirm-preview" id="aiConfirmPreview"></div>
+          </div>
+          <div class="ai-confirm-footer">
+            <button class="ai-confirm-deny" id="aiConfirmDeny">
+              <i class="fa-solid fa-xmark"></i> Deny
+            </button>
+            <button class="ai-confirm-allow" id="aiConfirmAllow">
+              <i class="fa-solid fa-check"></i> Allow
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="subdomainsModal" class="activity-modal" aria-hidden="true">
+    <div class="activity-glass-layer activity-glass-layer-1"></div>
+    <div class="activity-glass-layer activity-glass-layer-2"></div>
+    <div class="activity-glass-layer activity-glass-layer-3"></div>
+    <div class="activity-panel" role="dialog" aria-modal="true" aria-labelledby="subdomainsModalTitle">
+      <div class="activity-inner-glow"></div>
+      <div class="activity-header">
+        <div class="activity-header-left">
+          <div class="activity-icon-wrap">
+            <div class="activity-icon-pulse"></div>
+            <div class="activity-icon"><i class="fa-solid fa-globe"></i></div>
+          </div>
+          <div class="activity-header-text">
+            <div class="activity-title" id="subdomainsModalTitle">Subdomains</div>
+            <div class="activity-subtitle"><span class="activity-server-name">
+                <%= displayName %>
+              </span></div>
+          </div>
+        </div>
+        <button class="activity-close" id="subdomainsModalClose" title="Close (Esc)">
+          <span class="activity-close-icon"><i class="fa-solid fa-xmark"></i></span>
+        </button>
+      </div>
+
+      <div class="activity-search-wrap">
+        <div class="activity-filter-pills" style="gap: 10px;">
+          <button class="activity-pill" id="subdomainsAddBtn" title="Add Subdomain">
+            <i class="fa-solid fa-plus"></i>
+            <span>Add Subdomain</span>
+          </button>
+          <button class="activity-pill" id="subdomainsRefreshBtn" title="Refresh">
+            <i class="fa-solid fa-rotate-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="activity-body">
+        <div class="activity-list" id="subdomainsList">
+          <div class="backups-loading"><i class="fa-solid fa-spinner fa-spin"></i> Loading subdomains...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="subdomainCreateModal" class="activity-modal backup-create-activity" aria-hidden="true">
+    <div class="activity-glass-layer activity-glass-layer-1"></div>
+    <div class="activity-glass-layer activity-glass-layer-2"></div>
+    <div class="activity-glass-layer activity-glass-layer-3"></div>
+    <div class="activity-panel" role="dialog" aria-modal="true" aria-labelledby="subdomainCreateModalTitle">
+      <div class="activity-inner-glow"></div>
+      <div class="activity-header">
+        <div class="activity-header-left">
+          <div class="activity-icon-wrap">
+            <div class="activity-icon"><i class="fa-solid fa-globe"></i></div>
+          </div>
+          <div class="activity-header-text">
+            <div class="activity-title" id="subdomainCreateModalTitle">Add Subdomain</div>
+            <div class="activity-subtitle"><span class="activity-server-name">
+                <%= displayName %>
+              </span></div>
+          </div>
+        </div>
+        <button class="activity-close" id="subdomainCreateClose" title="Close (Esc)">
+          <span class="activity-close-icon"><i class="fa-solid fa-xmark"></i></span>
+        </button>
+      </div>
+
+      <div class="activity-body">
+        <div class="backup-create-body">
+          <div class="backup-create-field">
+            <label for="subdomainInput">Domain</label>
+            <input type="text" id="subdomainInput" placeholder="e.g. play.example.com" maxlength="255" />
+          </div>
+          <div class="backup-create-info">
+            <i class="fa-solid fa-info-circle"></i>
+            <span>Enter the full domain you want to link. Using a subdomain pointing to this node's IP is
+              recommended.</span>
+          </div>
+          <div class="backup-create-field" id="subdomainVerificationResult" style="display:none; margin-top:12px;">
+          </div>
+        </div>
+      </div>
+
+      <div class="backup-create-footer">
+        <button class="backup-create-cancel" id="subdomainCreateCancel">Cancel</button>
+        <button class="backup-create-confirm" id="subdomainVerifyBtn">
+          <i class="fa-solid fa-check" style="color: white;"></i>
+          <span style="color: white;">Verify & Add</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="reinstallModal" class="activity-modal" aria-hidden="true">
+    <div class="activity-glass-layer activity-glass-layer-1"></div>
+    <div class="activity-glass-layer activity-glass-layer-2"></div>
+    <div class="activity-glass-layer activity-glass-layer-3"></div>
+    <div class="reinstall-panel" role="dialog" aria-modal="true" aria-labelledby="reinstallModalTitle">
+      <div class="activity-inner-glow"></div>
+      <div class="activity-header">
+        <div class="activity-header-left">
+          <div class="activity-icon-wrap">
+            <div class="activity-icon-pulse"></div>
+            <div class="activity-icon reinstall-icon-accent"><i class="fa-solid fa-rotate"></i></div>
+          </div>
+          <div class="activity-header-text">
+            <div class="activity-title" id="reinstallModalTitle">Reinstall Server</div>
+            <div class="activity-subtitle"><span class="activity-server-name">
+                <%= displayName %>
+              </span></div>
+          </div>
+        </div>
+        <button class="activity-close" id="reinstallModalClose" title="Close (Esc)">
+          <span class="activity-close-icon"><i class="fa-solid fa-xmark"></i></span>
+        </button>
+      </div>
+
+      <div class="reinstall-body">
+        <div class="reinstall-content" id="reinstallDefaultView">
+          <div class="reinstall-warning-card">
+            <div class="reinstall-warning-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div class="reinstall-warning-text">
+              <div class="reinstall-warning-title">This will wipe your server clean</div>
+              <div class="reinstall-warning-desc">Every file on this server will be permanently deleted and the server
+                will be set up from scratch. Backups will not be affected, so make sure you've saved anything important
+                before proceeding.</div>
+            </div>
+          </div>
+          <div class="reinstall-info-cards">
+            <div class="reinstall-info-card">
+              <div class="reinstall-info-icon"><i class="fa-solid fa-trash-can"></i></div>
+              <div class="reinstall-info-label">All server files removed</div>
+            </div>
+            <div class="reinstall-info-card">
+              <div class="reinstall-info-icon"><i class="fa-solid fa-box-archive"></i></div>
+              <div class="reinstall-info-label">Backups stay untouched</div>
+            </div>
+            <div class="reinstall-info-card">
+              <div class="reinstall-info-icon"><i class="fa-solid fa-arrows-rotate"></i></div>
+              <div class="reinstall-info-label">Fresh deployment with current template</div>
+            </div>
+          </div>
+          <div class="reinstall-actions">
+            <button class="reinstall-cancel-btn" id="reinstallCancelBtn">Cancel</button>
+            <button class="reinstall-confirm-btn" id="reinstallConfirmBtn"><i class="fa-solid fa-rotate"></i> Reinstall
+              Server</button>
+          </div>
+        </div>
+
+        <div class="reinstall-content reinstall-confirm-view" id="reinstallConfirmView" style="display:none;">
+          <div class="reinstall-confirm-icon-wrap">
+            <div class="reinstall-confirm-big-icon"><i class="fa-solid fa-exclamation"></i></div>
+          </div>
+          <div class="reinstall-confirm-title">Are you absolutely sure?</div>
+          <div class="reinstall-confirm-desc">This action cannot be undone. All server data will be erased and the
+            server will be freshly deployed.</div>
+          <div class="reinstall-confirm-actions">
+            <button class="reinstall-cancel-btn" id="reinstallConfirmNo">No, go back</button>
+            <button class="reinstall-danger-btn" id="reinstallConfirmYes"><i class="fa-solid fa-check"></i> Yes,
+              reinstall now</button>
+          </div>
+        </div>
+
+        <div class="reinstall-content reinstall-progress-view" id="reinstallProgressView" style="display:none;">
+          <div class="reinstall-progress-spinner">
+            <div class="reinstall-spinner"></div>
+          </div>
+          <div class="reinstall-progress-title" id="reinstallProgressTitle">Reinstalling server...</div>
+          <div class="reinstall-progress-desc" id="reinstallProgressDesc">Removing old files and setting up a fresh
+            deployment. This may take a moment.</div>
+        </div>
+
+        <div class="reinstall-content reinstall-success-view" id="reinstallSuccessView" style="display:none;">
+          <div class="reinstall-success-icon-wrap">
+            <div class="reinstall-success-big-icon"><i class="fa-solid fa-check"></i></div>
+          </div>
+          <div class="reinstall-success-title">Server reinstalled successfully</div>
+          <div class="reinstall-success-desc">Your server has been wiped and freshly deployed. You can start it whenever
+            you're ready.</div>
+          <div class="reinstall-success-actions">
+            <button class="reinstall-done-btn" id="reinstallDoneBtn"><i class="fa-solid fa-check"></i> Done</button>
+          </div>
+        </div>
+
+        <div class="reinstall-content reinstall-error-view" id="reinstallErrorView" style="display:none;">
+          <div class="reinstall-error-icon-wrap">
+            <div class="reinstall-error-big-icon"><i class="fa-solid fa-xmark"></i></div>
+          </div>
+          <div class="reinstall-error-title">Reinstall failed</div>
+          <div class="reinstall-error-desc" id="reinstallErrorDesc">Something went wrong during the reinstall process.
+            Please try again or contact an administrator.</div>
+          <div class="reinstall-error-actions">
+            <button class="reinstall-cancel-btn" id="reinstallErrorClose">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="clearConsoleModal" class="clear-console-modal" style="display: none;" aria-hidden="true">
+    <div class="clear-console-glass-layer"></div>
+    <div class="clear-console-content">
+      <h3 class="clear-console-title">Clear Console</h3>
+      <p class="clear-console-desc">Are you sure? This action cannot be undone.</p>
+      <div class="clear-console-toggle-wrapper" id="clearConsoleToggleWrapper">
+        <span class="clear-console-label-text">Do not ask me again</span>
+        <label class="switch" onclick="event.stopPropagation()">
+          <input type="checkbox" id="clearConsoleNoAsk">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="clear-console-actions">
+        <button id="clearConsoleCancel" class="btn-cancel">Cancel</button>
+        <button id="clearConsoleConfirm" class="btn-clear">Clear Console</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>

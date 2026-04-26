@@ -1,0 +1,6 @@
+{
+  "rate_limiting": false,
+  "limit": 25,
+  "window_seconds": 120,
+  "trusted_subnets": []
+}

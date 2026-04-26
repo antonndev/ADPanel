@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Opening <%= serviceLabel %>...</title>
+  <style>
+    :root {
+      color-scheme: light;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: #0b1220;
+      color: #e7eefc;
+      height: 100%;
+    }
+    .wrap {
+      min-height: 100%;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+    .card {
+      width: min(560px, 100%);
+      background: linear-gradient(160deg, rgba(18, 28, 48, 0.96), rgba(13, 20, 34, 0.98));
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 24px;
+      box-sizing: border-box;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+    }
+    .title {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0 0 8px;
+      letter-spacing: 0.2px;
+    }
+    .subtitle {
+      margin: 0;
+      color: #b6c5e5;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .status {
+      margin-top: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #d5e2ff;
+      font-size: 14px;
+    }
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      border: 2px solid rgba(255, 255, 255, 0.26);
+      border-top-color: #8fc8ff;
+      animation: spin 0.9s linear infinite;
+    }
+    .error {
+      margin-top: 16px;
+      display: none;
+      color: #ffd4d4;
+      background: rgba(255, 80, 80, 0.14);
+      border: 1px solid rgba(255, 80, 80, 0.28);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 13px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .actions {
+      margin-top: 16px;
+      display: none;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: #eaf1ff;
+      background: #2a3c5f;
+      text-decoration: none;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn.secondary {
+      background: #192742;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" data-service="<%= service %>">
+      <h1 class="title">Opening <%= serviceLabel %></h1>
+      <p class="subtitle">Generating a secure one-time link and preparing a safe session for this tab.</p>
+      <div class="status"><span class="spinner"></span><span id="statusText">Requesting secure token...</span></div>
+      <div id="errorBox" class="error"></div>
+      <div id="actionBox" class="actions">
+        <button id="retryBtn" class="btn" type="button">Retry</button>
+        <a class="btn secondary" href="/settings">Back to Settings</a>
+      </div>
+    </div>
+  </div>
+
+  <script nonce="<%= cspNonce %>">
+    (function () {
+      'use strict';
+      const card = document.querySelector('.card');
+      const service = String(card?.dataset?.service || '').trim();
+      const statusText = document.getElementById('statusText');
+      const errorBox = document.getElementById('errorBox');
+      const actionBox = document.getElementById('actionBox');
+      const retryBtn = document.getElementById('retryBtn');
+
+      async function start() {
+        if (!service) {
+          showError('Missing service identifier.');
+          return;
+        }
+
+        setStatus('Requesting secure token...');
+        hideError();
+
+        try {
+          const res = await fetch('/api/settings/database/access-token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ service })
+          });
+
+          const payload = await res.json().catch(function () { return {}; });
+          if (!res.ok || !payload || !payload.url) {
+            throw new Error(payload?.error || 'Failed to generate secure link.');
+          }
+
+          setStatus('Redirecting to secure session...');
+          window.location.replace(payload.url);
+        } catch (err) {
+          showError(err && err.message ? err.message : 'Unexpected error while opening database tool.');
+        }
+      }
+
+      function setStatus(msg) {
+        if (statusText) statusText.textContent = msg;
+      }
+
+      function showError(msg) {
+        setStatus('Unable to open secure session.');
+        if (errorBox) {
+          errorBox.style.display = 'block';
+          errorBox.textContent = msg;
+        }
+        if (actionBox) actionBox.style.display = 'flex';
+      }
+
+      function hideError() {
+        if (errorBox) {
+          errorBox.style.display = 'none';
+          errorBox.textContent = '';
+        }
+        if (actionBox) actionBox.style.display = 'none';
+      }
+
+      if (retryBtn) {
+        retryBtn.addEventListener('click', function () {
+          start();
+        });
+      }
+
+      start();
+    })();
+  </script>
+</body>
+</html>

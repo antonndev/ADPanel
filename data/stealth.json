@@ -1,0 +1,10 @@
+{
+  "enabled": true,
+  "cookieName": "adpanel_gate",
+  "cookieSecret": "0WmiA1223Zo3elx_9-XWtm5D1Q80aqYxWXArvrVAuYt4qC-88KGpAKSCPGiMlblO",
+  "cookieTtlDays": 30,
+  "challengeSecret": "eBq2-wSJqxINynqLxiIGQ_ySL5gym5Cj3XHtKbjEGI10BVnNA8hNnsyp5MEC5sX0",
+  "htmlVariantSalt": "Cg7WCJ9A3LxMC_-q2c1F-mCwcocuX_wt",
+  "createdAt": "2026-03-31T09:28:19.012Z",
+  "rotatedAt": "2026-03-31T09:28:19.012Z"
+}

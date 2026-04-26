@@ -1,0 +1,3361 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  
+  <style nonce="<%= cspNonce %>">
+    html:not([data-theme="dark"]) body{background:#f3f4f6;color:#0f172a}
+    html[data-theme="dark"] body{background:#282c34;color:#e6eef8}
+  </style>
+
+  <script nonce="<%= cspNonce %>">
+    (function(){
+      try{
+        var bg=localStorage.getItem('dashboardBg');
+        if(bg){
+          var data=JSON.parse(bg);
+          if(data.type==='color'&&data.value){
+            document.documentElement.style.setProperty('--bg-main',data.value);
+          }else if(data.type==='image'&&data.value){
+            document.documentElement.style.setProperty('--bg-main','url('+data.value+')');
+          }
+        }
+      }catch(e){}
+    })();
+  </script>
+
+  <link rel="stylesheet" href="settings.css?v=18">
+  <title><%= (branding && branding.appName) ? branding.appName : 'ADPanel' %> Settings</title>
+  <link id="favicon" rel="icon" type="image/webp" sizes="16x16"
+    href="<%= (branding && branding.faviconUrl) ? branding.faviconUrl : '/auth-assets/favicon' %>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+  <link id="faLink" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha384-nRgPTkuX86pH8yjPJUAFuASXQSSl2/bBUiNV47vSYpKFxHJhbcrGnmlYpYJMeD7a" crossorigin="anonymous" referrerpolicy="no-referrer" media="print">
+  <link id="gfLink" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet" media="print">
+
+
+  <script nonce="<%= cspNonce %>">
+    (function () {
+      const CHRISTMAS_IMG = '/images/ADPanel-christmas.png';
+      function isChristmasPeriod() {
+        const now = new Date();
+        const month = now.getMonth();
+        const day = now.getDate();
+        return month === 11 && day >= 25 && day <= 28;
+      }
+      function applyChristmasTheme() {
+        if (!isChristmasPeriod()) return;
+        const favicon = document.getElementById('favicon') || document.querySelector('link[rel="icon"]');
+        if (favicon) favicon.href = CHRISTMAS_IMG;
+        document.querySelectorAll('img').forEach(img => {
+          if (img.src && (img.src.includes('ADPanel-dark.webp') || img.src.includes('i.imgur.com/k5agjYf'))) {
+            img.src = CHRISTMAS_IMG;
+          }
+        });
+      }
+      document.addEventListener('DOMContentLoaded', applyChristmasTheme);
+    })();
+  </script>
+
+
+  <script nonce="<%= cspNonce %>" data-cfasync="false" src="/js/settings.js?v=13" defer></script>
+  <script nonce="<%= cspNonce %>">
+    (function(){
+      function enableLink(id){var l=document.getElementById(id);if(l)l.media='all';}
+      ['faLink','gfLink'].forEach(function(id){
+        var l=document.getElementById(id);
+        if(!l)return;
+        if(l.sheet){enableLink(id);}else{l.addEventListener('load',function(){enableLink(id);});}
+      });
+    })();
+  </script>
+</head>
+
+<body>
+
+  <div class="closeEscFixed" id="closeEscFixed" title="Go Back">
+    <div class="closeEscFixed-inner">
+      <i class="fa-solid fa-xmark"></i>
+      <small>ESC</small>
+    </div>
+  </div>
+
+  <div class="app">
+    <aside class="sidebar" aria-label="Sidebar">
+      <div class="brand">
+        <div class="logo"><i class="fa-solid fa-cog"></i></div>
+        <div>
+          <h1>Settings</h1>
+          <p>Customize ADPanel.</p>
+        </div>
+      </div>
+
+      <nav class="nav" id="sidebarNav">
+        <button data-panel="preferences" class="active"><i class="fa-solid fa-cog"></i> Preferences</button>
+        <button data-panel="customization"><i class="fa-solid fa-palette"></i> Customization</button>
+        <button data-panel="account"><i class="fa-solid fa-user"></i> Account</button>
+        <button data-panel="security"><i class="fa-solid fa-shield-halved"></i> Security</button>
+        <% if (user && user.admin) { %>
+        <button data-panel="sessions"><i class="fa-solid fa-window-restore"></i> Sessions</button>
+        <% } %>
+        <button data-panel="databases"><i class="fa-solid fa-database"></i> Databases</button>
+        <button data-panel="nodes"><i class="fa-solid fa-diagram-project"></i> Nodes</button>
+        <button data-panel="templates"><i class="fa-solid fa-file"></i> Templates</button>
+        <button data-panel="servers"><i class="fa-solid fa-server"></i> Servers</button>
+        <button data-panel="webhooks"><i class="fa-brands fa-discord"></i> Webhooks</button>
+        <% if (user && user.admin) { %>
+          <button data-panel="panelinfo"><i class="fa-solid fa-circle-info"></i> Panel Info</button>
+          <% } %>
+      </nav>
+
+    </aside>
+
+    <main>
+      <section class="panel" aria-labelledby="settings-title">
+        <h2 id="settings-title">Settings</h2>
+
+        <div class="layout-inner">
+          <div class="content-flex">
+            <div class="content-area">
+              <div id="preferences" class="panel-section active">
+                <div class="panelinfo-header">
+                  <div>
+                    <div class="panelinfo-title">Preferences</div>
+                    <div class="panelinfo-subtitle">Bring ADPanel to your style.</div>
+                  </div>
+                </div>
+
+                <div class="panelinfo-content">
+                  <div class="glass-card">
+                    <div class="glass-card-inner">
+                      <div class="glass-card-header">
+                        <div class="glass-card-title"><i class="fa-regular fa-image"></i> <span>Background
+                            Selection</span></div>
+                        <div class="glass-card-subtitle">First, you need a unique look</div>
+                      </div>
+
+                      <div class="bg-section-grid">
+                        <div class="bg-preview-wrapper">
+                          <div class="bg-preview" id="bgPreview">
+                            <div class="label">Main color</div>
+                            <div class="bg-preview-text">
+                              <div class="bg-hex-display" id="bgHex">#ffffff</div>
+                              <div class="bg-preview-label">Preview area</div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="bg-controls-wrapper">
+                          <div class="control-group">
+                            <label>Main Theme Color</label>
+                            <div class="color-picker-row">
+                              <div class="color-dot" id="colorDot" style="background:#ffffff"></div>
+                              <input type="color" id="colorPicker" value="#ffffff" title="Pick main color">
+                              <input type="text" id="hexInput" value="#ffffff" class="glass-input"
+                                aria-label="Hex input">
+                              <button class="btn-glass" id="applyColorBtn"><i class="fa-solid fa-check"></i>
+                                Apply</button>
+                            </div>
+                          </div>
+
+                          <div class="control-group">
+                            <label>Background Image</label>
+                            <div class="upload-row">
+                              <div class="btn-upload" id="uploadBtn" role="button" tabindex="0"><i
+                                  class="fa-solid fa-upload"></i> Upload</div>
+                              <input id="uploadFile" type="file" accept="image/*"
+                                style="position:absolute;width:0;height:0;opacity:0;overflow:hidden">
+                              <input type="text" id="urlInput" placeholder="Paste image URL" class="glass-input">
+                              <button class="btn-glass" id="useUrlBtn">Use</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="thumbs-section">
+                        <div class="thumbs-title">Thumbnail Previews</div>
+                        <div class="thumbs" id="thumbs"></div>
+                      </div>
+
+                      <div class="note">Note: background set here will be applied to the dashboard and main style
+                        files.</div>
+                    </div>
+                  </div>
+
+                  <div class="glass-card">
+                    <div class="glass-card-inner">
+                      <div class="glass-card-header">
+                        <div class="background-title"><i class="fa-solid fa-floppy-disk"></i> <span>Saved
+                            Background</span></div>
+                      </div>
+                      <div id="savedBg" class="saved-bg-value">None</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="customization" class="panel-section">
+                <div class="customization-header">
+                  <div>
+                    <div class="customization-title">Customization</div>
+                    <div class="customization-subtitle">Personalize your dashboard experience</div>
+                  </div>
+                </div>
+
+                <% if (user && user.admin) { %>
+                  <div class="customization-section">
+                    <div class="customization-section-header">
+                      <div class="customization-section-info">
+                        <div class="customization-section-icon" style="background-color: none; background: none;">
+                          <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/adpanel-dark.webp"
+                            alt="Quick Actions" width="47px" height="47px">
+                        </div>
+                        <div>
+                          <div class="customization-section-title">Quick Actions</div>
+                          <div class="customization-section-desc">Configure buttons shown on the dashboard</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="quick-actions-config">
+                      <div class="qa-subgroup">
+                        <div class="qa-subgroup-header">
+                          <span class="qa-subgroup-title">For Admins</span>
+                          <button class="btn btn-sm" id="addQuickActionBtn" title="Add admin action">
+                            <i class="fa-solid fa-plus"></i> Add
+                          </button>
+                        </div>
+
+                        <div class="quick-actions-list" id="quickActionsList"></div>
+
+                        <div class="quick-actions-empty" id="quickActionsEmpty" style="display: none;">
+                          <i class="fa-solid fa-layer-group"></i>
+                          <p>No admin actions configured</p>
+                        </div>
+                        <div class="quick-actions-limit-note">
+                          <i class="fa-solid fa-circle-info"></i>
+                          <span id="quickActionsCount">0</span>/6 actions
+                        </div>
+                      </div>
+
+                      <div class="qa-separator"></div>
+
+                      <div class="qa-subgroup">
+                        <div class="qa-subgroup-header">
+                          <span class="qa-subgroup-title">For Normal Users</span>
+                          <button class="btn btn-sm" id="addUserQuickActionBtn" title="Add user action">
+                            <i class="fa-solid fa-plus"></i> Add
+                          </button>
+                        </div>
+
+                        <div class="quick-actions-list" id="userQuickActionsList"></div>
+
+                        <div class="quick-actions-empty" id="userQuickActionsEmpty" style="display: none;">
+                          <i class="fa-solid fa-layer-group"></i>
+                          <p>No user actions configured</p>
+                        </div>
+                        <div class="quick-actions-limit-note">
+                          <i class="fa-solid fa-circle-info"></i>
+                          <span id="userQuickActionsCount">0</span>/6 actions
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                  <% } %>
+
+                    <div class="customization-section">
+                      <div class="customization-section-header">
+                        <div class="customization-section-info">
+                          <div class="customization-section-icon" style="background-color: none; background: none;">
+                            <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/create-user.webp" alt="Branding"
+                              width="47px" height="47px">
+                          </div>
+                          <div>
+                            <div class="customization-section-title">Change name and logos</div>
+                            <div class="customization-section-desc">Turn ADPanel into your brand</div>
+                          </div>
+                        </div>
+                        <button class="btn" id="openBrandingBtn" title="Change branding">
+                          <i class="fa-solid fa-pen"></i> Change
+                        </button>
+                      </div>
+                    </div>
+
+                    <% if (user && user.admin) { %>
+                      <div class="customization-section">
+                        <div class="customization-section-header">
+                          <div class="customization-section-info">
+                            <div class="customization-section-icon" style="background-color: none; background: none;">
+                              <img
+                                src="<%= (branding && branding.loginWatermarkUrl) ? branding.loginWatermarkUrl : 'https://cdn.jsdelivr.net/gh/antonndev/ADCDn/watermark.webp' %>"
+                                alt="Login Watermark" width="47px" height="47px"
+                                style="width: 47px; height: 47px; object-fit: contain;" data-login-watermark-image>
+                            </div>
+                            <div>
+                              <div class="customization-section-title">Login watermark</div>
+                              <div class="customization-section-desc">Turn ADPanel into your brand</div>
+                            </div>
+                          </div>
+                          <button class="btn" id="openLoginWatermarkBtn" title="Change login watermark">
+                            <i class="fa-solid fa-image"></i> Change Watermark
+                          </button>
+                        </div>
+                      </div>
+
+                      <div class="customization-section">
+                        <div class="customization-section-header">
+                          <div class="customization-section-info">
+                            <div class="customization-section-icon">
+                              <i class="fa-solid fa-photo-film"></i>
+                            </div>
+                            <div>
+                              <div class="customization-section-title">Login background</div>
+                              <div class="customization-section-desc">Set the scene before sign-in.</div>
+                            </div>
+                          </div>
+                          <button class="btn" id="openLoginBackgroundBtn" title="Change login background">
+                            <i class="fa-solid fa-panorama"></i> Change Background
+                          </button>
+                        </div>
+                      </div>
+
+                      <div class="customization-section">
+                        <div class="customization-section-header">
+                          <div class="customization-section-info">
+                            <div class="customization-section-icon" style="background-color: none; background: none;">
+                              <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/alert.webp" alt="Global Alert"
+                                width="55px" height="47px">
+                            </div>
+                            <div>
+                              <div class="customization-section-title">Global Alert</div>
+                              <div class="customization-section-desc">Inform users about an alert or a maintenance</div>
+                            </div>
+                          </div>
+                          <button class="btn" id="openAlertModalBtn" title="Set Alert"
+                            style="display: flex; align-items: center; gap: 6px;">
+                            <span>Add Alert</span>
+                          </button>
+                        </div>
+                      </div>
+                      <% } %>
+
+              </div>
+
+              <div id="account" class="panel-section">
+                <div class="account-header">
+                  <div>
+                    <div class="account-title">Account</div>
+                    <div class="account-subtitle">ADPanel helps you to manage all users, simplified.</div>
+                  </div>
+                  <button id="logoutBtn" class="logout-btn-modern"><i
+                      class="fa-solid fa-right-from-bracket"></i><span>Log Out</span></button>
+                </div>
+
+                <div class="account-content">
+
+                  <div id="changePassCard" class="clickable-card change-pass-card">
+                    <div class="change-pass-header">
+                      <div>
+                        <div class="change-pass-title">Change password</div>
+                        <small class="change-pass-subtitle">Requires current password & 2FA.</small>
+                      </div>
+                      <div class="change-pass-icon"><i class="fa-solid fa-key"></i></div>
+                    </div>
+                  </div>
+
+                  <div class="note-box">
+                    <strong>NOTE:</strong> Other settings like admin-user creation are changed via the
+                    <code>initialize.sh</code>
+                  </div>
+
+                  <div id="accountsSection" class="accounts-section">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 15px;">
+                      <div>
+                        <div class="accounts-title" style="margin-bottom: 0;">Accounts</div>
+                      </div>
+                      <button class="btn ghost" id="openCreateUserBtn" title="Create new user"
+                        style="display: flex; align-items: center; gap: 6px; color: white; margin-bottom: 0;">
+                        <i class="fa-solid fa-user-plus"></i> Create User
+                      </button>
+                    </div>
+                    <div class="accounts-search-container">
+                      <i class="fa-solid fa-search accounts-search-icon"></i>
+                      <input type="text" id="accountsSearchInput" class="accounts-search-input"
+                        placeholder="Search accounts by email...">
+                    </div>
+                    <div id="accountsList" class="accounts-list">
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <div id="security" class="panel-section">
+                <div class="security-title">Security</div>
+                <div class="security-subtitle">ADPanel helps you to handle attacks</div>
+
+                <div class="security-card" id="rateLimiterCard">
+                  <div class="security-card-inner">
+                    <div class="security-card-left">
+                      <div class="security-card-icon security-card-icon-rate"></div>
+                      <div>
+                        <div class="security-card-title">Rate Limiter</div>
+                        <div class="security-card-desc">Limit requests per IP to prevent abuse</div>
+                      </div>
+                    </div>
+                    <label class="switch">
+                      <input type="checkbox" id="rateLimiterToggle">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+
+                  <div id="rateLimiterDetails" class="security-details">
+                    <div class="security-details-grid">
+                      <div class="security-details-row">
+                        <div class="security-details-col">
+                          <label class="security-details-label">
+                            <i class="fa-solid fa-hashtag"></i> Max requests
+                          </label>
+                          <input type="number" id="rateLimiterLimit" min="1" max="10000" value="5"
+                            class="security-details-input" placeholder="5">
+                        </div>
+                        <div class="security-details-col">
+                          <label class="security-details-label">
+                            <i class="fa-solid fa-clock"></i> Window (seconds)
+                          </label>
+                          <input type="number" id="rateLimiterWindow" min="1" max="86400" value="120"
+                            class="security-details-input" placeholder="120">
+                        </div>
+                      </div>
+                      <div class="security-details-footer">
+                        <div class="security-summary">
+                          <i class="fa-solid fa-info-circle"></i>
+                          <span id="rateLimiterSummary">5 requests per 120 seconds</span>
+                        </div>
+                        <button class="btn security-save-btn" id="rateLimiterSave">
+                          <i class="fa-solid fa-floppy-disk"></i> Save
+                        </button>
+                      </div>
+                      <div id="rateLimiterFeedback" class="security-feedback"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="security-card security-card-mt-sm" id="captchaCard">
+                  <div class="security-card-inner">
+                    <div class="security-card-left">
+                      <div class="security-card-icon security-card-icon-captcha"></div>
+                      <div>
+                        <div class="security-card-title">Enable captcha at login</div>
+                        <div class="security-card-desc">Protect against simple bots using reCAPTCHA/Turnstile/hCaptcha</div>
+                      </div>
+                    </div>
+                    <label class="switch">
+                      <input type="checkbox" id="captchaToggle">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+
+                  <div id="captchaDetails" class="security-details">
+                    <div class="captcha-active-box">
+                      <i class="fa-solid fa-check-circle captcha-active-icon"></i>
+                      <span class="captcha-active-text">Captcha is configured and active</span>
+                    </div>
+                    <div class="captcha-info">
+                      <i class="fa-solid fa-info-circle"></i> To update keys, toggle off and back on.
+                    </div>
+                  </div>
+                </div>
+
+                <% if (user && user.admin) { %>
+                <div class="security-card security-card-mt-sm" id="maintenanceCard">
+                  <div class="security-card-inner">
+                    <div class="security-card-left">
+                      <div class="security-card-icon security-card-icon-maintenance">
+                        <i class="fa-solid fa-wrench" style="font-size: 20px; color: #f59e0b; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;"></i>
+                      </div>
+                      <div>
+                        <div class="security-card-title">Maintenance Mode</div>
+                        <div class="security-card-desc">Lock the panel for non-admin users during updates or fixes</div>
+                      </div>
+                    </div>
+                    <label class="switch">
+                      <input type="checkbox" id="maintenanceToggle">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+
+                  <div id="maintenanceDetails" class="security-details">
+                    <div id="maintenanceActiveBox" class="captcha-active-box" style="display:none; background: rgba(245, 158, 11, 0.1);">
+                      <i class="fa-solid fa-wrench" style="color: #f59e0b;"></i>
+                      <span style="font-size: 13px; color: #f59e0b;" id="maintenanceActiveText">Maintenance mode is active</span>
+                    </div>
+                    <div id="maintenanceScheduledBox" class="captcha-active-box" style="display:none; background: rgba(59, 130, 246, 0.1); margin-top: 8px;">
+                      <i class="fa-solid fa-calendar-days" style="color: #3b82f6;"></i>
+                      <span style="font-size: 13px; color: #3b82f6;" id="maintenanceScheduledText">Scheduled for ...</span>
+                    </div>
+                    <div class="captcha-info" style="margin-top: 12px;">
+                      <i class="fa-solid fa-info-circle"></i> When active, all non-admin users will see a maintenance page and cannot access any panel features. Admins can still use the panel normally. The setting persists across panel restarts.
+                    </div>
+                  </div>
+                </div>
+                <% } %>
+
+              </div>
+
+              <% if (user && user.admin) { %>
+              <div id="sessions" class="panel-section">
+                <div class="sessions-panel-header">
+                  <div>
+                    <div class="sessions-panel-title">Sessions</div>
+                    <div class="sessions-panel-subtitle">Manage all ADPanel Sessions.</div>
+                  </div>
+                  <div class="security-sessions-header-meta">
+                    <span class="security-inline-chip" id="sessionsCountBadge">0 active</span>
+                  </div>
+                </div>
+
+                <div class="security-card security-sessions-card sessions-standalone-card">
+                  <div class="sessions-toolbar">
+                    <div class="accounts-search-container sessions-search-container">
+                      <i class="fa-solid fa-search accounts-search-icon"></i>
+                      <input type="text" id="sessionsSearchInput" class="accounts-search-input"
+                        placeholder="Search by Email" autocomplete="off" spellcheck="false">
+                    </div>
+                    <div id="sessionsSummary" class="security-summary sessions-summary">
+                      Loading active browser sessions...
+                    </div>
+                  </div>
+
+                  <div id="sessionsFeedback" class="security-feedback sessions-feedback"></div>
+
+                  <div id="sessionsList" class="sessions-list">
+                    <div class="sessions-empty-state">
+                      <i class="fa-solid fa-spinner fa-spin"></i>
+                      <span>Loading active sessions...</span>
+                    </div>
+                  </div>
+
+                  <div id="sessionsPagination" class="sessions-pagination"></div>
+                </div>
+              </div>
+              <% } %>
+
+              <div id="databases" class="panel-section">
+                <div class="databases-header">
+                  <div>
+                    <div class="databases-title">Database Management</div>
+                    <div class="databases-subtitle">Install and manage database servers</div>
+                  </div>
+                </div>
+
+                <div class="databases-content">
+                  <div class="security-card" id="phpmyadminCard">
+                    <div class="security-card-inner">
+                      <div class="security-card-left">
+                        <div class="security-card-icon db-card-icon-phpmyadmin"><img
+                            src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/phpmyadmin.webp"
+                            alt="phpMyAdmin" width="45px" height="45px"></div>
+                        <div>
+                          <div class="security-card-title">phpMyAdmin</div>
+                          <div class="security-card-desc">MySQL/MariaDB web management interface</div>
+                        </div>
+                      </div>
+                      <label class="switch">
+                        <input type="checkbox" id="phpmyadminToggle">
+                        <span class="slider"></span>
+                      </label>
+                    </div>
+
+                    <div id="phpmyadminDetails" class="security-details db-details">
+                      <div id="phpmyadminStatus" class="db-status-box">
+                        <div class="db-status-loading">
+                          <i class="fa-solid fa-spinner fa-spin"></i>
+                          <span>Checking status...</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div id="dbUsersSection" class="db-users-section" style="display: none;">
+                    <div class="db-users-header">
+                      <div>
+                        <div class="db-users-title">MySQL Users</div>
+                        <div class="db-users-subtitle">Manage phpMyAdmin user accounts</div>
+                      </div>
+                      <button class="btn" id="addDbUserBtn"><i class="fa-solid fa-plus"></i> Add User</button>
+                    </div>
+                    <div id="dbUsersList" class="db-users-list">
+                      <div class="db-users-empty">
+                        <i class="fa-solid fa-user-slash"></i>
+                        <p>No database users configured</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div id="phpmyadminAccessSection" class="db-access-section" style="display: none;">
+                    <div class="db-access-header">
+                      <div class="db-access-icon success"><i class="fa-solid fa-check-circle"></i></div>
+                      <div>
+                        <div class="db-access-title">phpMyAdmin ready!</div>
+                        <div class="db-access-subtitle">Access your MySQL database</div>
+                      </div>
+                    </div>
+                    <div class="db-access-url-box">
+                      <div class="db-access-url" id="phpmyadminUrl"></div>
+                      <div class="db-access-actions">
+                        <button class="btn ghost" id="copyPhpmyadminUrl" title="Copy URL"><i
+                            class="fa-solid fa-copy"></i></button>
+                        <a class="btn" id="openPhpmyadminUrl" title="Open in new tab" href="/db-open/phpmyadmin"
+                          target="_blank" rel="noopener noreferrer"><i
+                            class="fa-solid fa-arrow-up-right-from-square"></i> Open</a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="security-card" id="pgadminCard" style="margin-top: 16px;">
+                    <div class="security-card-inner">
+                      <div class="security-card-left">
+                        <div class="security-card-icon db-card-icon-pgadmin"><img
+                            src="https://upload.wikimedia.org/wikipedia/commons/2/29/Postgresql_elephant.svg"
+                            alt="pgAdmin4" width="45px" height="45px" style="object-fit: contain;"></div>
+                        <div>
+                          <div class="security-card-title">pgAdmin4</div>
+                          <div class="security-card-desc">PostgreSQL web management interface</div>
+                        </div>
+                      </div>
+                      <label class="switch">
+                        <input type="checkbox" id="pgadminToggle">
+                        <span class="slider"></span>
+                      </label>
+                    </div>
+
+                    <div id="pgadminDetails" class="security-details db-details">
+                      <div id="pgadminStatus" class="db-status-box">
+                        <div class="db-status-loading">
+                          <i class="fa-solid fa-spinner fa-spin"></i>
+                          <span>Checking status...</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div id="pgadminAccessSection" class="db-access-section" style="display: none;">
+                    <div class="db-access-header">
+                      <div class="db-access-icon success"><i class="fa-solid fa-check-circle"></i></div>
+                      <div>
+                        <div class="db-access-title">pgAdmin4 ready!</div>
+                        <div class="db-access-subtitle">Access your PostgreSQL database</div>
+                      </div>
+                    </div>
+                    <div class="db-access-url-box">
+                      <div class="db-access-url" id="pgadminUrl"></div>
+                      <div class="db-access-actions">
+                        <button class="btn ghost" id="copyPgadminUrl" title="Copy URL"><i
+                            class="fa-solid fa-copy"></i></button>
+                        <a class="btn" id="openPgadminUrl" title="Open in new tab" href="/db-open/pgadmin"
+                          target="_blank" rel="noopener noreferrer"><i
+                            class="fa-solid fa-arrow-up-right-from-square"></i> Open</a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="security-card" id="mongodbCard" style="margin-top: 16px;">
+                    <div class="security-card-inner">
+                      <div class="security-card-left">
+                        <div class="security-card-icon db-card-icon-mongodb"><img
+                            src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/mongodb.ico" alt="MongoDB" width="45px"
+                            height="45px"></div>
+                        <div>
+                          <div class="security-card-title">MongoDB</div>
+                          <div class="security-card-desc">NoSQL document database</div>
+                        </div>
+                      </div>
+                      <label class="switch">
+                        <input type="checkbox" id="mongodbToggle">
+                        <span class="slider"></span>
+                      </label>
+                    </div>
+
+                    <div id="mongodbDetails" class="security-details db-details">
+                      <div id="mongodbStatus" class="db-status-box">
+                        <div class="db-status-loading">
+                          <i class="fa-solid fa-spinner fa-spin"></i>
+                          <span>Checking status...</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div id="mongodbAccessSection" class="db-access-section" style="display: none;">
+                    <div class="db-access-header">
+                      <div class="db-access-icon success"><i class="fa-solid fa-check-circle"></i></div>
+                      <div>
+                        <div class="db-access-title">MongoDB ready!</div>
+                        <div class="db-access-subtitle" id="mongodbPortInfo">Database is running on port 27017</div>
+                      </div>
+                      <button class="btn ghost" id="createMongodbUser" title="Create new user"
+                        style="margin-left: auto;">
+                        <i class="fa-solid fa-user-plus"></i> Create User
+                      </button>
+                    </div>
+                    <div class="db-access-url-box">
+                      <div class="db-access-url-wrapper">
+                        <span class="db-conn-prefix">mongodb://</span><span class="db-conn-user"
+                          id="mongodbConnUser">admin</span><span class="db-conn-sep">:</span><span
+                          class="db-conn-pass blurred" id="mongodbConnPass"
+                          title="Click to reveal password">••••••••</span><span class="db-conn-sep">@</span><span
+                          class="db-conn-host" id="mongodbConnHost">localhost:27017</span><span
+                          class="db-conn-suffix">/?authSource=admin</span>
+                      </div>
+                      <div class="db-access-actions">
+                        <button class="btn ghost" id="toggleMongodbPassword" title="Show password"><i
+                            class="fa-solid fa-eye"></i></button>
+                        <button class="btn ghost" id="copyMongodbUrl" title="Copy connection string"><i
+                            class="fa-solid fa-copy"></i></button>
+                      </div>
+                    </div>
+
+                    <div class="db-users-section" id="mongodbUsersSection">
+                      <div class="db-users-header">
+                        <div>
+                          <div class="db-users-title"><i class="fa-solid fa-users"></i> Database Users</div>
+                          <div class="db-users-subtitle">Manage MongoDB user accounts</div>
+                        </div>
+                      </div>
+                      <div class="db-users-list" id="mongodbUsersList">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="nodes" class="panel-section">
+                <div class="nodes-header">
+                  <div>
+                    <div class="nodes-title">Nodes</div>
+                    <div class="muted">Manage your infrastructure</div>
+                  </div>
+                  <div style="display:flex;gap:8px;align-items:center">
+                    <div class="nodes-search-wrap">
+                      <i class="fa-solid fa-magnifying-glass"></i>
+                      <input type="text" id="nodesSearchInput" placeholder="Search nodes…" spellcheck="false" autocomplete="off" />
+                    </div>
+                    <button class="btn" id="openCreateNode"><i class="fa-solid fa-circle-plus"></i> Create
+                      node</button>
+                  </div>
+                </div>
+
+                <div id="nodesList" class="nodes-list"></div>
+                <div id="nodesPagination" class="nodes-pagination"></div>
+              </div>
+
+              <div id="templates" class="panel-section">
+                <div class="servers-header templates-header">
+                  <div>
+                    <div class="templates-title">Templates</div>
+                    <div class="templates-subtitle">Manage your server templates.</div>
+                  </div>
+                  <div class="templates-header-actions">
+                    <div class="nodes-search-wrap">
+                      <i class="fa-solid fa-magnifying-glass"></i>
+                      <input type="text" id="templatesSearchInput" placeholder="Search templates…" spellcheck="false" autocomplete="off" />
+                    </div>
+                    <button class="btn" id="openCreateTemplate"><i class="fa-solid fa-plus"></i> Create</button>
+                  </div>
+                </div>
+                <div id="templatesFeedback" class="muted templates-feedback"></div>
+                <div id="templatesList" class="templates-grid templates-list"></div>
+                <div id="templatesPagination" class="nodes-pagination"></div>
+              </div>
+
+              <div id="servers" class="panel-section">
+                <div class="servers-header">
+                  <div>
+                    <div class="servers-title">Servers</div>
+                    <div class="servers-subtitle">All servers in one place.</div>
+                  </div>
+
+                  <div class="create-inline">
+                    <input id="createServerName" type="text" placeholder="Server name" aria-label="New server name" />
+                    <button class="btn" id="createServerBtn"><i class="fa-solid fa-plus"></i> Create</button>
+                  </div>
+                  <div class="nodes-search-wrap">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="serversSearchInput" placeholder="Search servers…" spellcheck="false" autocomplete="off" />
+                  </div>
+                </div>
+
+                <div id="serversList" class="servers-list">
+                </div>
+                <div id="serversPagination" class="nodes-pagination"></div>
+
+              </div>
+
+              <div id="panelinfo" class="panel-section">
+                <% if (user && user.admin) { %>
+                  <div class="panelinfo-header">
+                    <div>
+                      <div class="panelinfo-title">Panel Information</div>
+                      <div class="panelinfo-subtitle">Version details and updates</div>
+                    </div>
+                  </div>
+
+                  <div class="panelinfo-content">
+                    <div class="panelinfo-card">
+                      <div class="panelinfo-card-inner">
+                        <div class="panelinfo-row">
+                          <div class="panelinfo-label"><i class="fa-solid fa-code-branch"></i> ADPanel Version</div>
+                          <div class="panelinfo-value-group">
+                            <div class="panelinfo-value" id="panelInfoVersion"><code>Loading...</code></div>
+                            <button class="panelinfo-copy-btn" id="copyVersionBtn" title="Copy version"><i
+                                class="fa-solid fa-copy"></i></button>
+                          </div>
+                        </div>
+                        <div class="panelinfo-row">
+                          <div class="panelinfo-label"><i class="fa-solid fa-microchip"></i> Built on</div>
+                          <div class="panelinfo-value-group">
+                            <div class="panelinfo-value" id="panelInfoArchitecture"><code>Loading...</code></div>
+                            <button class="panelinfo-copy-btn" id="copyArchBtn" title="Copy architecture"><i
+                                class="fa-solid fa-copy"></i></button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="panelinfo-actions-row">
+                      <div class="panelinfo-update-section">
+                        <button class="btn btn-update-check" id="checkForUpdatesBtn">
+                          <i class="fa-solid fa-arrows-rotate" id="updateSpinIcon"></i> Check for Updates
+                        </button>
+                        <button class="btn btn-auto-update" id="toggleAutoUpdateBtn" data-enabled="false">
+                          <i class="fa-solid fa-clock-rotate-left"></i> Auto Update: Off
+                        </button>
+                      </div>
+                      <div class="panelinfo-manual-section">
+                        <div class="panelinfo-manual-label">Install specific version</div>
+                        <div class="panelinfo-manual-input-group">
+                          <input type="text" class="panelinfo-manual-input" id="manualVersionInput" placeholder="v1.2.3"
+                            spellcheck="false" autocomplete="off">
+                          <button class="btn btn-manual-install" id="manualInstallBtn"><i
+                              class="fa-solid fa-download"></i> Install</button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="panelinfo-update-status" id="panelUpdateStatus"></div>
+                  </div>
+                  <% } else { %>
+                    <div class="panelinfo-header">
+                      <div>
+                        <div class="panelinfo-title">Panel Information</div>
+                        <div class="panelinfo-subtitle">Only admins can view panel information</div>
+                      </div>
+                    </div>
+                    <% } %>
+              </div>
+
+              <div id="webhooks" class="panel-section">
+                <% if (user && user.admin) { %>
+                  <div class="webhooks-header">
+                    <div>
+                      <div class="webhooks-title">Webhooks</div>
+                      <div class="webhooks-subtitle">Send ADPanel activity logs to Discord</div>
+                    </div>
+                    <button class="btn" id="openAddWebhookBtn"><i class="fa-solid fa-plus"></i> Add</button>
+                  </div>
+
+                  <div class="webhooks-mode-selector">
+                    <button class="webhook-mode-tab active" data-mode="single" id="webhookModeSingle">
+                      <i class="fa-solid fa-bolt"></i>
+                      <div>
+                        <div class="webhook-mode-title">Single Webhook</div>
+                        <div class="webhook-mode-desc">One webhook receives all logs</div>
+                      </div>
+                    </button>
+                    <button class="webhook-mode-tab" data-mode="multiple" id="webhookModeMultiple">
+                      <i class="fa-solid fa-layer-group"></i>
+                      <div>
+                        <div class="webhook-mode-title">Multiple Webhooks</div>
+                        <div class="webhook-mode-desc">Per category</div>
+                      </div>
+                    </button>
+                  </div>
+
+                  <div id="webhookSingleSection">
+                    <div id="webhookSingleList" class="webhooks-list"></div>
+                    <div id="webhookSingleEmpty" class="webhooks-empty"
+                      style="display: flex; flex-direction: column; align-items: center;">
+                      <i class="fa-brands fa-discord"></i>
+                      <p>No webhook configured</p>
+                      <small>Click "Add" to set up a Discord webhook</small>
+                    </div>
+                  </div>
+
+                  <div id="webhookMultipleSection" style="display: none;">
+                    <div class="webhook-categories-grid" id="webhookCategoriesGrid">
+                    </div>
+                  </div>
+                  <% } else { %>
+                    <div class="webhooks-header">
+                      <div>
+                        <div class="webhooks-title">Webhooks</div>
+                        <div class="webhooks-subtitle">Only admins can manage webhooks</div>
+                      </div>
+                    </div>
+                    <% } %>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </main>
+  </div>
+
+  <div id="accountModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal access-modal" id="accountModal">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 id="accountModalTitle" class="enterprise-modal-title">Access</h3>
+          <p class="enterprise-modal-subtitle">Manage which servers this user can see.</p>
+        </div>
+        <button class="enterprise-modal-close" id="accountModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div id="accountModalBody" class="enterprise-modal-body"></div>
+    </div>
+  </div>
+
+  <div id="permModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal perm-modal" id="permModal">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon perm-icon">
+          <i class="fa-solid fa-key"></i>
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 id="permModalTitle" class="enterprise-modal-title">Permissions</h3>
+          <p class="enterprise-modal-subtitle">Control what this user can do.</p>
+        </div>
+        <button class="enterprise-modal-close" id="permCancel" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div id="permModalBody" class="enterprise-modal-body perm-modal-body"></div>
+      <div class="enterprise-modal-footer">
+        <button class="enterprise-btn-secondary" id="permCancelBtn">Cancel</button>
+        <button class="enterprise-btn-primary" id="permSave"><i class="fa-solid fa-check"></i> Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="serverTemplateOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal server-template-enterprise-modal" id="serverTemplateModal">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon server-template-icon">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 id="serverTemplateTitle" class="enterprise-modal-title">Change Template</h3>
+          <p id="serverTemplateSubtitle" class="enterprise-modal-subtitle">Pick a template to apply.</p>
+        </div>
+        <button class="enterprise-modal-close" id="serverTemplateClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="enterprise-modal-body server-template-body">
+        <div id="serverTemplateList" class="template-picker-grid-enterprise"></div>
+        <div id="serverTemplateFeedback" class="node-feedback"></div>
+      </div>
+
+      <div class="enterprise-modal-footer">
+        <button class="enterprise-btn-secondary" id="serverTemplateCancel">Cancel</button>
+        <button class="enterprise-btn-primary" id="serverTemplateDone"><i class="fa-solid fa-check"></i> Apply
+          Template</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="createTemplateOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal template-enterprise-modal" id="createTemplateModal">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon template-icon">
+          <i class="fa-solid fa-file-code"></i>
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 class="enterprise-modal-title" id="createTemplateModalTitle">New Template</h3>
+          <p class="enterprise-modal-subtitle" id="createTemplateModalSubtitle">Set up a reusable Docker template.</p>
+        </div>
+        <button class="enterprise-modal-close" id="createTemplateClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="enterprise-modal-body template-modal-body">
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-info-circle"></i> Basic Information</div>
+          <div class="node-form-grid">
+            <div class="node-form-field">
+              <label class="node-form-label">Template name</label>
+              <input id="ct_name" type="text" class="node-form-input" placeholder="e.g. Minecraft Server" />
+            </div>
+            <div class="node-form-field">
+              <label class="node-form-label">Template ID</label>
+              <input id="ct_id" type="text" class="node-form-input" placeholder="lowercase, a-z 0-9 - _" />
+            </div>
+          </div>
+          <div class="node-form-field" style="margin-top: 12px;">
+            <label class="node-form-label">Description</label>
+            <textarea id="ct_description" class="node-form-textarea"
+              placeholder="Explain what this template does..."></textarea>
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-brands fa-docker"></i> Docker Configuration</div>
+          <div class="node-form-grid">
+            <div class="node-form-field">
+              <label class="node-form-label">Docker image</label>
+              <input id="ct_image" type="text" class="node-form-input"
+                placeholder="e.g. spritsail/fivem, node, python" />
+            </div>
+            <div class="node-form-field">
+              <label class="node-form-label">Tag</label>
+              <input id="ct_tag" type="text" class="node-form-input" placeholder="latest" value="latest" />
+            </div>
+          </div>
+          <div class="node-form-field" style="margin-top: 12px;">
+            <label class="node-form-label">Startup command</label>
+            <textarea id="ct_startup_command" class="node-form-textarea" aria-describedby="ct_startupCommandHelp" placeholder="e.g. node /app/index.js"></textarea>
+            <small id="ct_startupCommandHelp" class="startup-cmd-help">Use only the in-container executable and arguments. Docker CLI commands like <code>docker run</code> are blocked.</small>
+          </div>
+          <div class="node-form-field" style="margin-top: 12px;">
+            <label class="node-form-label">Workdir</label>
+            <input id="ct_workdir" type="text" class="node-form-input" placeholder="e.g. /app" />
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-image"></i> Appearance</div>
+          <div class="node-form-field">
+            <label class="node-form-label">Template image URL <span class="node-form-hint">(optional)</span></label>
+            <input id="ct_template_image" type="text" class="node-form-input"
+              placeholder="https://example.com/cover.jpg" />
+          </div>
+        </div>
+
+        <div id="createTemplateFeedback" class="node-feedback"></div>
+      </div>
+
+      <div class="enterprise-modal-footer">
+        <input id="ct_import_json" type="file" accept=".json,application/json" style="display: none;" />
+        <button class="enterprise-btn-secondary" id="createTemplateImportBtn"><i class="fa-solid fa-upload"></i> Upload JSON</button>
+        <button class="enterprise-btn-secondary" id="createTemplateCancel">Cancel</button>
+        <button class="enterprise-btn-primary" id="createTemplateSave"><i class="fa-solid fa-plus"></i> Create
+          Template</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal password-modal" id="changeModal">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon password-icon">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 class="enterprise-modal-title">Change Password</h3>
+          <p class="enterprise-modal-subtitle">Update your account password.</p>
+        </div>
+        <button class="enterprise-modal-close" id="modalCancel" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="password-form">
+        <div class="password-field">
+          <label class="password-label">Current password</label>
+          <div class="password-input-wrap">
+            <input type="password" id="modalCurrent" placeholder="Enter current password"
+              autocomplete="current-password">
+            <button type="button" class="password-toggle" aria-label="Show password">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <div class="password-field">
+          <label class="password-label">New password</label>
+          <div class="password-input-wrap">
+            <input type="password" id="modalNew" placeholder="Minimum 8 characters" autocomplete="new-password">
+            <button type="button" class="password-toggle" aria-label="Show password">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+          <div class="password-strength" id="passwordStrength"></div>
+        </div>
+        <div class="password-field">
+          <label class="password-label">Confirm new password</label>
+          <div class="password-input-wrap">
+            <input type="password" id="modalConfirm" placeholder="Re-enter new password" autocomplete="new-password">
+            <button type="button" class="password-toggle" aria-label="Show password">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <div class="password-field" id="twoFactorField" style="display: none;">
+          <label class="password-label"><i class="fa-solid fa-shield-halved" style="margin-right:6px;"></i>2FA
+            Code</label>
+          <div class="password-input-wrap">
+            <input type="text" id="modalTwoFactor" placeholder="Enter your 6-digit code" autocomplete="one-time-code"
+              maxlength="6" inputmode="numeric" pattern="[0-9]*">
+          </div>
+          <small style="color:var(--muted);font-size:12px;margin-top:4px;display:block;">Enter the code from your
+            authenticator app</small>
+        </div>
+      </div>
+      <div id="changePasswordFeedback" class="node-feedback" style="display:none;"></div>
+      <div class="enterprise-modal-footer">
+        <button class="enterprise-btn-secondary" id="modalCancelBtn">Cancel</button>
+        <button class="enterprise-btn-primary" id="modalSave"><i class="fa-solid fa-check"></i> Update Password</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="adminChangePasswordOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal password-modal" id="adminChangePasswordModal">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon password-icon">
+          <i class="fa-solid fa-key"></i>
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 class="enterprise-modal-title" id="adminChangePasswordTitle">Reset Password</h3>
+          <p class="enterprise-modal-subtitle" id="adminChangePasswordSubtitle">Set a new password for this user.</p>
+        </div>
+        <button class="enterprise-modal-close" id="adminChangePasswordClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="password-form">
+        <div class="password-field">
+          <label class="password-label">New password</label>
+          <div class="password-input-wrap">
+            <input type="password" id="adminNewPassword" placeholder="Minimum 8 characters" autocomplete="new-password">
+            <button type="button" class="password-toggle" aria-label="Show password">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+          <div class="password-strength" id="adminPasswordStrength"></div>
+        </div>
+        <div class="password-field">
+          <label class="password-label">Confirm new password</label>
+          <div class="password-input-wrap">
+            <input type="password" id="adminConfirmPassword" placeholder="Re-enter new password"
+              autocomplete="new-password">
+            <button type="button" class="password-toggle" aria-label="Show password">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div id="adminChangePasswordFeedback" class="node-feedback" style="display:none;"></div>
+      <div class="enterprise-modal-footer">
+        <button class="enterprise-btn-secondary" id="adminChangePasswordCancelBtn">Cancel</button>
+        <button class="enterprise-btn-primary" id="adminChangePasswordSave"><i class="fa-solid fa-check"></i> Update
+          Password</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="qrOptionsModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal qr-options-modal" id="qrOptionsModal">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon" style="background: transparent;">
+          <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/qr-code.webp" alt="QR"
+            style="width: 120px; height: 90px;">
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 class="enterprise-modal-title">Security</h3>
+          <p class="enterprise-modal-subtitle" id="qrOptionsUserEmail">Choose an action for this user.</p>
+        </div>
+        <button class="enterprise-modal-close" id="qrOptionsModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="enterprise-modal-body" style="padding: 24px;">
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <button class="qr-option-btn" id="resetUser2FABtn">
+            <div class="qr-option-icon" style="background: transparent;">
+              <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/reset.webp" alt="QR"
+                style="width: 70px; height: 44px;">
+            </div>
+            <div class="qr-option-content">
+              <div class="qr-option-title">Reset user QR code</div>
+              <div class="qr-option-desc">Generate a new 2FA secret and QR code for this user</div>
+            </div>
+            <i class="fa-solid fa-chevron-right" style="color: var(--muted);"></i>
+          </button>
+
+          <button class="qr-option-btn" id="resetUserRecoveryBtn">
+            <div class="qr-option-icon" style="background: transparent;">
+              <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/captcha.webp" alt="Recovery"
+                style="width: 60px; height: 44px;">
+            </div>
+            <div class="qr-option-content">
+              <div class="qr-option-title">Reset user recovery codes</div>
+              <div class="qr-option-desc">Generate new recovery codes for this user</div>
+            </div>
+            <i class="fa-solid fa-chevron-right" style="color: var(--muted);"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="qrResetModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal qr-reset-modal" id="qrResetModal">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon" style="background: transparent;">
+          <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/captcha.webp" alt="QR"
+            style="width: 130px; height: 90px;">
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 class="enterprise-modal-title">Setup 2FA</h3>
+          <p class="enterprise-modal-subtitle" id="qrResetUserEmail">Scan with your authenticator app.</p>
+        </div>
+        <button class="enterprise-modal-close" id="qrResetModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="enterprise-modal-body" style="padding: 24px; text-align: center;">
+        <div id="qrResetLoading" style="padding: 40px;">
+          <i class="fa-solid fa-spinner fa-spin" style="font-size: 32px; color: var(--muted);"></i>
+          <p style="margin-top: 12px; color: var(--muted);">Generating new QR code...</p>
+        </div>
+
+        <div id="qrResetContent" style="display: none;">
+          <div
+            style="background: white; padding: 16px; border-radius: 12px; display: inline-block; margin-bottom: 16px;">
+            <img id="qrResetImage" src="" alt="QR Code" style="width: 200px; height: 200px;">
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <p style="color: var(--muted); font-size: 13px; margin-bottom: 8px;">Or enter this secret manually:</p>
+            <div
+              style="background: rgba(0,0,0,0.2); padding: 12px 16px; border-radius: 8px; font-family: 'SF Mono', Monaco, monospace; font-size: 14px; letter-spacing: 2px; word-break: break-all;"
+              id="qrResetSecretText">
+            </div>
+          </div>
+
+          <div style="background: rgba(245, 158, 11, 0.1); border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+            <i class="fa-solid fa-triangle-exclamation" style="color: #f59e0b; margin-right: 8px;"></i>
+            <span style="font-size: 13px; color: rgba(255,255,255,0.8);">The user must scan this QR code with their
+              authenticator app.</span>
+          </div>
+        </div>
+
+        <div id="qrResetError" style="display: none; color: #f44747; padding: 20px;">
+          <i class="fa-solid fa-circle-exclamation" style="font-size: 24px;"></i>
+          <p style="margin-top: 8px;" id="qrResetErrorText">Failed to generate QR code</p>
+        </div>
+      </div>
+
+      <div class="enterprise-modal-footer">
+        <button class="enterprise-btn-primary" id="qrResetDoneBtn"><i class="fa-solid fa-check"></i> Done</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="recoveryResetModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal qr-reset-modal" id="recoveryResetModal">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon" style="background: transparent;">
+          <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/captcha.webp" alt="Recovery"
+            style="width: 130px; height: 90px;">
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 class="enterprise-modal-title">Recovery Codes</h3>
+          <p class="enterprise-modal-subtitle" id="recoveryResetUserEmail">Keep these somewhere safe.</p>
+        </div>
+        <button class="enterprise-modal-close" id="recoveryResetModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="enterprise-modal-body" style="padding: 24px;">
+        <div id="recoveryResetLoading" style="padding: 40px; text-align: center;">
+          <i class="fa-solid fa-spinner fa-spin" style="font-size: 32px; color: var(--muted);"></i>
+          <p style="margin-top: 12px; color: var(--muted);">Generating new recovery codes...</p>
+        </div>
+
+        <div id="recoveryResetContent" style="display: none;">
+          <div style="background: rgba(245, 158, 11, 0.1); border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+            <i class="fa-solid fa-triangle-exclamation" style="color: #f59e0b; margin-right: 8px;"></i>
+            <span style="font-size: 13px; color: rgba(255,255,255,0.8);">Give these codes to the user. They can only be
+              shown ONCE!</span>
+          </div>
+
+          <div id="recoveryCodesList" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+          </div>
+        </div>
+
+        <div id="recoveryResetError" style="display: none; color: #f44747; padding: 20px; text-align: center;">
+          <i class="fa-solid fa-circle-exclamation" style="font-size: 24px;"></i>
+          <p style="margin-top: 8px;" id="recoveryResetErrorText">Failed to generate recovery codes</p>
+        </div>
+      </div>
+
+      <div class="enterprise-modal-footer">
+        <button class="enterprise-btn-primary" id="recoveryResetDoneBtn"><i class="fa-solid fa-check"></i> Done</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="createUserModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal" id="createUserModal" style="width: 480px;">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon" style="background: transparent;">
+          <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/create-user.webp" alt="Create User"
+            style="width: 80px; height: 70px;">
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 class="enterprise-modal-title">New User</h3>
+          <p class="enterprise-modal-subtitle">Add a new user to this panel.</p>
+        </div>
+        <button class="enterprise-modal-close" id="createUserModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="enterprise-modal-body" style="padding: 24px;">
+        <div id="createUserForm">
+          <div style="margin-bottom: 16px;">
+            <label
+              style="display: block; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 8px;">Email</label>
+            <input type="email" id="createUserEmail" placeholder="user@example.com"
+              style="width: 100%; height: 48px; padding: 0 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.2); color: rgba(255,255,255,0.95); font-size: 14px; outline: none;">
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label
+              style="display: block; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 8px;">Password</label>
+            <div style="position: relative;">
+              <input type="password" id="createUserPassword" placeholder="Enter password"
+                style="width: 100%; height: 48px; padding: 0 48px 0 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.2); color: rgba(255,255,255,0.95); font-size: 14px; outline: none;">
+              <button type="button" class="password-toggle" data-target="createUserPassword"
+                style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(255,255,255,0.4); cursor: pointer;">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label
+              style="display: block; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 8px;">Confirm
+              Password</label>
+            <div style="position: relative;">
+              <input type="password" id="createUserPasswordConfirm" placeholder="Confirm password"
+                style="width: 100%; height: 48px; padding: 0 48px 0 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.2); color: rgba(255,255,255,0.95); font-size: 14px; outline: none;">
+              <button type="button" class="password-toggle" data-target="createUserPasswordConfirm"
+                style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(255,255,255,0.4); cursor: pointer;">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div id="createUserError" style="display: none; color: #f44747; font-size: 13px; margin-top: 8px;"></div>
+        </div>
+      </div>
+
+      <div class="enterprise-modal-footer">
+        <button class="enterprise-btn-secondary" id="createUserCancelBtn">Cancel</button>
+        <button class="enterprise-btn-primary" id="createUserSubmitBtn"><i class="fa-solid fa-plus"></i> Create
+          User</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="userCredentialsModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal" id="userCredentialsModal" style="width: 520px;">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon" style="background: transparent;">
+          <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/captcha.webp" alt="Credentials"
+            style="width: 130px; height: 90px;">
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 class="enterprise-modal-title">User Created!</h3>
+          <p class="enterprise-modal-subtitle" id="credentialsUserEmail">Save these before closing.</p>
+        </div>
+        <button class="enterprise-modal-close" id="credentialsModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="enterprise-modal-body" style="padding: 24px; text-align: center;">
+        <div style="background: rgba(245, 158, 11, 0.1); border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+          <i class="fa-solid fa-triangle-exclamation" style="color: #f59e0b; margin-right: 8px;"></i>
+          <span style="font-size: 13px; color: rgba(255,255,255,0.8);">Give these credentials to the user. They can only
+            be shown ONCE!</span>
+        </div>
+
+        <div style="background: white; padding: 16px; border-radius: 12px; display: inline-block; margin-bottom: 16px;">
+          <img id="credentialsQRCode" src="" alt="QR Code" style="width: 160px; height: 160px;">
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <p style="color: var(--muted); font-size: 13px; margin-bottom: 8px;">2FA Secret:</p>
+          <div id="credentialsSecret"
+            style="background: rgba(0,0,0,0.2); padding: 12px 16px; border-radius: 8px; font-family: 'SF Mono', Monaco, monospace; font-size: 14px; letter-spacing: 2px; word-break: break-all;">
+          </div>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <p style="color: var(--muted); font-size: 13px; margin-bottom: 8px;">Recovery Codes:</p>
+          <div id="credentialsRecoveryCodes" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+          </div>
+        </div>
+      </div>
+
+      <div class="enterprise-modal-footer" style="justify-content: space-between;">
+        <button class="enterprise-btn-secondary" id="downloadCredentialsBtn"
+          style="border: none !important; box-shadow: none !important;">
+          <i class="fa-solid fa-download"></i> Download
+        </button>
+        <button class="enterprise-btn-primary" id="credentialsDoneBtn"><i class="fa-solid fa-check"></i> Done</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="brandingModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal" id="brandingModal" style="width: 520px;">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon" style="background: transparent;">
+          <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/create-user.webp" alt="Branding"
+            style="width: 70px; height: 70px;">
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 class="enterprise-modal-title">Branding</h3>
+          <p class="enterprise-modal-subtitle">Change your panel name and logo.</p>
+        </div>
+        <button class="enterprise-modal-close" id="brandingModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="enterprise-modal-body" style="padding: 24px;">
+        <div style="margin-bottom: 20px;">
+          <label
+            style="display: block; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 8px;">
+            <i class="fa-solid fa-font" style="margin-right: 6px;"></i> App Name
+          </label>
+          <input type="text" id="brandingAppName" placeholder="ADPanel"
+            style="width: 100%; height: 48px; padding: 0 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.2); color: rgba(255,255,255,0.95); font-size: 14px; outline: none;">
+          <small style="display: block; margin-top: 6px; color: var(--muted); font-size: 12px;">This will update the
+            title everywhere in the panel</small>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <label
+            style="display: block; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 8px;">
+            <i class="fa-solid fa-image" style="margin-right: 6px;"></i> Logo Source
+          </label>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="branding-logo-tab active" id="logoTabUpload"
+              style="flex: 1; padding: 10px 16px; border-radius: 8px; border: 1px solid rgba(99,102,241,0.5); background: rgba(99,102,241,0.15); color: #a5b4fc; cursor: pointer; font-size: 13px; font-weight: 500;">
+              <i class="fa-solid fa-upload"></i> Upload File
+            </button>
+            <button type="button" class="branding-logo-tab" id="logoTabUrl"
+              style="flex: 1; padding: 10px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.6); cursor: pointer; font-size: 13px; font-weight: 500;">
+              <i class="fa-solid fa-link"></i> From URL
+            </button>
+          </div>
+        </div>
+
+        <div id="logoUploadSection" style="margin-bottom: 16px;">
+          <input type="file" id="brandingLogoFile" accept="image/*" style="display: none;">
+          <button type="button" id="brandingLogoSelectBtn"
+            style="width: 100%; padding: 16px; border-radius: 12px; border: 2px dashed rgba(255,255,255,0.15); background: rgba(0,0,0,0.1); color: rgba(255,255,255,0.6); cursor: pointer; font-size: 14px;">
+            <i class="fa-solid fa-cloud-upload-alt" style="font-size: 24px; margin-bottom: 8px; display: block;"></i>
+            Click to select logo image
+          </button>
+          <div id="logoPreviewUpload" style="display: none; margin-top: 12px; text-align: center;">
+            <img id="logoPreviewImg" src="" alt="Logo preview"
+              style="max-width: 100px; max-height: 60px; border-radius: 8px;">
+            <div style="font-size: 12px; color: var(--muted); margin-top: 6px;" id="logoFileName"></div>
+          </div>
+        </div>
+
+        <div id="logoUrlSection" style="display: none; margin-bottom: 16px;">
+          <input type="url" id="brandingLogoUrl" placeholder="https://example.com/logo.png"
+            style="width: 100%; height: 48px; padding: 0 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.2); color: rgba(255,255,255,0.95); font-size: 14px; outline: none;">
+        </div>
+
+        <div id="brandingError" style="display: none; color: #f44747; font-size: 13px; margin-top: 8px;"></div>
+
+        <div style="background: rgba(59, 130, 246, 0.1); border-radius: 8px; padding: 12px; margin-top: 16px;">
+          <i class="fa-solid fa-circle-info" style="color: #3b82f6; margin-right: 8px;"></i>
+          <span style="font-size: 13px; color: rgba(255,255,255,0.8);">Changes will be applied immediately and visible
+            after page refresh.</span>
+        </div>
+      </div>
+
+      <div class="enterprise-modal-footer">
+        <button class="enterprise-btn-secondary" id="brandingCancelBtn">Cancel</button>
+        <button class="enterprise-btn-primary" id="brandingSaveBtn"><i class="fa-solid fa-check"></i> Save
+          Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="loginWatermarkModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal login-watermark-enterprise-modal" id="loginWatermarkModal" style="width: 560px;">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon" style="background: transparent;">
+          <img
+            src="<%= (branding && branding.loginWatermarkUrl) ? branding.loginWatermarkUrl : 'https://cdn.jsdelivr.net/gh/antonndev/ADCDn/watermark.webp' %>"
+            alt="Login Watermark" style="width: 72px; height: 72px; object-fit: contain;" data-login-watermark-image>
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 class="enterprise-modal-title">Login Watermark</h3>
+          <p class="enterprise-modal-subtitle">Pick a new image from your device or from a direct web link.</p>
+        </div>
+        <button class="enterprise-modal-close" id="loginWatermarkModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="enterprise-modal-body">
+        <div class="node-form-section">
+          <label class="node-form-label">Image Source</label>
+          <div class="login-watermark-source-tabs">
+            <button type="button" class="login-watermark-source-tab active" id="loginWatermarkTabUpload">
+              <i class="fa-solid fa-hard-drive"></i> From Device
+            </button>
+            <button type="button" class="login-watermark-source-tab" id="loginWatermarkTabUrl">
+              <i class="fa-solid fa-link"></i> From Web
+            </button>
+          </div>
+        </div>
+
+        <div id="loginWatermarkUploadSection" class="node-form-section">
+          <input type="file" id="loginWatermarkFile" accept="image/*" class="login-watermark-upload-input">
+          <button type="button" id="loginWatermarkSelectBtn" class="login-watermark-dropzone">
+            <span class="login-watermark-dropzone-icon">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+            </span>
+            <span class="login-watermark-dropzone-copy">
+              <strong>Choose a new watermark image</strong>
+              <span>PNG, JPG, WEBP, ICO or SVG from your computer.</span>
+            </span>
+            <span class="login-watermark-dropzone-action">Browse</span>
+          </button>
+          <div id="loginWatermarkUploadMeta" class="login-watermark-upload-meta"></div>
+        </div>
+
+        <div id="loginWatermarkUrlSection" class="node-form-section" style="display: none;">
+          <div class="node-form-field">
+            <label class="node-form-label" for="loginWatermarkUrl">Direct Image URL</label>
+            <input type="url" id="loginWatermarkUrl" class="node-form-input"
+              placeholder="https://example.com/watermark.webp" autocomplete="off">
+            <small class="login-watermark-input-hint">Paste a direct HTTP or HTTPS image link and it becomes the new login watermark.</small>
+          </div>
+        </div>
+
+        <div class="login-watermark-preview-card">
+          <div class="login-watermark-preview-top">
+            <div class="login-watermark-preview-title">Live Preview</div>
+            <div id="loginWatermarkPreviewBadge" class="login-watermark-preview-badge">Current image</div>
+          </div>
+          <div class="login-watermark-preview-frame">
+            <img
+              src="<%= (branding && branding.loginWatermarkUrl) ? branding.loginWatermarkUrl : 'https://cdn.jsdelivr.net/gh/antonndev/ADCDn/watermark.webp' %>"
+              alt="Login watermark preview" id="loginWatermarkPreviewImg">
+          </div>
+          <div id="loginWatermarkPreviewMeta" class="login-watermark-preview-meta">
+            This preview only swaps the image. The hardcoded watermark size from the login page stays untouched.
+          </div>
+        </div>
+
+        <div id="loginWatermarkFeedback" class="login-watermark-feedback"></div>
+      </div>
+
+      <div class="enterprise-modal-footer">
+        <button class="enterprise-btn-secondary" id="loginWatermarkCancelBtn">Cancel</button>
+        <button class="enterprise-btn-primary" id="loginWatermarkSaveBtn">
+          <i class="fa-solid fa-check"></i> Save Watermark
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="loginBackgroundModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal login-background-enterprise-modal" id="loginBackgroundModal" style="width: 600px;">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon" style="background: transparent;">
+          <div class="login-background-modal-badge">
+            <i class="fa-solid fa-photo-film"></i>
+          </div>
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 class="enterprise-modal-title">Login Background</h3>
+          <p class="enterprise-modal-subtitle">Set the tone before sign-in.</p>
+        </div>
+        <button class="enterprise-modal-close" id="loginBackgroundModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="enterprise-modal-body">
+        <div class="node-form-section">
+          <label class="node-form-label">Media Source</label>
+          <div class="login-watermark-source-tabs">
+            <button type="button" class="login-watermark-source-tab active" id="loginBackgroundTabUpload">
+              <i class="fa-solid fa-hard-drive"></i> From Device
+            </button>
+            <button type="button" class="login-watermark-source-tab" id="loginBackgroundTabUrl">
+              <i class="fa-solid fa-link"></i> From Web
+            </button>
+          </div>
+        </div>
+
+        <div id="loginBackgroundUploadSection" class="node-form-section">
+          <input type="file" id="loginBackgroundFile" accept="image/*,video/webm,video/mp4,video/ogg,.webm,.mp4,.ogg,.ogv"
+            class="login-watermark-upload-input">
+          <button type="button" id="loginBackgroundSelectBtn" class="login-watermark-dropzone">
+            <span class="login-watermark-dropzone-icon">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+            </span>
+            <span class="login-watermark-dropzone-copy">
+              <strong>Choose image or video</strong>
+              <span>PNG, JPG, WEBP, SVG, WEBM, MP4 or OGG.</span>
+            </span>
+            <span class="login-watermark-dropzone-action">Browse</span>
+          </button>
+          <div id="loginBackgroundUploadMeta" class="login-watermark-upload-meta"></div>
+        </div>
+
+        <div id="loginBackgroundUrlSection" class="node-form-section" style="display: none;">
+          <div class="node-form-field">
+            <label class="node-form-label" for="loginBackgroundUrl">Direct Media URL</label>
+            <input type="url" id="loginBackgroundUrl" class="node-form-input"
+              placeholder="https://example.com/login-bg.webm" autocomplete="off">
+            <small class="login-watermark-input-hint">Paste a direct file link.</small>
+          </div>
+        </div>
+
+        <div class="login-watermark-preview-card">
+          <div class="login-watermark-preview-top">
+            <div class="login-watermark-preview-title">Preview</div>
+            <div id="loginBackgroundPreviewBadge" class="login-watermark-preview-badge"><%= (branding && branding.loginBackgroundType === 'image') ? 'Image' : 'Video' %></div>
+          </div>
+          <div class="login-background-media-frame">
+            <img id="loginBackgroundPreviewImg"
+              class="login-background-media<%= (branding && branding.loginBackgroundType === 'image') ? ' is-visible' : '' %>"
+              src="<%= (branding && branding.loginBackgroundType === 'image' && branding.loginBackgroundUrl) ? branding.loginBackgroundUrl : '' %>"
+              alt="Login background preview">
+            <video id="loginBackgroundPreviewVideo"
+              class="login-background-media<%= (!branding || branding.loginBackgroundType !== 'image') ? ' is-visible' : '' %>"
+              src="<%= (!branding || branding.loginBackgroundType !== 'image') ? ((branding && branding.loginBackgroundUrl) ? branding.loginBackgroundUrl : '/images/bgvid.webm') : '' %>"
+              muted loop playsinline preload="metadata"></video>
+          </div>
+          <div id="loginBackgroundPreviewMeta" class="login-watermark-preview-meta">Current <%= (branding && branding.loginBackgroundType === 'image') ? 'image' : 'video' %></div>
+        </div>
+
+        <div id="loginBackgroundFeedback" class="login-watermark-feedback"></div>
+      </div>
+
+      <div class="enterprise-modal-footer">
+        <button class="enterprise-btn-secondary" id="loginBackgroundCancelBtn">Cancel</button>
+        <button class="enterprise-btn-primary" id="loginBackgroundSaveBtn">
+          <i class="fa-solid fa-check"></i> Save Background
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="createNodeOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal node-enterprise-modal" id="createNodeModal">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon node-icon">
+          <i class="fa-solid fa-server"></i>
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 class="enterprise-modal-title">New Node</h3>
+          <p class="enterprise-modal-subtitle">Add a node to your cluster.</p>
+        </div>
+        <button class="enterprise-modal-close" id="createNodeClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="enterprise-modal-body node-modal-body">
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-info-circle"></i> Basic Information</div>
+          <div class="node-form-grid">
+            <div class="node-form-field">
+              <label class="node-form-label">Node name</label>
+              <input id="cn_name" type="text" class="node-form-input" placeholder="e.g. eu-1" />
+            </div>
+            <div class="node-form-field">
+              <label class="node-form-label">Address (IP or FQDN)</label>
+              <input id="cn_address" type="text" class="node-form-input" placeholder="e.g. 203.0.113.10" />
+            </div>
+          </div>
+          <div class="node-form-field node-ssl-toggle-row" id="cn_ssl_row" style="display:none; margin-top: 10px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <label class="switch node-ssl-switch">
+                <input type="checkbox" id="cn_ssl_enabled">
+                <span class="slider"></span>
+              </label>
+              <div>
+                <label class="node-form-label" style="margin-bottom:2px;">Use HTTPS</label>
+                <div style="font-size:0.82rem; color:rgba(255,255,255,0.45);">Communicate with this node over HTTPS (requires Let's Encrypt or custom SSL certificate on the node).</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-microchip"></i> Hardware Resources</div>
+          <div class="node-form-grid node-form-grid-3">
+            <div class="node-form-field">
+              <label class="node-form-label">CPU Cores</label>
+              <input id="cn_cpu_cores" type="number" class="node-form-input" min="1" step="1" placeholder="e.g. 8" />
+            </div>
+            <div class="node-form-field">
+              <label class="node-form-label">RAM (GB)</label>
+              <input id="cn_ram_gb" type="number" class="node-form-input" min="1" step="1" placeholder="e.g. 16" />
+            </div>
+            <div class="node-form-field">
+              <label class="node-form-label">Disk (GB)</label>
+              <input id="cn_disk_gb" type="number" class="node-form-input" min="10" step="10" placeholder="e.g. 250" />
+            </div>
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-plug"></i> Port Allocations <span
+              class="node-form-hint">(max 1000)</span></div>
+          <div class="node-ports-mode">
+            <label class="node-port-chip">
+              <input type="radio" name="cn_ports_mode" value="range" checked>
+              <span><i class="fa-solid fa-arrows-left-right"></i> Range</span>
+            </label>
+            <label class="node-port-chip">
+              <input type="radio" name="cn_ports_mode" value="list">
+              <span><i class="fa-solid fa-list"></i> List</span>
+            </label>
+          </div>
+
+          <div id="cn_ports_range" class="node-form-grid">
+            <div class="node-form-field">
+              <label class="node-form-label">Start port</label>
+              <input id="cn_port_start" type="number" class="node-form-input" min="1" max="65535"
+                placeholder="e.g. 25565" />
+            </div>
+            <div class="node-form-field">
+              <label class="node-form-label">Count (≤1000)</label>
+              <input id="cn_port_count" type="number" class="node-form-input" min="1" max="1000"
+                placeholder="e.g. 50" />
+            </div>
+          </div>
+
+          <div id="cn_ports_list" class="node-form-field ports-list-field">
+            <label class="node-form-label">Ports (comma separated)</label>
+            <input id="cn_port_list" type="text" class="node-form-input" placeholder="e.g. 25565,25566,25567" />
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Limit</div>
+          <div class="node-form-grid">
+            <div class="node-form-field">
+              <label class="node-form-label">Max single-file upload size (MB)</label>
+              <input id="cn_max_upload_mb" type="number" class="node-form-input" min="1" max="100000" step="1" placeholder="e.g. 10240" value="100" />
+            </div>
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-network-wired"></i> Daemon Ports</div>
+          <div class="node-form-grid">
+            <div class="node-form-field">
+              <label class="node-form-label">Daemon Port</label>
+              <input id="cn_daemon_port" type="number" class="node-form-input" min="1" max="65535" step="1" placeholder="8080" value="8080" />
+            </div>
+            <div class="node-form-field">
+              <label class="node-form-label">SFTP Port</label>
+              <input id="cn_sftp_port" type="number" class="node-form-input" min="1" max="65535" step="1" placeholder="2022" value="2022" />
+            </div>
+          </div>
+        </div>
+
+        <div id="createNodeFeedback" class="node-feedback"></div>
+      </div>
+
+      <div class="enterprise-modal-footer">
+        <button class="enterprise-btn-secondary" id="createNodeCancel">Cancel</button>
+        <button class="enterprise-btn-primary" id="createNodeSave"><i class="fa-solid fa-plus"></i> Create Node</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="captchaModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal node-enterprise-modal captcha-enterprise-modal" id="captchaModal">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon captcha-icon">
+          <img class="captcha-modal-icon" src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/adpanel-dark.webp"
+            alt="Captcha">
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 class="enterprise-modal-title">Configure Captcha</h3>
+          <p class="enterprise-modal-subtitle">Enter your reCAPTCHA or Turnstile credentials</p>
+        </div>
+        <button class="enterprise-modal-close" id="captchaModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="enterprise-modal-body captcha-modal-body">
+        <div class="captcha-modal-form">
+          <div class="node-form-field">
+            <label class="node-form-label captcha-input-label">
+              <i class="fa-solid fa-key"></i> Site Key
+            </label>
+            <input type="text" id="captchaSiteKey" class="node-form-input captcha-input"
+              placeholder="Enter your site key...">
+          </div>
+          <div class="node-form-field">
+            <label class="node-form-label captcha-input-label">
+              <i class="fa-solid fa-lock"></i> Secret Key
+            </label>
+            <div class="captcha-input-wrapper">
+              <input type="password" id="captchaSecretKey" class="node-form-input captcha-input captcha-input-secret"
+                placeholder="Enter your secret key...">
+              <button type="button" id="captchaSecretToggle" class="captcha-toggle-btn">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="captcha-notice">
+          <div class="captcha-notice-inner">
+            <i class="fa-solid fa-shield-halved captcha-notice-icon"></i>
+            <div class="captcha-notice-text">
+              <strong class="captcha-notice-strong">Security Notice:</strong> Your keys are stored securely in the
+              server's environment configuration and are never exposed to clients. Only administrators can access this
+              setting.
+            </div>
+          </div>
+        </div>
+
+        <div id="captchaModalFeedback" class="captcha-modal-feedback"></div>
+      </div>
+
+      <div class="enterprise-modal-footer captcha-modal-actions">
+        <button class="enterprise-btn-secondary" id="captchaModalCancel">Cancel</button>
+        <button class="enterprise-btn-primary" id="captchaModalSave"><i class="fa-solid fa-floppy-disk"></i> Save & Enable</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="maintenanceModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal maintenance-enterprise-modal" id="maintenanceModal">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon maintenance-icon">
+          <i class="fa-solid fa-wrench"></i>
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 class="enterprise-modal-title">Enable Maintenance Mode</h3>
+          <p class="enterprise-modal-subtitle">Non-admin users will be locked out of the panel</p>
+        </div>
+        <button class="enterprise-modal-close" id="maintenanceModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="enterprise-modal-body maintenance-modal-body">
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-clock"></i> Timing</div>
+          <div class="maintenance-timing-chips">
+            <label class="node-port-chip">
+              <input type="radio" name="maintenanceTiming" value="immediate" checked id="maintenanceImmediate">
+              <span><i class="fa-solid fa-bolt"></i> Right now</span>
+            </label>
+            <label class="node-port-chip">
+              <input type="radio" name="maintenanceTiming" value="scheduled" id="maintenanceScheduled">
+              <span><i class="fa-solid fa-calendar-days"></i> Schedule for later</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="node-form-section" id="maintenanceScheduleGroup" style="display: none;">
+          <div class="node-form-section-title"><i class="fa-solid fa-calendar"></i> Schedule</div>
+          <div class="node-form-field">
+            <label class="node-form-label">Maintenance date & time</label>
+            <input type="datetime-local" id="maintenanceScheduleInput" class="node-form-input">
+            <span class="node-form-hint" style="margin-top: 4px; display: block;">The panel will automatically enter maintenance mode at this time</span>
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-message"></i> Details</div>
+          <div class="node-form-field">
+            <label class="node-form-label">Reason (optional)</label>
+            <input type="text" id="maintenanceReasonInput" class="node-form-input" placeholder="e.g. Upgrading server infrastructure" maxlength="500">
+            <span class="node-form-hint" style="margin-top: 4px; display: block;">Shown to users on the maintenance page so they know what's going on</span>
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-bell"></i> Pre-Alert</div>
+          <div class="maintenance-alert-toggle-row">
+            <div>
+              <div class="node-form-label" style="font-size: 13px;">Show an alert before maintenance?</div>
+              <span class="node-form-hint">Displays a banner alert on the dashboard to give users a heads-up</span>
+            </div>
+            <label class="switch switch-sm">
+              <input type="checkbox" id="maintenancePreAlertToggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div id="maintenancePreAlertGroup" style="display: none;">
+          <div class="node-form-section">
+            <div class="node-form-grid">
+              <div class="node-form-field">
+                <label class="node-form-label">Alert message</label>
+                <input type="text" id="maintenancePreAlertMessage" class="node-form-input" placeholder="e.g. Scheduled maintenance in 30 minutes" maxlength="300">
+              </div>
+              <div class="node-form-field">
+                <label class="node-form-label">Minutes before</label>
+                <input type="number" id="maintenancePreAlertMinutes" class="node-form-input" placeholder="30" min="1" max="525600" value="30">
+              </div>
+            </div>
+            <span class="node-form-hint" style="margin-top: 8px; display: block;">The alert will appear this many minutes before the scheduled time. After maintenance ends, your previous alert will be restored automatically.</span>
+          </div>
+        </div>
+
+        <div class="maintenance-security-notice">
+          <div class="maintenance-security-notice-inner">
+            <i class="fa-solid fa-shield-halved"></i>
+            <div>
+              <strong>Note:</strong> This action is server-side and you cannot disable it without accesing the settings back.
+            </div>
+          </div>
+        </div>
+
+        <div id="maintenanceModalFeedback" class="node-feedback"></div>
+      </div>
+
+      <div class="enterprise-modal-footer">
+        <button class="enterprise-btn-secondary" id="maintenanceModalCancel">Cancel</button>
+        <button class="enterprise-btn-primary maintenance-btn-enable" id="maintenanceModalSave">
+          <i class="fa-solid fa-wrench"></i> Enable Maintenance
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <% if (user && user.admin) { %>
+  <div id="sessionRevokeModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal password-modal session-revoke-modal" id="sessionRevokeModal">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon password-icon">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 class="enterprise-modal-title">Revoke Session</h3>
+        </div>
+        <button class="enterprise-modal-close" id="sessionRevokeModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="password-form session-revoke-form">
+        <div class="session-revoke-target-card">
+          <div class="session-revoke-target-label">Target Session</div>
+          <div class="session-revoke-target-value" id="sessionRevokeTargetSession">—</div>
+          <div class="session-revoke-target-subvalue" id="sessionRevokeTargetEmail">—</div>
+        </div>
+
+        <div class="password-field">
+          <label class="password-label">2FA Code</label>
+          <div class="password-input-wrap">
+            <input type="text" id="sessionRevokeTwoFactorInput" placeholder="000000" autocomplete="one-time-code"
+              maxlength="6" inputmode="numeric" pattern="[0-9]*">
+          </div>
+        </div>
+      </div>
+
+      <div id="sessionRevokeModalFeedback" class="node-feedback" style="display:none;"></div>
+
+      <div class="enterprise-modal-footer">
+        <button class="enterprise-btn-secondary" id="sessionRevokeModalCancel">Cancel</button>
+        <button class="enterprise-btn-primary" id="sessionRevokeModalConfirm">
+          <i class="fa-solid fa-user-slash"></i> Revoke Session
+        </button>
+      </div>
+    </div>
+  </div>
+  <% } %>
+
+  <div id="nodeStatsModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal node-enterprise-modal stats-enterprise-modal" id="nodeStatsModal">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon stats-icon">
+          <img id="nodeStatsImage" src="/images/node-status.avif" alt="Node Status" style="width: 100px; height: 60px;">
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 class="enterprise-modal-title">Node Statistics</h3>
+          <p class="enterprise-modal-subtitle" id="statsNodeName">Loading...</p>
+        </div>
+        <button class="enterprise-modal-close" id="statsModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="enterprise-modal-body stats-modal-body" id="statsModalBody">
+        <div class="stats-loading">
+          <div class="stats-spinner"></div>
+          <span>Loading statistics...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="nodeModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal node-enterprise-modal node-configure-modal" id="nodeModal">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon node-icon">
+          <i class="fa-solid fa-server"></i>
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 id="nm_title" class="enterprise-modal-title">Node Settings</h3>
+          <p id="nm_subtitle" class="enterprise-modal-subtitle">Tweak this node's config.</p>
+        </div>
+        <button class="enterprise-modal-close" id="nodeModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="node-tabs">
+        <button data-tab="build" class="node-tab active"><i class="fa-solid fa-screwdriver-wrench"></i> Build</button>
+        <button data-tab="linking" class="node-tab"><i class="fa-solid fa-link"></i> Linking</button>
+        <button data-tab="deletion" class="node-tab node-tab-danger"><i class="fa-solid fa-trash"></i> Delete</button>
+      </div>
+
+      <div class="enterprise-modal-body node-modal-body">
+        <div class="tab-page active" id="tab_build">
+          <div class="node-form-section">
+            <div class="node-form-section-title"><i class="fa-solid fa-info-circle"></i> Basic Information</div>
+            <div class="node-form-grid">
+              <div class="node-form-field">
+                <label class="node-form-label">Name</label>
+                <input id="nm_name" type="text" class="node-form-input" />
+              </div>
+              <div class="node-form-field">
+                <label class="node-form-label">Address (IP or FQDN)</label>
+                <input id="nm_address" type="text" class="node-form-input" />
+              </div>
+            </div>
+            <div class="node-form-field node-ssl-toggle-row" id="nm_ssl_row" style="display:none; margin-top: 10px;">
+              <div style="display:flex; align-items:center; gap:12px;">
+                <label class="switch node-ssl-switch">
+                  <input type="checkbox" id="nm_ssl_enabled">
+                  <span class="slider"></span>
+                </label>
+                <div>
+                  <label class="node-form-label" style="margin-bottom:2px;">Use HTTPS</label>
+                  <div style="font-size:0.82rem; color:rgba(255,255,255,0.45);">Communicate with this node over HTTPS (requires Let's Encrypt or custom SSL certificate on the node).</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="node-form-section">
+            <div class="node-form-section-title"><i class="fa-solid fa-microchip"></i> Hardware Resources</div>
+            <div class="node-form-grid node-form-grid-3">
+              <div class="node-form-field">
+                <label class="node-form-label">CPU Cores</label>
+                <input id="nm_cpu_cores" type="number" class="node-form-input" min="1" step="1" />
+              </div>
+              <div class="node-form-field">
+                <label class="node-form-label">RAM (GB)</label>
+                <input id="nm_ram_gb" type="number" class="node-form-input" min="1" step="1" />
+              </div>
+              <div class="node-form-field">
+                <label class="node-form-label">Disk (GB)</label>
+                <input id="nm_disk_gb" type="number" class="node-form-input" min="10" step="10" />
+              </div>
+            </div>
+          </div>
+
+          <div class="node-form-section">
+            <div class="node-form-section-title"><i class="fa-solid fa-plug"></i> Port Allocations</div>
+            <div class="node-ports-mode">
+              <label class="node-port-chip">
+                <input type="radio" name="nm_ports_mode" value="range">
+                <span><i class="fa-solid fa-arrows-left-right"></i> Range</span>
+              </label>
+              <label class="node-port-chip">
+                <input type="radio" name="nm_ports_mode" value="list">
+                <span><i class="fa-solid fa-list"></i> List</span>
+              </label>
+            </div>
+
+            <div id="nm_ports_range" class="node-form-grid">
+              <div class="node-form-field">
+                <label class="node-form-label">Start port</label>
+                <input id="nm_port_start" type="number" class="node-form-input" min="1" max="65535" />
+              </div>
+              <div class="node-form-field">
+                <label class="node-form-label">Count (≤1000)</label>
+                <input id="nm_port_count" type="number" class="node-form-input" min="1" max="1000" />
+              </div>
+            </div>
+
+            <div id="nm_ports_list" class="node-form-field ports-list-field">
+              <label class="node-form-label">Ports (comma separated)</label>
+              <input id="nm_port_list" type="text" class="node-form-input" />
+            </div>
+          </div>
+
+          <div class="node-form-section">
+            <div class="node-form-section-title"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Limit</div>
+            <div class="node-form-grid">
+              <div class="node-form-field">
+                <label class="node-form-label">Max single-file upload size (MB)</label>
+                <input id="nm_max_upload_mb" type="number" class="node-form-input" min="1" max="100000" step="1" />
+              </div>
+            </div>
+          </div>
+
+          <div class="node-form-section">
+            <div class="node-form-section-title"><i class="fa-solid fa-network-wired"></i> Daemon Ports</div>
+            <div class="node-form-grid">
+              <div class="node-form-field">
+                <label class="node-form-label">Daemon Port</label>
+                <input id="nm_daemon_port" type="number" class="node-form-input" min="1" max="65535" step="1" />
+              </div>
+              <div class="node-form-field">
+                <label class="node-form-label">SFTP Port</label>
+                <input id="nm_sftp_port" type="number" class="node-form-input" min="1" max="65535" step="1" />
+              </div>
+            </div>
+          </div>
+
+          <div id="nm_saveFeedback" class="node-feedback"></div>
+        </div>
+
+        <div class="tab-page" id="tab_linking">
+          <div class="node-form-section">
+            <div class="node-linking-header">
+              <div class="node-linking-info">
+                <div class="node-form-section-title"><i class="fa-solid fa-file-code"></i> config.yml</div>
+                <p class="node-linking-desc">Place this configuration file on your node server at
+                  <code>/var/lib/node/config.yml</code>
+                </p>
+              </div>
+              <div class="node-linking-actions">
+                <button class="node-action-btn" id="nm_copyConfig"><i class="fa-solid fa-copy"></i></button>
+                <button class="node-action-btn" id="nm_downloadConfig"><i class="fa-solid fa-download"></i></button>
+              </div>
+            </div>
+            <textarea id="nm_configYml" class="node-codebox" readonly></textarea>
+          </div>
+
+          <div class="node-form-section">
+            <div class="node-linking-header">
+              <div class="node-linking-info">
+                <div class="node-form-section-title"><i class="fa-solid fa-terminal"></i> Setup Command</div>
+                <p class="node-linking-desc">One-time command to configure the node</p>
+              </div>
+              <button class="enterprise-btn-secondary node-generate-btn" id="nm_showCmd"><i
+                  class="fa-solid fa-wand-magic-sparkles"></i> Generate</button>
+            </div>
+            <textarea id="nm_cmd" class="node-codebox node-cmd-box" readonly
+              placeholder="Click Generate to create a setup command..."></textarea>
+            <div class="node-linking-actions node-cmd-actions" id="nm_cmdActions">
+              <button class="node-action-btn" id="nm_copyCmd"><i class="fa-solid fa-copy"></i> Copy Command</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-page" id="tab_deletion">
+          <div class="node-danger-zone">
+            <div class="node-danger-icon">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div class="node-danger-content">
+              <h4 class="node-danger-title">Delete this node</h4>
+              <p class="node-danger-desc">This action is permanent and cannot be undone. The node must have <strong>no
+                  servers</strong> assigned before deletion.</p>
+            </div>
+            <button class="node-danger-btn" id="nm_delete"><i class="fa-solid fa-trash"></i> Delete Node</button>
+            <div id="nm_deleteFeedback" class="node-feedback node-danger-feedback"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="enterprise-modal-footer node-modal-footer" id="buildFooter">
+        <button class="enterprise-btn-secondary" id="nodeModalCancelBtn">Cancel</button>
+        <button class="enterprise-btn-primary" id="nm_save"><i class="fa-solid fa-check"></i> Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="resourcesModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal resources-enterprise-modal" id="resourcesModal">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon resources-icon">
+          <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/adpanel-dark.webp" alt="Resources Icon"
+            width="135px" height="125px" />
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 id="resourcesModalTitle" class="enterprise-modal-title">Resources</h3>
+          <p id="resourcesModalSubtitle" class="enterprise-modal-subtitle">Set limits for this server.</p>
+        </div>
+        <button class="enterprise-modal-close" id="resourcesModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="enterprise-modal-body resources-modal-body">
+        <div class="resources-warning-banner">
+          <div class="resources-warning-icon">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+          <div class="resources-warning-content">
+            <strong>Heads up!</strong>
+            <p>Saving these changes will restart the server automatically.</p>
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-signature"></i> Server Identity</div>
+          <div class="node-form-grid">
+            <div class="node-form-field">
+              <label class="node-form-label">Panel Server Name</label>
+              <input id="res_serverName" type="text" class="node-form-input" maxlength="120"
+                placeholder="Enter a server name" />
+              <small class="resource-hint">Changes the panel/UI name without restarting the running server.</small>
+            </div>
+            <div class="node-form-field resource-rename-action">
+              <label class="node-form-label">Apply Rename</label>
+              <button type="button" id="res_renameServer" class="enterprise-btn-secondary resource-rename-btn">
+                <i class="fa-solid fa-pen"></i> Rename
+              </button>
+              <small class="resource-hint">Safe rename for panel, access, cache and schedules.</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-microchip"></i> Compute</div>
+          <div class="node-form-grid">
+            <div class="node-form-field">
+              <label class="node-form-label">RAM (MB)</label>
+              <div class="resource-input-wrapper">
+                <input id="res_ramMb" type="number" class="node-form-input" placeholder="e.g. 2048" min="128"
+                  step="128" />
+                <span class="resource-input-suffix">MB</span>
+              </div>
+              <small class="resource-hint">1024–4096 MB works for most servers.</small>
+            </div>
+            <div class="node-form-field">
+              <label class="node-form-label">CPU Cores</label>
+              <div class="resource-input-wrapper">
+                <input id="res_cpuCores" type="number" class="node-form-input" placeholder="e.g. 2" min="0.5"
+                  step="0.5" />
+                <span class="resource-input-suffix">cores</span>
+              </div>
+              <small class="resource-hint">Supports decimals, e.g. 1.5</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-hard-drive"></i> Storage</div>
+          <div class="node-form-grid">
+            <div class="node-form-field">
+              <label class="node-form-label">Storage (MB)</label>
+              <div class="resource-input-wrapper">
+                <input id="res_storageMb" type="number" class="node-form-input" placeholder="e.g. 500" min="1"
+                  step="1" />
+                <span class="resource-input-suffix">MB</span>
+              </div>
+              <small class="resource-hint">Max disk space for server files.</small>
+            </div>
+            <div class="node-form-field">
+              <label class="node-form-label">Swap Memory (MB)</label>
+              <div class="resource-input-wrapper">
+                <select id="res_swapMb" class="node-form-input resource-select">
+                  <option value="-1">Disabled (Recommended)</option>
+                  <option value="0">Unlimited</option>
+                  <option value="256">256 MB</option>
+                  <option value="512">512 MB</option>
+                  <option value="1024">1024 MB</option>
+                  <option value="2048">2048 MB</option>
+                </select>
+              </div>
+              <small class="resource-hint">-1 disabled, 0 unlimited.</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-clock-rotate-left"></i> Backups & Schedules</div>
+          <div class="node-form-grid">
+            <div class="node-form-field">
+              <label class="node-form-label">Maximum Backups</label>
+              <div class="resource-input-wrapper">
+                <input id="res_backupsMax" type="number" class="node-form-input" placeholder="e.g. 5" min="0"
+                  step="1" />
+                <span class="resource-input-suffix">backups</span>
+              </div>
+              <small class="resource-hint">0 for unlimited.</small>
+            </div>
+            <div class="node-form-field">
+              <label class="node-form-label">Max Schedules</label>
+              <div class="resource-input-wrapper">
+                <input id="res_maxSchedules" type="number" class="node-form-input" placeholder="e.g. 10" min="0"
+                  step="1" />
+                <span class="resource-input-suffix">schedules</span>
+              </div>
+              <small class="resource-hint">0 for unlimited.</small>
+            </div>
+          </div>
+          <div class="node-form-grid" style="margin-top: 12px;">
+            <div class="node-form-field">
+              <label class="node-form-label">Current Usage</label>
+              <div class="resource-current-display">
+                <div class="resource-usage-bar">
+                  <div class="resource-usage-fill" id="res_usageBar" style="width: 0%"></div>
+                </div>
+                <span class="resource-usage-text" id="res_usageText">Loading...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-gauge-high"></i> Performance</div>
+          <div class="node-form-grid">
+            <div class="node-form-field">
+              <label class="node-form-label">I/O Priority</label>
+              <div class="resource-input-wrapper">
+                <input id="res_ioWeight" type="number" class="node-form-input" placeholder="e.g. 500" min="10"
+                  max="1000" step="10" />
+              </div>
+              <small class="resource-hint">Maximum is 1000.</small>
+            </div>
+            <div class="node-form-field">
+              <label class="node-form-label">CPU Priority</label>
+              <div class="resource-input-wrapper">
+                <input id="res_cpuWeight" type="number" class="node-form-input" placeholder="e.g. 500" min="1"
+                  max="1000" step="10" />
+              </div>
+              <small class="resource-hint">Maximum is 1000.</small>
+            </div>
+            <div class="node-form-field">
+              <label class="node-form-label">Process Limit</label>
+              <div class="resource-input-wrapper">
+                <input id="res_pidsLimit" type="number" class="node-form-input" placeholder="e.g. 512" min="64"
+                  max="4096" step="64" />
+              </div>
+              <small class="resource-hint">Maximum is 4096.</small>
+            </div>
+            <div class="node-form-field">
+              <label class="node-form-label">File Limit</label>
+              <div class="resource-input-wrapper">
+                <input id="res_fileLimit" type="number" class="node-form-input" placeholder="e.g. 65535" min="1024"
+                  max="1048576" step="1024" />
+              </div>
+              <small class="resource-hint">Maximum is 1048576.</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-network-wired"></i> Port Management</div>
+          <div class="node-form-field">
+            <label class="node-form-label">Server Ports</label>
+            <div class="ports-list-container">
+              <div id="res_portsList" class="ports-list">
+              </div>
+              <div class="ports-add-row">
+                <input id="res_newPort" type="number" class="node-form-input ports-input" inputmode="numeric" pattern="[0-9]*"
+                  placeholder="Additional port (1-65535)" min="1" max="65535" />
+                <button type="button" id="res_addPort" class="enterprise-btn-secondary ports-add-btn">
+                  <i class="fa-solid fa-plus"></i> Add Port
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="node-form-section" id="res_startupSection">
+          <div class="node-form-section-title"><i class="fa-solid fa-terminal"></i> Container Process Command</div>
+          <div class="node-form-field">
+            <label class="node-form-label">Current Command</label>
+            <div class="startup-cmd-display" id="res_startupDisplay">
+              <div class="startup-cmd-display-header">
+                <div class="startup-cmd-display-label">
+                  <i class="fa-solid fa-terminal"></i> Current command
+                </div>
+                <button type="button" class="startup-cmd-copy-btn" id="res_copyStartupCmd" title="Copy to clipboard">
+                  <i class="fa-solid fa-copy"></i>
+                </button>
+              </div>
+              <pre class="startup-cmd-code" id="res_startupPreview"><code>No startup command configured</code></pre>
+            </div>
+          </div>
+
+          <div class="node-form-field" style="margin-top: 16px;">
+            <label class="node-form-label">Edit Process Command</label>
+            <div class="startup-cmd-editor-wrap">
+              <div class="startup-cmd-editor-gutter"><span class="startup-cmd-prompt">$</span></div>
+              <textarea id="res_startupCommand" class="node-form-textarea startup-cmd-textarea" rows="4" spellcheck="false" aria-describedby="res_startupCommandHelp"
+                placeholder="java -Xms128M -Xmx{RAM_MB}M -jar /data/server.jar nogui"></textarea>
+            </div>
+            <div class="startup-cmd-variables">
+              <span class="startup-cmd-var-label">Variables:</span>
+              <code class="startup-cmd-var">{PORT}</code>
+              <code class="startup-cmd-var">{DATA_DIR}</code>
+              <code class="startup-cmd-var">{START_FILE}</code>
+              <code class="startup-cmd-var">{RAM_MB}</code>
+              <code class="startup-cmd-var">{CPU_CORES}</code>
+            </div>
+            <small id="res_startupCommandHelp" class="startup-cmd-help">The process runs directly through Docker Engine API without a shell wrapper. Docker CLI commands like <code>docker run</code> are blocked.</small>
+          </div>
+        </div>
+
+        <div id="resourcesFeedback" class="node-feedback"></div>
+      </div>
+
+      <div class="enterprise-modal-footer">
+        <button class="enterprise-btn-secondary" id="resourcesCancel">Cancel</button>
+        <button class="enterprise-btn-primary" id="resourcesSave"><i class="fa-solid fa-bolt"></i> Apply &
+          Restart</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="portForwardModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal portforward-enterprise-modal" id="portForwardModal">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon portforward-icon">
+          <i class="fa-solid fa-shuffle"></i>
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 id="portForwardModalTitle" class="enterprise-modal-title">Port Forwarding</h3>
+          <p id="portForwardModalSubtitle" class="enterprise-modal-subtitle">Map public ports to container ports.</p>
+        </div>
+        <button class="enterprise-modal-close" id="portForwardModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="enterprise-modal-body portforward-modal-body">
+        <div class="resources-warning-banner">
+          <div class="resources-warning-icon">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+          <div class="resources-warning-content">
+            <strong>Heads up!</strong>
+            <p>Saving changes will restart the server.</p>
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-shuffle"></i> Port Forward Rules</div>
+          <div class="node-form-field">
+            <small class="node-form-helper" style="margin-bottom: 8px; display: block;">
+              Pick an internal port and a public port to expose it.
+            </small>
+            <div id="pf_rulesList" class="pf-rules-list">
+            </div>
+            <div class="pf-add-row">
+              <div class="pf-add-inputs">
+                <div class="pf-input-group">
+                  <label class="pf-input-label">Internal Port (Server Port)</label>
+                  <select id="pf_newInternalPort" class="node-form-input pf-input">
+                    <option value="" disabled selected>Select a port…</option>
+                  </select>
+                </div>
+                <div class="pf-arrow-icon"><i class="fa-solid fa-arrow-right"></i></div>
+                <div class="pf-input-group">
+                  <label class="pf-input-label">Public Port</label>
+                  <input id="pf_newPublicPort" type="number" class="node-form-input pf-input" inputmode="numeric" pattern="[0-9]*" placeholder="e.g. 30000" min="1" max="65535" />
+                </div>
+              </div>
+              <button type="button" id="pf_addRule" class="enterprise-btn-secondary pf-add-btn">
+                <i class="fa-solid fa-plus"></i> Add Rule
+              </button>
+            </div>
+            <small class="resource-hint">Internal port must be allocated. Public port from node range.</small>
+          </div>
+        </div>
+
+        <div id="portForwardFeedback" class="node-feedback"></div>
+      </div>
+
+      <div class="enterprise-modal-footer">
+        <button class="enterprise-btn-secondary" id="portForwardCancel">Cancel</button>
+        <button class="enterprise-btn-primary" id="portForwardSave"><i class="fa-solid fa-bolt"></i> Apply & Restart</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="transferModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal transfer-enterprise-modal" id="transferModal">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon transfer-icon">
+          <i class="fa-solid fa-right-left"></i>
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 id="transferModalTitle" class="enterprise-modal-title">Transfer Server</h3>
+          <p id="transferModalSubtitle" class="enterprise-modal-subtitle">Pick a destination node.</p>
+        </div>
+        <button class="enterprise-modal-close" id="transferModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="enterprise-modal-body">
+        <div id="transferFeedback" class="node-feedback"></div>
+        <div id="transferNodeList" class="transfer-node-list"></div>
+        <div id="transferProgress" class="transfer-progress" style="display:none">
+          <div class="resource-usage-bar">
+            <div class="resource-usage-fill" id="transferProgressFill" style="width:0%"></div>
+          </div>
+          <div class="transfer-progress-text" id="transferProgressText"></div>
+        </div>
+      </div>
+
+      <div class="enterprise-modal-footer">
+        <button class="enterprise-btn-secondary" id="transferCancel">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="quickActionModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal quick-action-enterprise-modal" id="quickActionModal">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon quick-action-icon">
+          <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/adpanel-dark.webp" alt="Quick Actions" />
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 id="quickActionModalTitle" class="enterprise-modal-title">Quick Action</h3>
+          <p class="enterprise-modal-subtitle">Create a dashboard shortcut.</p>
+        </div>
+        <button class="enterprise-modal-close" id="quickActionModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="quick-action-modal-body">
+        <div class="quick-action-preview-section">
+          <div class="quick-action-preview-label">Preview</div>
+          <div class="quick-action-preview-card" id="quickActionPreview">
+            <i class="fa-solid fa-star" id="previewIcon"></i>
+            <p id="previewTitle">Action Title</p>
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-pen"></i> Basic Information</div>
+          <div class="node-form-grid">
+            <div class="node-form-field">
+              <label class="node-form-label">Title <span class="required">*</span></label>
+              <input id="qa_title" type="text" class="node-form-input" placeholder="e.g. Manage Servers"
+                maxlength="30" />
+              <small class="resource-hint">Display name for the button (max 30 chars)</small>
+            </div>
+            <div class="node-form-field">
+              <label class="node-form-label">Link <span class="required">*</span></label>
+              <input id="qa_link" type="text" class="node-form-input"
+                placeholder="e.g. /settings?panel=servers or https://..." />
+              <small class="resource-hint">Internal path or external URL</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-icons"></i> Icon Selection</div>
+          <div class="node-form-field">
+            <label class="node-form-label">Icon Class <span class="required">*</span></label>
+            <div class="icon-input-wrapper">
+              <input id="qa_icon" type="text" class="node-form-input" placeholder="fa-solid fa-star" />
+              <div class="icon-preview" id="iconInputPreview"><i class="fa-solid fa-star"></i></div>
+            </div>
+            <small class="resource-hint">FontAwesome icon class (e.g. fa-solid fa-gear)</small>
+          </div>
+          <div class="icon-suggestions">
+            <div class="icon-suggestions-label">Popular icons:</div>
+            <div class="icon-suggestions-grid" id="iconSuggestions">
+              <button type="button" class="icon-suggestion" data-icon="fa-solid fa-gear" title="Settings"><i
+                  class="fa-solid fa-gear"></i></button>
+              <button type="button" class="icon-suggestion" data-icon="fa-solid fa-server" title="Server"><i
+                  class="fa-solid fa-server"></i></button>
+              <button type="button" class="icon-suggestion" data-icon="fa-solid fa-user" title="User"><i
+                  class="fa-solid fa-user"></i></button>
+              <button type="button" class="icon-suggestion" data-icon="fa-solid fa-house" title="Home"><i
+                  class="fa-solid fa-house"></i></button>
+              <button type="button" class="icon-suggestion" data-icon="fa-solid fa-chart-line" title="Stats"><i
+                  class="fa-solid fa-chart-line"></i></button>
+              <button type="button" class="icon-suggestion" data-icon="fa-solid fa-shield-halved" title="Security"><i
+                  class="fa-solid fa-shield-halved"></i></button>
+              <button type="button" class="icon-suggestion" data-icon="fa-solid fa-database" title="Database"><i
+                  class="fa-solid fa-database"></i></button>
+              <button type="button" class="icon-suggestion" data-icon="fa-solid fa-terminal" title="Terminal"><i
+                  class="fa-solid fa-terminal"></i></button>
+              <button type="button" class="icon-suggestion" data-icon="fa-solid fa-folder" title="Files"><i
+                  class="fa-solid fa-folder"></i></button>
+              <button type="button" class="icon-suggestion" data-icon="fa-solid fa-plug" title="Plugins"><i
+                  class="fa-solid fa-plug"></i></button>
+              <button type="button" class="icon-suggestion" data-icon="fa-solid fa-globe" title="Website"><i
+                  class="fa-solid fa-globe"></i></button>
+              <button type="button" class="icon-suggestion" data-icon="fa-solid fa-bell" title="Notifications"><i
+                  class="fa-solid fa-bell"></i></button>
+              <button type="button" class="icon-suggestion" data-icon="fa-brands fa-discord" title="Discord"><i
+                  class="fa-brands fa-discord"></i></button>
+              <button type="button" class="icon-suggestion" data-icon="fa-brands fa-github" title="GitHub"><i
+                  class="fa-brands fa-github"></i></button>
+              <button type="button" class="icon-suggestion" data-icon="fa-solid fa-book" title="Docs"><i
+                  class="fa-solid fa-book"></i></button>
+              <button type="button" class="icon-suggestion" data-icon="fa-solid fa-download" title="Download"><i
+                  class="fa-solid fa-download"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Animation</div>
+          <div class="node-form-field">
+            <label class="node-form-label">Hover Animation</label>
+            <select id="qa_animation" class="node-form-input">
+              <option value="default">Default (Lift Up)</option>
+              <option value="pulse">Pulse</option>
+              <option value="shake">Shake</option>
+              <option value="bounce">Bounce</option>
+              <option value="glow">Glow</option>
+              <option value="scale">Scale</option>
+              <option value="rotate">Rotate Icon</option>
+              <option value="none">No Animation</option>
+            </select>
+            <small class="resource-hint">Animation when hovering over the button</small>
+          </div>
+
+          <div class="node-form-field" id="qa_scale_wrapper" style="display: none; margin-top: 10px;">
+            <label class="node-form-label">Scale Value <span class="required">*</span></label>
+            <input id="qa_scale" type="number" step="0.01" min="0.5" max="2.0" class="node-form-input"
+              placeholder="e.g. 1.05" value="1.05" />
+            <small class="resource-hint">Scale factor on hover (e.g. 1.02 = 2% larger)</small>
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-arrow-up-right-from-square"></i> Link Behavior
+          </div>
+          <div class="node-form-field">
+            <div class="quick-action-switch-row">
+              <label class="quick-action-switch-label" for="qa_newTab">Open in new tab</label>
+              <label class="quick-action-switch" for="qa_newTab" aria-label="Toggle open in new tab">
+                <input type="checkbox" id="qa_newTab" />
+                <span class="quick-action-switch-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div id="quickActionFeedback" class="node-feedback"></div>
+      </div>
+
+      <div class="enterprise-modal-footer">
+        <button class="enterprise-btn-secondary" id="quickActionCancel">Cancel</button>
+        <button class="enterprise-btn-primary" id="quickActionSave"><i class="fa-solid fa-check"></i> Save
+          Action</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="dbSetupModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal db-enterprise-modal" id="dbSetupModal">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon db-setup-icon" style="background: transparent;">
+          <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/phpmyadmin.webp" alt="phpMyAdmin" width="48" height="48">
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 class="enterprise-modal-title">phpMyAdmin Setup</h3>
+          <p class="enterprise-modal-subtitle">Connect to your MySQL database.</p>
+        </div>
+        <button class="enterprise-modal-close" id="dbSetupModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="enterprise-modal-body db-setup-modal-body">
+        <input type="hidden" name="db_type" value="mysql">
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-plug"></i> Connection Settings</div>
+          <div class="node-form-grid">
+            <div class="node-form-field">
+              <label class="node-form-label">Host</label>
+              <input id="db_host" type="text" class="node-form-input" placeholder="localhost" value="localhost" />
+            </div>
+            <div class="node-form-field">
+              <label class="node-form-label">Port</label>
+              <input id="db_port" type="number" class="node-form-input" placeholder="3306" value="3306" />
+            </div>
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-user-shield"></i> Admin Credentials</div>
+          <div class="node-form-grid">
+            <div class="node-form-field">
+              <label class="node-form-label">Username</label>
+              <input id="db_username" type="text" class="node-form-input" placeholder="root" />
+            </div>
+            <div class="node-form-field">
+              <label class="node-form-label">Password</label>
+              <div class="password-input-wrap">
+                <input id="db_password" type="password" class="node-form-input" placeholder="Enter password" />
+                <button type="button" class="password-toggle db-pass-toggle" aria-label="Show password">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <small class="node-form-helper" style="margin-top: 8px;">These credentials will be used to access
+            phpMyAdmin</small>
+        </div>
+
+        <div class="db-security-notice">
+          <div class="db-security-notice-inner">
+            <i class="fa-solid fa-shield-halved"></i>
+            <div>
+              <strong>Security Note:</strong>
+              <p>Do not share your unique URL; others could use it to access your phpMyAdmin.</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="dbSetupFeedback" class="node-feedback"></div>
+      </div>
+
+      <div class="enterprise-modal-footer">
+        <button class="enterprise-btn-secondary" id="dbSetupCancel">Cancel</button>
+        <button class="enterprise-btn-primary" id="dbSetupSave"><i class="fa-solid fa-check"></i> Setup &
+          Enable</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="pgadminSetupModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal db-enterprise-modal" id="pgadminSetupModal">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon db-setup-icon" style="background: transparent;">
+          <img
+            src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/pgadmin.webp"
+            alt="pgAdmin4" width="48" height="48">
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 class="enterprise-modal-title">pgAdmin4 Setup</h3>
+          <p class="enterprise-modal-subtitle">Install PostgreSQL and pgAdmin4.</p>
+        </div>
+        <button class="enterprise-modal-close" id="pgadminSetupModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="enterprise-modal-body db-setup-modal-body">
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-envelope"></i> pgAdmin Login</div>
+          <div class="node-form-field">
+            <label class="node-form-label">Email Address</label>
+            <input id="pgadmin_email" type="email" class="node-form-input" placeholder="admin@example.com" />
+            <small class="node-form-helper">This will be your pgAdmin web login</small>
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-key"></i> Password</div>
+          <div class="node-form-field">
+            <label class="node-form-label">Password</label>
+            <div class="password-input-wrap">
+              <input id="pgadmin_password" type="password" class="node-form-input" placeholder="Minimum 8 characters" />
+              <button type="button" class="password-toggle db-pass-toggle" id="pgadmin_password_toggle"
+                aria-label="Show password">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+            <div class="password-strength" id="pgadminPasswordStrength"></div>
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-database"></i> Database Settings</div>
+          <div class="node-form-field">
+            <label class="node-form-label">Database Username</label>
+            <input id="pgadmin_db_user" type="text" class="node-form-input" placeholder="admin" value="admin" />
+          </div>
+          <div class="node-form-field-row">
+            <div class="node-form-field" style="flex: 2;">
+              <label class="node-form-label">Listen Host</label>
+              <input id="pgadmin_db_host" type="text" class="node-form-input" placeholder="127.0.0.1" value="127.0.0.1" />
+            </div>
+            <div class="node-form-field" style="flex: 1;">
+              <label class="node-form-label">Port</label>
+              <input id="pgadmin_db_port" type="number" class="node-form-input" placeholder="5432" value="5432" />
+            </div>
+          </div>
+        </div>
+
+        <div class="db-security-notice">
+          <div class="db-security-notice-inner">
+            <i class="fa-solid fa-info-circle"></i>
+            <div>
+              <strong>What will be installed:</strong>
+              <p>PostgreSQL database server, pgAdmin4 web interface, and UFW firewall rules for ports 5432 and 5050.</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="pgadminProgressContainer" class="install-progress-container" style="display: none;">
+          <div class="install-progress-label">
+            <span id="pgadminProgressText">Installing...</span>
+            <span id="pgadminProgressPercent">0%</span>
+          </div>
+          <div class="install-progress-bar">
+            <div id="pgadminProgressFill" class="install-progress-fill" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <div id="pgadminSetupFeedback" class="node-feedback"></div>
+      </div>
+
+      <div class="enterprise-modal-footer">
+        <button class="enterprise-btn-secondary" id="pgadminSetupCancel">Cancel</button>
+        <button class="enterprise-btn-primary" id="pgadminSetupSave"><i class="fa-solid fa-download"></i> Install &
+          Setup</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="mongodbSetupModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal db-enterprise-modal" id="mongodbSetupModal">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon db-setup-icon" style="background: transparent;">
+          <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/mongodb.ico" alt="MongoDB" width="48" height="48">
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 class="enterprise-modal-title">MongoDB Setup</h3>
+          <p class="enterprise-modal-subtitle">Install and configure MongoDB.</p>
+        </div>
+        <button class="enterprise-modal-close" id="mongodbSetupModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="enterprise-modal-body db-setup-modal-body">
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-user-shield"></i> Admin Account</div>
+          <div class="node-form-field">
+            <label class="node-form-label">Admin Username</label>
+            <input id="mongodb_username" type="text" class="node-form-input" placeholder="admin" value="admin" />
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-plug"></i> Connection Settings</div>
+          <div class="node-form-grid">
+            <div class="node-form-field">
+              <label class="node-form-label">Listen Host</label>
+              <input id="mongodb_host" type="text" class="node-form-input" placeholder="127.0.0.1" value="127.0.0.1" />
+            </div>
+            <div class="node-form-field">
+              <label class="node-form-label">Port</label>
+              <input id="mongodb_port" type="number" class="node-form-input" placeholder="27017" value="27017" />
+            </div>
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-key"></i> Password</div>
+          <div class="node-form-field">
+            <label class="node-form-label">Password</label>
+            <div class="password-input-wrap">
+              <input id="mongodb_password" type="password" class="node-form-input" placeholder="Minimum 8 characters" />
+              <button type="button" class="password-toggle db-pass-toggle" id="mongodb_password_toggle"
+                aria-label="Show password">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+            <div class="password-strength" id="mongodbPasswordStrength"></div>
+          </div>
+        </div>
+
+        <div class="db-security-notice">
+          <div class="db-security-notice-inner">
+            <i class="fa-solid fa-info-circle"></i>
+            <div>
+              <strong>What will be installed:</strong>
+              <p>MongoDB 7.0 server with authentication enabled and UFW firewall rule for port 27017.</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="mongodbProgressContainer" class="install-progress-container" style="display: none;">
+          <div class="install-progress-label">
+            <span id="mongodbProgressText">Installing...</span>
+            <span id="mongodbProgressPercent">0%</span>
+          </div>
+          <div class="install-progress-bar">
+            <div id="mongodbProgressFill" class="install-progress-fill" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <div id="mongodbSetupFeedback" class="node-feedback"></div>
+      </div>
+
+      <div class="enterprise-modal-footer">
+        <button class="enterprise-btn-secondary" id="mongodbSetupCancel">Cancel</button>
+        <button class="enterprise-btn-primary" id="mongodbSetupSave"><i class="fa-solid fa-download"></i> Install &
+          Setup</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="mongodbUserModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal db-enterprise-modal" id="mongodbUserModal">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon db-setup-icon">
+          <i class="fa-solid fa-user-plus"></i>
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 class="enterprise-modal-title">New MongoDB User</h3>
+          <p class="enterprise-modal-subtitle">Add a database user.</p>
+        </div>
+        <button class="enterprise-modal-close" id="mongodbUserModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="enterprise-modal-body db-setup-modal-body">
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-user"></i> User Details</div>
+          <div class="node-form-field">
+            <label class="node-form-label">Username</label>
+            <input id="mongodb_new_username" type="text" class="node-form-input" placeholder="username" />
+            <small class="node-form-helper">Alphanumeric, underscore, and hyphen only</small>
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-key"></i> Password</div>
+          <div class="node-form-field">
+            <label class="node-form-label">Password</label>
+            <div class="password-input-wrap">
+              <input id="mongodb_new_password" type="password" class="node-form-input"
+                placeholder="Minimum 8 characters" />
+              <button type="button" class="password-toggle db-pass-toggle" id="mongodb_new_password_toggle"
+                aria-label="Show password">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="mongodbUserFeedback" class="node-feedback"></div>
+      </div>
+
+      <div class="enterprise-modal-footer">
+        <button class="enterprise-btn-secondary" id="mongodbUserCancel">Cancel</button>
+        <button class="enterprise-btn-primary" id="mongodbUserSave"><i class="fa-solid fa-user-plus"></i> Create
+          User</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="mongodbDeleteUserModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal mongodb-delete-modal" id="mongodbDeleteUserModal">
+      <div class="mongodb-delete-modal-content">
+        <div class="mongodb-delete-icon">
+          <i class="fa-solid fa-exclamation"></i>
+        </div>
+        <h3 class="mongodb-delete-title">Delete User</h3>
+        <p class="mongodb-delete-text">Are you sure you want to delete <strong id="mongodbDeleteUsername"></strong>?</p>
+        <p class="mongodb-delete-subtext">This action cannot be undone. The user will lose all access to the database.
+        </p>
+        <div class="mongodb-delete-actions">
+          <button class="mongodb-delete-btn mongodb-delete-btn-cancel" id="mongodbDeleteCancel">Cancel</button>
+          <button class="mongodb-delete-btn mongodb-delete-btn-confirm" id="mongodbDeleteConfirm">
+            <i class="fa-solid fa-trash"></i> Delete User
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="dbUserModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal db-user-modal" id="dbUserModal">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon db-user-icon">
+          <i class="fa-solid fa-user-plus"></i>
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 id="dbUserModalTitle" class="enterprise-modal-title">New DB User</h3>
+          <p class="enterprise-modal-subtitle">Create a phpMyAdmin user.</p>
+        </div>
+        <button class="enterprise-modal-close" id="dbUserModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="enterprise-modal-body">
+        <div class="node-form-section">
+          <div class="node-form-field">
+            <label class="node-form-label">Username <span class="required">*</span></label>
+            <input id="dbuser_username" type="text" class="node-form-input" placeholder="Enter username" />
+          </div>
+          <div class="node-form-field" style="margin-top: 12px;">
+            <label class="node-form-label">Password <span class="required">*</span></label>
+            <div class="password-input-wrap">
+              <input id="dbuser_password" type="password" class="node-form-input" placeholder="Enter password" />
+              <button type="button" class="password-toggle" aria-label="Show password">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+            <div class="password-strength" id="dbUserPasswordStrength"></div>
+          </div>
+        </div>
+
+        <div id="dbUserFeedback" class="node-feedback"></div>
+      </div>
+
+      <div class="enterprise-modal-footer">
+        <button class="enterprise-btn-secondary" id="dbUserCancel">Cancel</button>
+        <button class="enterprise-btn-primary" id="dbUserSave"><i class="fa-solid fa-check"></i> Create User</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="dbPassModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal db-pass-modal" id="dbPassModal">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon password-icon">
+          <i class="fa-solid fa-key"></i>
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 class="enterprise-modal-title">Change Password</h3>
+          <p id="dbPassModalSubtitle" class="enterprise-modal-subtitle">Set a new password.</p>
+        </div>
+        <button class="enterprise-modal-close" id="dbPassModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="enterprise-modal-body">
+        <input type="hidden" id="dbpass_username" />
+        <div class="node-form-section">
+          <div class="node-form-field">
+            <label class="node-form-label">New Password <span class="required">*</span></label>
+            <div class="password-input-wrap">
+              <input id="dbpass_password" type="password" class="node-form-input" placeholder="Enter new password" />
+              <button type="button" class="password-toggle" aria-label="Show password">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+            <div class="password-strength" id="dbPassPasswordStrength"></div>
+          </div>
+          <div class="node-form-field" style="margin-top: 12px;">
+            <label class="node-form-label">Confirm Password <span class="required">*</span></label>
+            <div class="password-input-wrap">
+              <input id="dbpass_confirm" type="password" class="node-form-input" placeholder="Confirm new password" />
+              <button type="button" class="password-toggle" aria-label="Show password">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="dbPassFeedback" class="node-feedback"></div>
+      </div>
+
+      <div class="enterprise-modal-footer">
+        <button class="enterprise-btn-secondary" id="dbPassCancel">Cancel</button>
+        <button class="enterprise-btn-primary" id="dbPassSave"><i class="fa-solid fa-check"></i> Update
+          Password</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="dbChangeTypeModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal db-change-type-modal" id="dbChangeTypeModal">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon db-setup-icon">
+          <i class="fa-solid fa-rotate"></i>
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 class="enterprise-modal-title">Switch Database</h3>
+          <p class="enterprise-modal-subtitle">Change to a different engine.</p>
+        </div>
+        <button class="enterprise-modal-close" id="dbChangeTypeModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="enterprise-modal-body">
+        <div class="db-change-warning">
+          <div class="db-change-warning-icon">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+          <div class="db-change-warning-content">
+            <strong>Warning: Data Loss</strong>
+            <p>Changing the database type will remove all existing database users and settings. This action cannot be
+              undone.</p>
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-server"></i> Select New Database Type</div>
+          <div class="db-type-selector">
+            <label class="db-type-option">
+              <input type="radio" name="db_change_type" value="mysql">
+              <div class="db-type-card">
+                <img src="https://www.logo.wine/a/logo/MySQL/MySQL-Logo.wine.svg" alt="MySQL Logo" width="45"
+                  height="45" />
+                <span>MySQL</span>
+              </div>
+            </label>
+            <label class="db-type-option">
+              <input type="radio" name="db_change_type" value="postgresql">
+              <div class="db-type-card">
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Postgresql_elephant.svg/1163px-Postgresql_elephant.svg.png"
+                  alt="PostgreSQL Logo" width="45" height="45" />
+                <span>PostgreSQL</span>
+              </div>
+            </label>
+            <label class="db-type-option">
+              <input type="radio" name="db_change_type" value="mongodb">
+              <div class="db-type-card">
+                <img src="https://images.seeklogo.com/logo-png/48/2/mongodb-logo-png_seeklogo-481256.png"
+                  alt="MongoDB Logo" width="45" height="45" />
+                <span>MongoDB</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-plug"></i> Connection Settings</div>
+          <div class="node-form-grid">
+            <div class="node-form-field">
+              <label class="node-form-label">Host</label>
+              <input id="db_change_host" type="text" class="node-form-input" placeholder="localhost"
+                value="localhost" />
+            </div>
+            <div class="node-form-field">
+              <label class="node-form-label">Port</label>
+              <input id="db_change_port" type="number" class="node-form-input" placeholder="3306" />
+            </div>
+          </div>
+        </div>
+
+        <div class="node-form-section">
+          <div class="node-form-section-title"><i class="fa-solid fa-user-shield"></i> Admin Credentials</div>
+          <div class="node-form-grid">
+            <div class="node-form-field">
+              <label class="node-form-label">Username</label>
+              <input id="db_change_username" type="text" class="node-form-input" placeholder="root" />
+            </div>
+            <div class="node-form-field">
+              <label class="node-form-label">Password</label>
+              <div class="password-input-wrap">
+                <input id="db_change_password" type="password" class="node-form-input" placeholder="Enter password" />
+                <button type="button" class="password-toggle" aria-label="Show password">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="dbChangeTypeFeedback" class="node-feedback"></div>
+      </div>
+
+      <div class="enterprise-modal-footer">
+        <button class="enterprise-btn-secondary" id="dbChangeTypeCancel">Cancel</button>
+        <button class="enterprise-btn-primary db-btn-danger" id="dbChangeTypeSave"><i class="fa-solid fa-rotate"></i>
+          Change Database</button>
+      </div>
+    </div>
+  </div>
+  <div id="alertModal" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal alert-enterprise-modal">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon" style="background: none; width: auto; height: auto;">
+          <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/alert.webp" width="85" height="70" alt="">
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 class="enterprise-modal-title">Global Alert</h3>
+          <p class="enterprise-modal-subtitle">Show a notice to all users.</p>
+        </div>
+        <button class="enterprise-modal-close" id="closeAlertModal" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="enterprise-modal-body">
+        <div class="node-form-section">
+          <div class="node-form-section-title">Existing Alerts</div>
+          <div id="alertsList"
+            style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; margin-bottom: 16px;">
+            <div style="color: #6b7280; font-size: 13px; text-align: center; padding: 10px;">Loading...</div>
+          </div>
+        </div>
+
+        <div class="node-form-section" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 16px;">
+          <div class="node-form-section-title"><i class="fa-solid fa-plus"></i> Schedule New Alert</div>
+          <div class="node-form-grid alert-schedule-grid">
+            <div class="node-form-field">
+              <label class="node-form-label">Start Date</label>
+              <input type="datetime-local" id="alertDate" class="node-form-input">
+            </div>
+            <div class="node-form-field">
+              <label class="node-form-label">End Date</label>
+              <input type="datetime-local" id="alertEndDate" class="node-form-input">
+            </div>
+          </div>
+          <div class="node-form-section" style="margin-top: 12px; margin-bottom: 0;">
+            <div class="maintenance-alert-toggle-row">
+              <div>
+                <div class="node-form-label" style="font-size: 13px;">Keep active until removed</div>
+              </div>
+              <label class="switch switch-sm">
+                <input type="checkbox" id="alertNeverEnds" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+          <div class="node-form-field" style="margin-top: 12px;">
+            <label class="node-form-label">Message</label>
+            <input type="text" id="alertContent" class="node-form-input" placeholder="e.g. Maintenance at 10 PM" />
+          </div>
+          <button id="addAlertBtn" class="enterprise-btn-primary" style="width: 100%; margin-top: 16px;">
+            <i class="fa-solid fa-plus"></i> Add Alert
+          </button>
+        </div>
+      </div>
+
+      <div class="enterprise-modal-footer">
+        <button id="closeAlertModalFooter" class="enterprise-btn-secondary">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="webhookModalOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal" id="webhookModal" style="width: 520px;">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon" style="background: transparent;">
+          <img
+            src="https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0a6a49cf127bf92de1e2_icon_clyde_blurple_RGB.png"
+            alt="Discord" style="width: 60px; height: 60px; object-fit: contain;">
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 class="enterprise-modal-title" id="webhookModalTitle">Add Webhook</h3>
+          <p class="enterprise-modal-subtitle" id="webhookModalSubtitle">Paste a Discord webhook URL.</p>
+        </div>
+        <button class="enterprise-modal-close" id="webhookModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="enterprise-modal-body" style="padding: 24px;">
+        <div id="webhookModeIndicator" style="display: none; margin-bottom: 16px;">
+          <div
+            style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: rgba(99,102,241,0.1); border-radius: 10px; border: 1px solid rgba(99,102,241,0.2);">
+            <i class="fa-solid fa-tag" style="color: #a5b4fc;"></i>
+            <span style="font-size: 13px; color: rgba(255,255,255,0.8);">Category: <strong
+                id="webhookCategoryLabel"></strong></span>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <label
+            style="display: block; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 8px;">
+            Webhook URL
+          </label>
+          <input type="url" id="webhookUrlInput" placeholder="https://discord.com/api/webhooks/..."
+            style="width: 100%; height: 48px; padding: 0 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.2); color: rgba(255,255,255,0.95); font-size: 14px; outline: none;">
+        </div>
+
+        <div style="background: rgba(59, 130, 246, 0.1); border-radius: 8px; padding: 12px; margin-top: 12px;">
+          <i class="fa-solid fa-circle-info" style="color: #3b82f6; margin-right: 8px;"></i>
+          <span style="font-size: 13px; color: rgba(255,255,255,0.8);">Paste a Discord webhook URL. Go to your Discord
+            server → Channel Settings → Integrations → Webhooks → New Webhook.</span>
+        </div>
+
+        <div id="webhookModalError" style="display: none; color: #f44747; font-size: 13px; margin-top: 12px;"></div>
+      </div>
+
+      <div class="enterprise-modal-footer">
+        <button class="enterprise-btn-secondary" id="webhookModalCancel">Cancel</button>
+        <button class="enterprise-btn-primary" id="webhookModalSave"><i class="fa-solid fa-check"></i> Save
+          Webhook</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="webhookDeleteOverlay" class="modal-overlay enterprise-modal-overlay" aria-hidden="true">
+    <div class="enterprise-modal" id="webhookDeleteModal" style="width: 420px;">
+      <div class="enterprise-modal-header">
+        <div class="enterprise-modal-icon" style="background: transparent;">
+          <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/alert.webp" alt="Global Alert" width="80px"
+            height="70px">
+        </div>
+        <div class="enterprise-modal-titles">
+          <h3 class="enterprise-modal-title">Delete Webhook</h3>
+          <p class="enterprise-modal-subtitle">This action cannot be undone</p>
+        </div>
+        <button class="enterprise-modal-close" id="webhookDeleteClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="enterprise-modal-body" style="padding: 24px;">
+        <div style="background: rgba(239, 68, 68, 0.1); border-radius: 8px; padding: 12px;">
+          <i class="fa-solid fa-triangle-exclamation" style="color: #f87171; margin-right: 8px;"></i>
+          <span style="font-size: 13px; color: rgba(255,255,255,0.8);" id="webhookDeleteText">Are you sure you want to
+            remove this webhook?</span>
+        </div>
+      </div>
+
+      <div class="enterprise-modal-footer">
+        <button class="enterprise-btn-secondary" id="webhookDeleteCancelBtn">Cancel</button>
+        <button class="enterprise-btn-primary" id="webhookDeleteConfirmBtn" style="background: #ef4444;"><i
+            class="fa-solid fa-trash"></i> Delete</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>

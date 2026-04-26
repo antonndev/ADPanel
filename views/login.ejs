@@ -1,0 +1,629 @@
+<% const loginBackgroundType=(branding && branding.loginBackgroundType) ? branding.loginBackgroundType : 'video' ; const
+  loginBackgroundUrl='/auth-assets/background' ; const protectedLoginWatermarkUrl='/auth-assets/watermark' ; const
+  loginBackgroundMimeType=(branding && branding.loginBackgroundMimeType) ? branding.loginBackgroundMimeType
+  : 'video/webm' ; %>
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Login - <%= (branding && branding.appName) ? branding.appName : 'Panel' %></title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha384-nRgPTkuX86pH8yjPJUAFuASXQSSl2/bBUiNV47vSYpKFxHJhbcrGnmlYpYJMeD7a" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link id="favicon" rel="icon" type="image/webp" sizes="16x16"
+    href="<%= (branding && branding.faviconUrl) ? branding.faviconUrl : '/auth-assets/favicon' %>" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+  <% if (loginBackgroundType==='image' && loginBackgroundUrl) { %>
+    <link rel="preload" as="image" href="<%= loginBackgroundUrl %>" fetchpriority="high" />
+  <% } %>
+  <script nonce="<%= cspNonce %>">
+    (function () {
+      const CHRISTMAS_IMG = '/auth-assets/christmas-logo';
+      function isChristmasPeriod() {
+        const now = new Date();
+        const month = now.getMonth();
+        const day = now.getDate();
+        return month === 11 && day >= 25 && day <= 28;
+      }
+      function applyChristmasTheme() {
+        if (!isChristmasPeriod()) return;
+        const favicon = document.getElementById('favicon') || document.querySelector('link[rel="icon"]');
+        if (favicon) favicon.href = CHRISTMAS_IMG;
+        document.querySelectorAll('img').forEach(img => {
+          if (img.src && (img.src.includes('/auth-assets/logo') || img.src.includes('ADPanel-dark.webp') || img.src.includes('i.imgur.com/k5agjYf'))) {
+            img.src = CHRISTMAS_IMG;
+          }
+        });
+      }
+      document.addEventListener('DOMContentLoaded', applyChristmasTheme);
+    })();
+  </script>
+  <style nonce="<%= cspNonce %>">
+    <%- loginCss || "" %>
+
+    *,
+    *::before,
+    *::after {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    img,
+    video,
+    canvas {
+      -webkit-user-drag: none;
+      user-drag: none;
+    }
+
+    <% if (loginBackgroundType === 'image' && loginBackgroundUrl) { %>
+    body.login-body--image {
+      background-image: url(<%- JSON.stringify(String(loginBackgroundUrl)) %>);
+    }
+    <% } %>
+  </style>
+  <script nonce="<%= cspNonce %>">
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('dragstart', e => e.preventDefault());
+    document.addEventListener('selectstart', e => e.preventDefault());
+    document.addEventListener('copy', e => e.preventDefault());
+    document.addEventListener('cut', e => e.preventDefault());
+    document.addEventListener('keydown', e => {
+      if ((e.ctrlKey || e.metaKey) && ['c', 'C', 'a', 'A', 's', 'S', 'u', 'U'].includes(e.key)) e.preventDefault();
+    });
+  </script>
+</head>
+
+  <body class="<%= loginBackgroundType === 'image' && loginBackgroundUrl ? 'login-body--image' : '' %>">
+        <div id="toastHost" class="toast-host" aria-live="polite" aria-atomic="true"></div>
+
+        <script nonce="<%= cspNonce %>">
+          (() => {
+            const msg = <%- JSON.stringify(String(error || "")).replace(/</g, "\\u003c") %>;
+            if (!msg) return;
+
+            const host = document.getElementById("toastHost");
+            if (!host) return;
+
+            function showToast(text, duration = 4500) {
+              const toast = document.createElement("div");
+              toast.className = "toast";
+              toast.innerHTML = `
+        <div class="toast-inner">
+          <div class="toast-msg"></div>
+          <div class="toast-bar"></div>
+        </div>
+              `;
+
+              toast.querySelector(".toast-msg").textContent = text;
+
+              host.appendChild(toast);
+              requestAnimationFrame(() => toast.classList.add("toast-show"));
+
+              const leaveAt = Math.max(0, duration - 320);
+              setTimeout(() => toast.classList.add("toast-hide"), leaveAt);
+              setTimeout(() => toast.remove(), duration + 450);
+            }
+
+            showToast(msg, 4500);
+          })();
+        </script>
+        <% if (loginBackgroundType==='video' ) { %>
+          <video id="bgVideo" autoplay muted loop playsinline preload="metadata" class="video">
+            <source src="<%= loginBackgroundUrl %>" type="<%= loginBackgroundMimeType %>" />
+            Your browser does not support instant-video.
+          </video>
+          <% } %>
+
+            <form method="POST" action="/login" class="login-form">
+              <input type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" hidden>
+              <input type="hidden" name="botProof" id="botProofInput" value="<%= botProofSeed || '' %>" autocomplete="off">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>" autocomplete="off">
+              <div class="input-holder">
+                <i class="input-icon fa-solid fa-envelope" aria-hidden="true"></i>
+                <input class="login-input" type="email" name="email" placeholder="Email" required />
+              </div>
+              <div class="input-holder">
+                <i class="input-icon fa-solid fa-lock" aria-hidden="true"></i>
+                <input class="login-input" type="password" name="password" placeholder="Password" required />
+              </div>
+              <div class="input-holder">
+                <i class="input-icon fa-solid fa-fingerprint" aria-hidden="true"></i>
+                <input class="login-input" type="text" name="code" placeholder="2FA Code" required />
+              </div>
+
+              <input type="hidden" name="captchaToken" id="captchaTokenInput" value="" />
+              <button type="submit" class="get-started">
+                <span>Access</span>
+                <img class="get-started__logo" src="/auth-assets/logo" alt="D Logo" draggable="false" />
+                <span>Panel</span>
+              </button>
+              <a class="forgot-password" href="/forgot-password">Forgot password?</a>
+              <div class="circle-icon">
+                <i class="fa-solid fa-arrow-right-to-bracket circle-icon__glyph"></i>
+              </div>
+            </form>
+
+            <div id="captchaModal" class="captcha-modal<%= (useExternalCaptcha || showLocalCaptcha) ? ' show' : '' %>"
+              data-provider="<%= (externalCaptchaProvider || 'recaptcha').toLowerCase() %>"
+              data-challenge="<%= (useExternalCaptcha || showLocalCaptcha) ? '1' : '0' %>"
+              aria-hidden="<%= (useExternalCaptcha || showLocalCaptcha) ? 'false' : 'true' %>">
+              <div class="captcha-modal__backdrop"></div>
+              <div class="captcha-modal__card">
+                <div class="captcha-modal__title">
+                  <i class="fa-solid fa-shield-halved captcha-modal__title-icon"></i>Security Verification
+                </div>
+                <div class="captcha-modal__desc">Complete the challenge below to continue</div>
+                <div class="captcha-modal__widget">
+                  <div id="recaptchaWidget" hidden></div>
+                  <div id="cf-turnstile" hidden></div>
+                </div>
+                <% if (showLocalCaptcha && captchaQuestion) { %>
+                  <div id="localCaptchaUI" class="local-captcha" data-token="<%= captchaQuestion.token %>"
+                    data-step="<%= captchaQuestion.step %>" data-total="<%= captchaQuestion.total %>">
+                    <div class="local-captcha__prompt" id="captchaPrompt">
+                      <%= captchaQuestion.prompt %>
+                    </div>
+                    <div class="local-captcha__grid" id="captchaGrid">
+                      <% captchaQuestion.images.forEach(function(imgUrl, idx) { %>
+                        <div class="local-captcha__cell" data-idx="<%= idx %>">
+                          <img src="<%= imgUrl %>" alt="captcha image" draggable="false" loading="lazy" />
+                          <div class="local-captcha__check"><i class="fa-solid fa-check"></i></div>
+                        </div>
+                      <% }); %>
+                    </div>
+                    <div class="local-captcha__footer">
+                      <span class="local-captcha__step" id="captchaStep">Step <%= captchaQuestion.step %> of <%= captchaQuestion.total %></span>
+                      <button type="button" id="captchaSubmitLocal" class="local-captcha__submit">Verify</button>
+                    </div>
+                    <div id="captchaLocalStatus" class="local-captcha__status"></div>
+                  </div>
+                <% } %>
+              </div>
+            </div>
+
+            <div class="menu"></div>
+
+            <div class="sign-up-subline">
+              <a class="sign-up-sublines"> and make something special </a>
+            </div>
+
+            <div class="sign-ups">
+              <a class="sign-up-desc"> Securely manage your applications with style </a>
+            </div>
+
+            <div>
+              <a class="sign-up"> Sign in with email </a>
+            </div>
+
+            <div class="watermark" id="watermark">
+              <img
+                src="<%= protectedLoginWatermarkUrl %>"
+                alt="watermark is not available" draggable="false" />
+            </div>
+
+            <script nonce="<%= cspNonce %>">
+              (() => {
+                const cfg = {
+                  enabled: <%- useExternalCaptcha ? "true" : "false" %>,
+                  required: <%- externalCaptchaAutoStart ? "true" : "false" %>,
+                  provider: <%- JSON.stringify((externalCaptchaProvider || "recaptcha").toLowerCase()) %>,
+                  siteKey: <%- JSON.stringify(externalCaptchaSiteKey || "") %>,
+                  hasError: <%- error ? "true" : "false" %>,
+                  showLocal: <%- showLocalCaptcha ? "true" : "false" %>,
+                  challengeActive: <%- (useExternalCaptcha || showLocalCaptcha) ? "true" : "false" %>,
+                };
+
+                const form = document.querySelector("form");
+                const modal = document.getElementById("captchaModal");
+                const tokenInput = document.getElementById("captchaTokenInput");
+                const recaptchaHost = document.getElementById("recaptchaWidget");
+                const turnstileHost = document.getElementById("cf-turnstile");
+                const statusEl = modal ? modal.querySelector(".captcha-modal__desc") : null;
+                const defaultStatusText = statusEl ? statusEl.textContent : "";
+
+                let recaptchaId = null;
+                let turnstileId = null;
+                let started = false;
+                let timeoutHandle = null;
+
+                const disableForm = () => {
+                  if (!form) return;
+                  form.querySelectorAll("input:not([type=hidden]), button[type=submit]").forEach(el => { el.disabled = true; });
+                  form.classList.add("login-form--blocked");
+                };
+
+                const enableForm = () => {
+                  if (!form) return;
+                  form.querySelectorAll("input, button").forEach(el => { el.disabled = false; });
+                  form.classList.remove("login-form--blocked");
+                };
+
+                const showModal = () => {
+                  if (modal) modal.classList.add("show");
+                  disableForm();
+                };
+
+                const hideModal = () => {
+                  if (modal) {
+                    modal.classList.remove("show");
+                    modal.dataset.challenge = "0";
+                  }
+                  enableForm();
+                  if (timeoutHandle) {
+                    clearTimeout(timeoutHandle);
+                    timeoutHandle = null;
+                  }
+                };
+
+                const resetStatus = () => {
+                  if (statusEl) statusEl.textContent = defaultStatusText;
+                };
+
+                const markTimeout = () => {
+                  if (statusEl) {
+                    statusEl.textContent = "Captcha unavailable. Try again.";
+                  }
+                };
+
+                function renderRecaptcha() {
+                  if (!cfg.enabled || recaptchaId !== null) return recaptchaId;
+                  if (!window.grecaptcha || typeof window.grecaptcha.render !== "function") return null;
+                  if (turnstileHost) turnstileHost.hidden = true;
+                  if (recaptchaHost) recaptchaHost.hidden = false;
+                  recaptchaId = window.grecaptcha.render("recaptchaWidget", {
+                    sitekey: cfg.siteKey,
+                    size: "normal",
+                    theme: "dark",
+                    callback: (token) => {
+                      tokenInput.value = token || "";
+                      if (timeoutHandle) { clearTimeout(timeoutHandle); timeoutHandle = null; }
+                      fetch("/api/captcha/verify", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ token }),
+                        credentials: "same-origin",
+                      }).catch(() => { });
+                      hideModal();
+                    },
+                    "expired-callback": () => { tokenInput.value = ""; },
+                    "error-callback": () => { tokenInput.value = ""; },
+                  });
+                  if (timeoutHandle) { clearTimeout(timeoutHandle); timeoutHandle = null; }
+                  resetStatus();
+                  return recaptchaId;
+                }
+
+                function ensureRecaptcha(attempt = 0) {
+                  if (recaptchaId === null) renderRecaptcha();
+                  if (recaptchaId !== null) return;
+                  if (attempt < 50) setTimeout(() => ensureRecaptcha(attempt + 1), 200);
+                }
+
+                function renderTurnstile() {
+                  if (!cfg.enabled || turnstileId !== null) return turnstileId;
+                  if (!window.turnstile || typeof window.turnstile.render !== "function") return null;
+                  if (recaptchaHost) recaptchaHost.hidden = true;
+                  if (turnstileHost) turnstileHost.hidden = false;
+                  turnstileId = window.turnstile.render("#cf-turnstile", {
+                    sitekey: cfg.siteKey,
+                    size: "normal",
+                    theme: "dark",
+                    callback: (token) => {
+                      tokenInput.value = token || "";
+                      if (timeoutHandle) { clearTimeout(timeoutHandle); timeoutHandle = null; }
+                      fetch("/api/captcha/verify", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ token }),
+                        credentials: "same-origin",
+                      }).catch(() => { });
+                      hideModal();
+                    },
+                    "expired-callback": () => { tokenInput.value = ""; },
+                    "error-callback": () => { tokenInput.value = ""; },
+                  });
+                  if (timeoutHandle) { clearTimeout(timeoutHandle); timeoutHandle = null; }
+                  resetStatus();
+                  return turnstileId;
+                }
+
+                function ensureTurnstile(attempt = 0) {
+                  if (turnstileId === null) renderTurnstile();
+                  if (turnstileId !== null) return;
+                  if (attempt < 50) setTimeout(() => ensureTurnstile(attempt + 1), 200);
+                }
+
+                function startCaptchaFlow() {
+                  started = true;
+                  showModal();
+                  resetStatus();
+                  if (timeoutHandle) clearTimeout(timeoutHandle);
+                  timeoutHandle = setTimeout(markTimeout, 30000);
+                  if (["cloudflare", "turnstile", "cf"].includes(cfg.provider)) return ensureTurnstile();
+                  return ensureRecaptcha();
+                }
+
+                if (form) {
+                  form.addEventListener("submit", (e) => {
+                    if (modal && modal.dataset.challenge === "1") {
+                      e.preventDefault();
+                      e.stopImmediatePropagation();
+                      if (cfg.enabled && !tokenInput.value) startCaptchaFlow();
+                      return false;
+                    }
+                    if (cfg.enabled && !tokenInput.value) {
+                      e.preventDefault();
+                      startCaptchaFlow();
+                      return false;
+                    }
+                  }, true);
+                }
+
+                if (cfg.challengeActive) {
+                  disableForm();
+                  if (cfg.enabled && !started) startCaptchaFlow();
+                } else if (cfg.enabled && cfg.required && !started) {
+                  startCaptchaFlow();
+                }
+
+                window.initRecaptcha = function initRecaptcha() {
+                  if (!cfg.enabled) return;
+                  ensureRecaptcha();
+                };
+
+                window.initTurnstile = function initTurnstile() {
+                  if (!cfg.enabled) return;
+                  ensureTurnstile();
+                };
+
+                window.__adCaptchaResolved = hideModal;
+              })();
+            </script>
+            <% if (useExternalCaptcha) { %>
+              <% if (["cloudflare","turnstile","cf"].includes((externalCaptchaProvider || "" ).toLowerCase())) { %>
+                <script nonce="<%= cspNonce %>"
+                  src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=initTurnstile&render=explicit" async
+                  defer></script>
+                <% } else { %>
+                  <script nonce="<%= cspNonce %>"
+                    src="https://www.google.com/recaptcha/api.js?onload=initRecaptcha&render=explicit" async
+                  defer></script>
+                <% } %>
+                    <% } %>
+
+                      <% if (showLocalCaptcha && captchaQuestion) { %>
+                        <script nonce="<%= cspNonce %>">
+                          (function () {
+                            var grid = document.getElementById("captchaGrid");
+                            var submitBtn = document.getElementById("captchaSubmitLocal");
+                            var statusEl = document.getElementById("captchaLocalStatus");
+                            var localUI = document.getElementById("localCaptchaUI");
+                            var promptEl = document.getElementById("captchaPrompt");
+                            var stepEl = document.getElementById("captchaStep");
+                            if (!grid || !submitBtn || !localUI) return;
+
+                            var selected = new Set();
+
+                            function setLocalStatus(message, state) {
+                              if (!statusEl) return;
+                              statusEl.textContent = message || "";
+                              statusEl.dataset.state = state || "";
+                            }
+
+                            grid.addEventListener("click", function (e) {
+                              var cell = e.target.closest(".local-captcha__cell");
+                              if (!cell) return;
+                              var idx = parseInt(cell.dataset.idx, 10);
+                              if (isNaN(idx)) return;
+                              if (selected.has(idx)) {
+                                selected.delete(idx);
+                                cell.classList.remove("selected");
+                              } else {
+                                selected.add(idx);
+                                cell.classList.add("selected");
+                              }
+                            });
+
+                            submitBtn.addEventListener("click", function () {
+                              if (selected.size === 0) {
+                                setLocalStatus("Select at least one image", "error");
+                                return;
+                              }
+
+                              var token = localUI.dataset.token;
+                              submitBtn.disabled = true;
+                              setLocalStatus("Verifying...", "muted");
+
+                              fetch("/api/captcha/local", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                credentials: "same-origin",
+                                body: JSON.stringify({ action: "verify", token: token, selection: Array.from(selected) }),
+                              })
+                                .then(function (resp) { return resp.json(); })
+                                .then(function (data) {
+                                  if (data.ok && data.done) {
+                                    setLocalStatus("Verified!", "success");
+                                    if (typeof window.__adCaptchaResolved === "function") window.__adCaptchaResolved();
+                                    return;
+                                  }
+                                  if (data.ok && !data.done && data.question) {
+                                    selected.clear();
+                                    rebuildGrid(data.question);
+                                    setLocalStatus("", "");
+                                    submitBtn.disabled = false;
+                                    return;
+                                  }
+                                  setLocalStatus(data.error === "expired" ? "Expired. Reloading..." : "Incorrect selection. Reloading...", "error");
+                                  setTimeout(function () { window.location.reload(); }, 1800);
+                                })
+                                .catch(function () {
+                                  setLocalStatus("Network error. Retrying...", "error");
+                                  setTimeout(function () { window.location.reload(); }, 2000);
+                                });
+                            });
+
+                            function rebuildGrid(question) {
+                              localUI.dataset.token = question.token;
+                              localUI.dataset.step = String(question.step);
+                              localUI.dataset.total = String(question.total);
+                              if (promptEl) promptEl.textContent = question.prompt;
+                              if (stepEl) stepEl.textContent = "Step " + question.step + " of " + question.total;
+                              grid.innerHTML = "";
+                              (question.images || []).forEach(function (imgUrl, idx) {
+                                var cell = document.createElement("div");
+                                cell.className = "local-captcha__cell";
+                                cell.dataset.idx = String(idx);
+                                var img = document.createElement("img");
+                                img.src = imgUrl;
+                                img.alt = "captcha image";
+                                img.draggable = false;
+                                img.loading = "lazy";
+                                var check = document.createElement("div");
+                                check.className = "local-captcha__check";
+                                check.innerHTML = '<i class="fa-solid fa-check"></i>';
+                                cell.appendChild(img);
+                                cell.appendChild(check);
+                                grid.appendChild(cell);
+                              });
+                            }
+                          })();
+                        </script>
+                      <% } %>
+
+                      <script nonce="<%= cspNonce %>">
+                        document.addEventListener("DOMContentLoaded", () => {
+                          const form = document.querySelector("form");
+                          const videoEl = document.getElementById("bgVideo");
+                          if (!videoEl) return;
+
+                          const tryPlay = () => {
+                            const p = videoEl.play();
+                            if (p && typeof p.then === "function") {
+                              p.catch(() => {
+                              });
+                            }
+                          };
+
+                          videoEl.addEventListener(
+                            "canplay",
+                            () => {
+                              tryPlay();
+                            },
+                            { once: true }
+                          );
+
+                          const resumeOnUserGesture = () => {
+                            tryPlay();
+                            window.removeEventListener("click", resumeOnUserGesture);
+                            window.removeEventListener("keydown", resumeOnUserGesture);
+                            window.removeEventListener("touchstart", resumeOnUserGesture);
+                          };
+
+                          window.addEventListener("click", resumeOnUserGesture);
+                          window.addEventListener("keydown", resumeOnUserGesture);
+                          window.addEventListener("touchstart", resumeOnUserGesture);
+
+                          videoEl.addEventListener("error", () => {
+                          });
+                        });
+                      </script>
+
+                          <script nonce="<%= cspNonce %>">
+                            (function () {
+                              var challengeActive = <%- (showLocalCaptcha || (useExternalCaptcha && externalCaptchaAutoStart)) ? "true" : "false" %>;
+                              if (!challengeActive) return;
+
+                              var modal = document.getElementById("captchaModal");
+                              var form = document.querySelector("form");
+                              if (!modal) return;
+
+                              if (form) {
+                                form.addEventListener("submit", function (e) {
+                                  if (modal.dataset.challenge === "1") {
+                                    e.preventDefault();
+                                    e.stopImmediatePropagation();
+                                    return false;
+                                  }
+                                }, true);
+                              }
+
+                              var restoring = false;
+                              var observer = new MutationObserver(function () {
+                                if (restoring) return;
+                                var m = document.getElementById("captchaModal");
+                                if (!m) {
+                                  restoring = true;
+                                  window.location.reload();
+                                  return;
+                                }
+                                if (m.dataset.challenge === "0") return;
+                                if (!m.classList.contains("show")) m.classList.add("show");
+                                var st = m.getAttribute("style") || "";
+                                if (st && (st.indexOf("display") !== -1 || st.indexOf("visibility") !== -1 || st.indexOf("opacity") !== -1)) {
+                                  m.removeAttribute("style");
+                                }
+                              });
+
+                              observer.observe(document.documentElement, {
+                                childList: true,
+                                subtree: true,
+                                attributes: true,
+                                attributeFilter: ["class", "style", "hidden"],
+                              });
+
+                              var integrityInterval = setInterval(function () {
+                                var m = document.getElementById("captchaModal");
+                                if (!m) {
+                                  clearInterval(integrityInterval);
+                                  window.location.reload();
+                                  return;
+                                }
+                                if (m.dataset.challenge === "0") {
+                                  clearInterval(integrityInterval);
+                                  observer.disconnect();
+                                  return;
+                                }
+                                if (!m.classList.contains("show")) m.classList.add("show");
+                                var cs = getComputedStyle(m);
+                                if (cs.display === "none" || cs.visibility === "hidden" || parseFloat(cs.opacity) < 0.5) {
+                                  m.removeAttribute("style");
+                                  m.classList.add("show");
+                                }
+                                if (form && m.dataset.challenge === "1") {
+                                  form.classList.add("login-form--blocked");
+                                }
+                              }, 800);
+
+                              try {
+                                var origRemove = modal.remove;
+                                Object.defineProperty(modal, "remove", {
+                                  value: function () {
+                                    if (modal.dataset.challenge === "1") return;
+                                    return origRemove.call(this);
+                                  },
+                                  writable: false,
+                                  configurable: false,
+                                });
+                              } catch (ex) { }
+
+                              try {
+                                var origSetAttr = modal.setAttribute.bind(modal);
+                                modal.setAttribute = function (name, value) {
+                                  if (modal.dataset.challenge !== "1") return origSetAttr(name, value);
+                                  if (name === "style" && typeof value === "string" && (/display\s*:\s*none|visibility\s*:\s*hidden|opacity\s*:\s*0/i).test(value)) return;
+                                  if (name === "class" && typeof value === "string" && !value.includes("show")) return;
+                                  if (name === "hidden") return;
+                                  return origSetAttr(name, value);
+                                };
+                              } catch (ex) { }
+
+                              modal.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+                            })();
+                          </script>
+
+                          </body>
+
+</html>

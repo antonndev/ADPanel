@@ -1,0 +1,270 @@
+{
+  "providers": [
+    {
+      "id": "vanilla",
+      "name": "Vanilla",
+      "description": "Vanilla Minecraft with no features",
+      "logo": "https://cdn.freebiesupply.com/logos/large/2x/minecraft-1-logo-png-transparent.png",
+      "versions": []
+    },
+    {
+      "id": "papermc",
+      "name": "PaperMC",
+      "description": "Fast, highly optimized Spigot fork with great plugin compatibility.",
+      "logo": "https://assets.papermc.io/brand/papermc_logo.256.png",
+      "versions": []
+    },
+    {
+      "id": "pufferfish",
+      "name": "Pufferfish",
+      "description": "A fork optimized to work on well on every host.",
+      "logo": "https://s3-eu-west-1.amazonaws.com/tpd/logos/615d0e460899bf001dd4eacb/0x0.png",
+      "versions": [
+        {
+          "id": "pufferfish-1.21.8",
+          "name": "1.21.8",
+          "label": "Pufferfish 1.21.8",
+          "mcVersion": "1.21.8",
+          "releaseDate": "2025-09-14",
+          "tags": [
+            "STABLE",
+            "OPTIMIZED"
+          ],
+          "url": "https://ci.pufferfish.host/job/Pufferfish-1.21/33/artifact/pufferfish-server/build/libs/pufferfish-paperclip-1.21.8-R0.1-SNAPSHOT-mojmap.jar"
+        },
+        {
+          "id": "pufferfish-1.20.4",
+          "name": "1.20.4",
+          "label": "Pufferfish 1.20.4",
+          "mcVersion": "1.20.4",
+          "releaseDate": "2024-07-06",
+          "tags": [
+            "STABLE",
+            "OPTIMIZED"
+          ],
+          "url": "https://ci.pufferfish.host/job/Pufferfish-1.20/52/artifact/build/libs/pufferfish-paperclip-1.20.4-R0.1-SNAPSHOT-reobf.jar"
+        },
+        {
+          "id": "pufferfish-1.19.4",
+          "name": "1.19.4",
+          "label": "Pufferfish 1.19.4",
+          "mcVersion": "1.19.4",
+          "releaseDate": "2023-06-06",
+          "tags": [
+            "STABLE",
+            "OPTIMIZED"
+          ],
+          "url": "https://ci.pufferfish.host/job/Pufferfish-1.19/73/artifact/build/libs/pufferfish-paperclip-1.19.4-R0.1-SNAPSHOT-reobf.jar"
+        },
+        {
+          "id": "pufferfish-1.18.2",
+          "name": "1.18.2",
+          "label": "Pufferfish 1.18.2",
+          "mcVersion": "1.18.2",
+          "releaseDate": "2022-06-18",
+          "tags": [
+            "STABLE",
+            "OPTIMIZED"
+          ],
+          "url": "https://ci.pufferfish.host/job/Pufferfish-1.18/72/artifact/build/libs/pufferfish-paperclip-1.18.2-R0.1-SNAPSHOT-reobf.jar"
+        },
+        {
+          "id": "pufferfish-1.17.1",
+          "name": "1.17.1",
+          "label": "Pufferfish 1.17.1",
+          "mcVersion": "1.17.1",
+          "releaseDate": "2022-02-02",
+          "tags": [
+            "STABLE",
+            "OPTIMIZED"
+          ],
+          "url": "https://ci.pufferfish.host/job/Pufferfish-1.17/22/artifact/build/libs/Pufferfish-1.17.1-R0.1-SNAPSHOT.jar"
+        }
+      ]
+    },
+    {
+      "id": "purpur",
+      "name": "Purpur",
+      "description": "A fork of PaperMC but with more options.",
+      "logo": "https://purpurmc.org/docs/images/purpur-small.png",
+      "versions": [
+        {
+          "id": "purpur-1.20.4",
+          "name": "1.20.4",
+          "label": "Purpur 1.20.4",
+          "mcVersion": "1.20.4",
+          "releaseDate": "2024-03-01",
+          "tags": [
+            "latest",
+            "feature-rich"
+          ],
+          "url": "https://api.purpurmc.org/v2/purpur/1.20.4/latest/download"
+        }
+      ]
+    },
+    {
+      "id": "velocity",
+      "name": "Velocity",
+      "description": "A stable way for your proxy and very secure",
+      "logo": "https://assets.papermc.io/brand/velocity_logo_blue.min.svg",
+      "versions": []
+    },
+    {
+      "id": "waterfall",
+      "name": "Waterfall",
+      "description": "A Bungeecord fork from PaperMC",
+      "logo": "https://static.vecteezy.com/system/resources/previews/009/663/548/non_2x/water-drop-icon-transparent-free-png.png",
+      "versions": []
+    },
+    {
+      "id": "folia",
+      "name": "Folia",
+      "description": "A fork of PaperMC optimized for high performance",
+      "logo": "https://files.catbox.moe/4b3qex.png",
+      "versions": []
+    },
+    {
+      "id": "leaves",
+      "name": "Leaves",
+      "description": "A fork of PaperMC balanced in features and performance",
+      "logo": "https://docs.leavesmc.org/logo.svg",
+      "versions": []
+    },
+    {
+      "id": "nukkit",
+      "name": "Nukkit",
+      "description": "The main platform for bedrock servers",
+      "logo": "https://avatars.githubusercontent.com/u/12780190?s=200&v=4",
+      "versions": [
+        {
+          "id": "nukkit",
+          "name": "Nukkit",
+          "label": "Nukkit",
+          "mcVersion": "Newest",
+          "releaseDate": "",
+          "tags": [
+            "LATEST",
+            "BEDROCK"
+          ],
+          "url": "https://repo.opencollab.dev/api/maven/latest/file/maven-snapshots/cn/nukkit/nukkit/1.0-SNAPSHOT?extension=jar"
+        }
+      ]
+    },
+    {
+      "id": "spigot",
+      "name": "SpigotMC",
+      "description": "The official SpigotMC jar with basic features",
+      "logo": "https://avatars.githubusercontent.com/u/4350249?s=200&v=4",
+      "versions": []
+    },
+    {
+      "id": "nodejs",
+      "template": "discord-bot",
+      "name": "Node.js",
+      "description": "Official Node.js images for Discord bots.",
+      "logo": "https://nodejs.org/static/images/logo.svg",
+      "versions": [
+        {
+          "id": "node-18",
+          "name": "18",
+          "label": "Node.js 18 (LTS)",
+          "releaseDate": "2024-04-23",
+          "tags": [
+            "LTS"
+          ],
+          "docker": {
+            "image": "node",
+            "tag": "18-alpine",
+            "command": "node /app/index.js"
+          },
+          "start": "index.js"
+        },
+        {
+          "id": "node-20",
+          "name": "20",
+          "label": "Node.js 20 (Active LTS)",
+          "releaseDate": "2024-10-08",
+          "tags": [
+            "LTS",
+            "RECOMMENDED"
+          ],
+          "docker": {
+            "image": "node",
+            "tag": "20-alpine",
+            "command": "node /app/index.js"
+          },
+          "start": "index.js"
+        },
+        {
+          "id": "node-22",
+          "name": "22",
+          "label": "Node.js 22 (Current)",
+          "releaseDate": "2025-04-23",
+          "tags": [
+            "LATEST"
+          ],
+          "docker": {
+            "image": "node",
+            "tag": "22-alpine",
+            "command": "node /app/index.js"
+          },
+          "start": "index.js"
+        }
+      ]
+    },
+    {
+      "id": "python",
+      "template": "discord-bot",
+      "name": "Python",
+      "description": "With this you can run any project based on Python.",
+      "logo": "https://files.catbox.moe/shq5gp.webp",
+      "versions": [
+        {
+          "id": "python-3.10",
+          "name": "3.10",
+          "label": "Python 3.10",
+          "releaseDate": "2023-12-05",
+          "tags": [
+            "LTS"
+          ],
+          "docker": {
+            "image": "python",
+            "tag": "3.10-slim",
+            "command": "python /app/main.py"
+          },
+          "start": "main.py"
+        },
+        {
+          "id": "python-3.11",
+          "name": "3.11",
+          "label": "Python 3.11",
+          "releaseDate": "2024-10-01",
+          "tags": [
+            "STABLE"
+          ],
+          "docker": {
+            "image": "python",
+            "tag": "3.11-slim",
+            "command": "python /app/main.py"
+          },
+          "start": "main.py"
+        },
+        {
+          "id": "python-3.12",
+          "name": "3.12",
+          "label": "Python 3.12",
+          "releaseDate": "2025-02-25",
+          "tags": [
+            "LATEST"
+          ],
+          "docker": {
+            "image": "python",
+            "tag": "3.12-slim",
+            "command": "python /app/main.py"
+          },
+          "start": "main.py"
+        }
+      ]
+    }
+  ]
+}

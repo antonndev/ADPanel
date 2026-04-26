@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= (branding && branding.appName) ? branding.appName : 'ADPanel' %> - Not Found</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="icon" type="image/webp" href="<%= (branding && branding.faviconUrl) ? branding.faviconUrl : '/auth-assets/favicon' %>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha384-nRgPTkuX86pH8yjPJUAFuASXQSSl2/bBUiNV47vSYpKFxHJhbcrGnmlYpYJMeD7a" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <style nonce="<%= cspNonce %>">
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+            background: #0a0c10;
+            color: #fff;
+            overflow: hidden;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        img {
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-drag: none;
+            pointer-events: none;
+        }
+
+        .page-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .grid-pattern {
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, transparent 70%);
+            top: 20%;
+            left: 10%;
+        }
+
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 70%);
+            bottom: 10%;
+            right: 15%;
+        }
+
+        .orb-3 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.06) 0%, transparent 70%);
+            top: 60%;
+            left: 60%;
+        }
+
+        .geo-shape {
+            position: fixed;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .geo-1 {
+            width: 200px;
+            height: 200px;
+            border-radius: 24px;
+            top: 15%;
+            right: 20%;
+            transform: rotate(15deg);
+        }
+
+        .geo-2 {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            bottom: 25%;
+            left: 15%;
+        }
+
+        .geo-3 {
+            width: 80px;
+            height: 80px;
+            border-radius: 16px;
+            top: 70%;
+            right: 10%;
+            transform: rotate(-20deg);
+        }
+
+        .geo-4 {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            top: 30%;
+            left: 8%;
+            background: rgba(99, 102, 241, 0.03);
+        }
+
+        .header {
+            padding: 32px 0 0 48px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header-logo {
+            width: 65px;
+            height: auto;
+            pointer-events: auto;
+        }
+
+        .header a {
+            display: inline-block;
+            pointer-events: auto;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 40px;
+            margin-top: -60px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .error-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .error-code {
+            font-size: 220px;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -0.06em;
+            position: relative;
+            display: inline-block;
+            background: linear-gradient(to top,
+                    rgba(255, 255, 255, 1) 0%,
+                    rgba(255, 255, 255, 1) 10%,
+                    rgba(255, 255, 255, 0.4) 30%,
+                    rgba(255, 255, 255, 0) 80%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .error-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 16px;
+            margin-bottom: 32px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 14px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+            pointer-events: auto;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.05);
+            opacity: 0.95;
+        }
+
+        .back-btn:active {
+            transform: scale(0.98);
+        }
+
+        .back-btn i {
+            font-size: 16px;
+        }
+
+        .deco-line {
+            position: fixed;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.03), transparent);
+            height: 1px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .deco-line-1 {
+            width: 40%;
+            top: 30%;
+            left: 0;
+        }
+
+        .deco-line-2 {
+            width: 30%;
+            bottom: 35%;
+            right: 0;
+        }
+
+        .deco-line-3 {
+            width: 25%;
+            top: 65%;
+            left: 10%;
+        }
+
+        .corner-accent {
+            position: fixed;
+            width: 100px;
+            height: 100px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .corner-accent-tl {
+            top: 0;
+            left: 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            border-left: 1px solid rgba(255, 255, 255, 0.03);
+            border-top-left-radius: 20px;
+        }
+
+        .corner-accent-br {
+            bottom: 0;
+            right: 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            border-right: 1px solid rgba(255, 255, 255, 0.03);
+            border-bottom-right-radius: 20px;
+        }
+
+        body {
+            -webkit-touch-callout: none;
+        }
+    </style>
+</head>
+
+<body oncontextmenu="return false;">
+    <div class="grid-pattern"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="geo-shape geo-1"></div>
+    <div class="geo-shape geo-2"></div>
+    <div class="geo-shape geo-3"></div>
+    <div class="geo-shape geo-4"></div>
+    <div class="deco-line deco-line-1"></div>
+    <div class="deco-line deco-line-2"></div>
+    <div class="deco-line deco-line-3"></div>
+    <div class="corner-accent corner-accent-tl"></div>
+    <div class="corner-accent corner-accent-br"></div>
+
+    <div class="page-container">
+        <header class="header">
+            <a href="/">
+                <img src="https://cdn.jsdelivr.net/gh/antonndev/ADCDn/adpanel-dark.webp" alt="ADPanel" class="header-logo"
+                    draggable="false">
+            </a>
+        </header>
+
+        <main class="main-content">
+            <div class="error-wrapper">
+                <div class="error-code">404</div>
+                <div class="error-title">Not Found</div>
+                <a href="/" class="back-btn">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Back to Dashboard</span>
+                </a>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>
